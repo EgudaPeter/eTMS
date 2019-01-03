@@ -1,0 +1,169 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="eTMSModelStoreContainer" CdmEntityContainer="eTMSEntities">
+    <EntitySetMapping Name="AccountTables">
+      <EntityTypeMapping TypeName="eTMSModel.AccountTable">
+        <MappingFragment StoreEntitySet="AccountTable">
+          <ScalarProperty Name="Comments" ColumnName="Comments" />
+          <ScalarProperty Name="CapturedDate" ColumnName="CapturedDate" />
+          <ScalarProperty Name="CapturedBy" ColumnName="CapturedBy" />
+          <ScalarProperty Name="AmountInAccount" ColumnName="AmountInAccount" />
+          <ScalarProperty Name="BankName" ColumnName="BankName" />
+          <ScalarProperty Name="AccountName" ColumnName="AccountName" />
+          <ScalarProperty Name="AccountNumber" ColumnName="AccountNumber" />
+          <ScalarProperty Name="AccountID" ColumnName="AccountID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="DealerTables">
+      <EntityTypeMapping TypeName="eTMSModel.DealerTable">
+        <MappingFragment StoreEntitySet="DealerTable">
+          <ScalarProperty Name="Comments" ColumnName="Comments" />
+          <ScalarProperty Name="CapturedDate" ColumnName="CapturedDate" />
+          <ScalarProperty Name="CapturedBy" ColumnName="CapturedBy" />
+          <ScalarProperty Name="DealerName" ColumnName="DealerName" />
+          <ScalarProperty Name="DealerID" ColumnName="DealerID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="TransactionTypeTables">
+      <EntityTypeMapping TypeName="eTMSModel.TransactionTypeTable">
+        <MappingFragment StoreEntitySet="TransactionTypeTable">
+          <ScalarProperty Name="Type" ColumnName="Type" />
+          <ScalarProperty Name="TID" ColumnName="TID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Banks">
+      <EntityTypeMapping TypeName="eTMSModel.Bank">
+        <MappingFragment StoreEntitySet="Banks">
+          <ScalarProperty Name="HQRSortCode" ColumnName="HQRSortCode" />
+          <ScalarProperty Name="BankCode" ColumnName="BankCode" />
+          <ScalarProperty Name="SwitchCode" ColumnName="SwitchCode" />
+          <ScalarProperty Name="BankGlActNo" ColumnName="BankGlActNo" />
+          <ScalarProperty Name="OpenAccount" ColumnName="OpenAccount" />
+          <ScalarProperty Name="ID_State" ColumnName="ID_State" />
+          <ScalarProperty Name="Address02" ColumnName="Address02" />
+          <ScalarProperty Name="Address01" ColumnName="Address01" />
+          <ScalarProperty Name="BankName" ColumnName="BankName" />
+          <ScalarProperty Name="ID_Bank" ColumnName="ID_Bank" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="TransactionTables">
+      <EntityTypeMapping TypeName="eTMSModel.TransactionTable">
+        <MappingFragment StoreEntitySet="TransactionTable">
+          <ScalarProperty Name="Bank" ColumnName="Bank" />
+          <ScalarProperty Name="FID" ColumnName="FID" />
+          <ScalarProperty Name="Comments" ColumnName="Comments" />
+          <ScalarProperty Name="Narration" ColumnName="Narration" />
+          <ScalarProperty Name="PaymentMode" ColumnName="PaymentMode" />
+          <ScalarProperty Name="CapturedBy" ColumnName="CapturedBy" />
+          <ScalarProperty Name="CapturedDate" ColumnName="CapturedDate" />
+          <ScalarProperty Name="DealerID" ColumnName="DealerID" />
+          <ScalarProperty Name="EffectiveDate" ColumnName="EffectiveDate" />
+          <ScalarProperty Name="AccountID" ColumnName="AccountID" />
+          <ScalarProperty Name="AmountOutstanding" ColumnName="AmountOutstanding" />
+          <ScalarProperty Name="AmountPaid" ColumnName="AmountPaid" />
+          <ScalarProperty Name="TID" ColumnName="TID" />
+          <ScalarProperty Name="TransactionID" ColumnName="TransactionID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="TransactionFactorTables">
+      <EntityTypeMapping TypeName="eTMSModel.TransactionFactorTable">
+        <MappingFragment StoreEntitySet="TransactionFactorTable">
+          <ScalarProperty Name="Comments" ColumnName="Comments" />
+          <ScalarProperty Name="CapturedDate" ColumnName="CapturedDate" />
+          <ScalarProperty Name="CapturedBy" ColumnName="CapturedBy" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="FID" ColumnName="FID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="GsmValidators">
+      <EntityTypeMapping TypeName="eTMSModel.GsmValidator">
+        <MappingFragment StoreEntitySet="GsmValidator">
+          <ScalarProperty Name="GsmNoLenght" ColumnName="GsmNoLenght" />
+          <ScalarProperty Name="Gsm1st3Digits" ColumnName="Gsm1st3Digits" />
+          <ScalarProperty Name="ProviderCode" ColumnName="ProviderCode" />
+          <ScalarProperty Name="ID_GsmFormat" ColumnName="ID_GsmFormat" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Debtors">
+      <EntityTypeMapping TypeName="eTMSModel.Debtor">
+        <MappingFragment StoreEntitySet="Debtors">
+          <ScalarProperty Name="Status" ColumnName="Status" />
+          <ScalarProperty Name="EffectiveDate" ColumnName="EffectiveDate" />
+          <ScalarProperty Name="Amount" ColumnName="Amount" />
+          <ScalarProperty Name="DeptorName" ColumnName="DeptorName" />
+          <ScalarProperty Name="TransactionID" ColumnName="TransactionID" />
+          <ScalarProperty Name="DebtorID" ColumnName="DebtorID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Debts">
+      <EntityTypeMapping TypeName="eTMSModel.Debt">
+        <MappingFragment StoreEntitySet="Debts">
+          <ScalarProperty Name="Status" ColumnName="Status" />
+          <ScalarProperty Name="EffectiveDate" ColumnName="EffectiveDate" />
+          <ScalarProperty Name="Amount" ColumnName="Amount" />
+          <ScalarProperty Name="DeptName" ColumnName="DeptName" />
+          <ScalarProperty Name="TransactionID" ColumnName="TransactionID" />
+          <ScalarProperty Name="DebtID" ColumnName="DebtID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ProfitAndLosses">
+      <EntityTypeMapping TypeName="eTMSModel.ProfitAndLoss">
+        <MappingFragment StoreEntitySet="ProfitAndLoss">
+          <ScalarProperty Name="Loss" ColumnName="Loss" />
+          <ScalarProperty Name="Profit" ColumnName="Profit" />
+          <ScalarProperty Name="CapturedDate" ColumnName="CapturedDate" />
+          <ScalarProperty Name="CapturedYear" ColumnName="CapturedYear" />
+          <ScalarProperty Name="CapturedMonth" ColumnName="CapturedMonth" />
+          <ScalarProperty Name="CapturedDay" ColumnName="CapturedDay" />
+          <ScalarProperty Name="TotalIncome" ColumnName="TotalIncome" />
+          <ScalarProperty Name="TotalExpense" ColumnName="TotalExpense" />
+          <ScalarProperty Name="TotalTransactionAmount" ColumnName="TotalTransactionAmount" />
+          <ScalarProperty Name="PLID" ColumnName="PLID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="EventLogs">
+      <EntityTypeMapping TypeName="eTMSModel.EventLog">
+        <MappingFragment StoreEntitySet="EventLogs">
+          <ScalarProperty Name="ExecutionDate" ColumnName="ExecutionDate" />
+          <ScalarProperty Name="Executioner" ColumnName="Executioner" />
+          <ScalarProperty Name="Event" ColumnName="Event" />
+          <ScalarProperty Name="EventType" ColumnName="EventType" />
+          <ScalarProperty Name="EventID" ColumnName="EventID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Setups">
+      <EntityTypeMapping TypeName="eTMSModel.Setup">
+        <MappingFragment StoreEntitySet="Setups">
+          <ScalarProperty Name="EnableWeekendProfitAndLossAnalysis" ColumnName="EnableWeekendProfitAndLossAnalysis" />
+          <ScalarProperty Name="MonthOfOperation" ColumnName="MonthOfOperation" />
+          <ScalarProperty Name="SetUpID" ColumnName="SetUpID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Annuals">
+      <EntityTypeMapping TypeName="eTMSModel.Annual">
+        <MappingFragment StoreEntitySet="Annual">
+          <ScalarProperty Name="Loss" ColumnName="Loss" />
+          <ScalarProperty Name="Profit" ColumnName="Profit" />
+          <ScalarProperty Name="TotalIncome" ColumnName="TotalIncome" />
+          <ScalarProperty Name="TotalExpense" ColumnName="TotalExpense" />
+          <ScalarProperty Name="TotalTransactionAmount" ColumnName="TotalTransactionAmount" />
+          <ScalarProperty Name="Year" ColumnName="Year" />
+          <ScalarProperty Name="Month" ColumnName="Month" />
+          <ScalarProperty Name="AID" ColumnName="AID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping>

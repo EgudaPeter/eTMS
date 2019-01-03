@@ -1,0 +1,33 @@
+﻿@using System.Web.UI.WebControls
+
+@{
+    ViewBag.Title = "Home";
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+}
+
+<div class="panel panel-default">
+
+    <div class="panel-heading nopadding">
+        <div class="row nomargin">
+            <div class="col-md-12 padding5">
+                <div class="col-md-2">
+                    <h4 class="titleStyle">HOME</h4>
+                </div>
+                <div class="col-md-10 action-wrap">
+                    <div class="form-inline">
+                        <div class="form-group pull-right">
+                            <div class="form-group">
+                            </div>
+                        </div>
+                    </div><!--/form-inline-->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-body" style="background-color:#ffffff !important;">
+        <img width='@Unit.Percentage(100)' style="height:300px" src="@Url.Content("~/Images/etmsHome2.jpg")" /> 
+        <h1 style="text-align:center; font-weight:900; font-size:xx-large"><img style="width:90px" src="@Url.Content("~/Images/eTMSLogo.png")"/> eTMS - Evolution</h1>
+    </div>
+</div>
+

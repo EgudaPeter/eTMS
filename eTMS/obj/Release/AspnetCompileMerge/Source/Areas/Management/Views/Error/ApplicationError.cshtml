@@ -1,0 +1,25 @@
+﻿
+@{
+    ViewBag.Title = "ApplicationError";
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+}
+
+<div class="panel panel-default">
+
+    <div class="panel-heading nopadding">
+        <div class="row nomargin">
+            <div class="col-md-12 padding5">
+                <div class="col-md-2">
+                    <h4 class="titleStyle">APPLICATION ERROR</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-body" style="background-color:#ffffff !important;">
+       <h1>Not found</h1><br />
+        <br />
+        <h2>Error Message : @ViewBag.ErrorMessage</h2>
+    </div>
+</div>
+

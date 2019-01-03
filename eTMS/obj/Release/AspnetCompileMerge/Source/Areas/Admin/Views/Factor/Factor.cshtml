@@ -1,0 +1,603 @@
+﻿@model eTMS.BusinessObjectLayer.TransactionFactorTable
+
+@using System.Web.UI.WebControls
+
+@{
+    ViewBag.Title = "Factors";
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+}
+
+<script>
+    var getID;
+    var selectedIDs;
+    var oldFactorName = null;
+
+    var stopSubmitBecauseFactorNameFlagged = false;
+    var stopSubmitBecauseEditedFactorNameFlagged = false;
+
+    var editedFactorNameFlaggedErrorMessage = null;
+    var factorNameFlaggedErrorMessage = null; //Global Variables
+
+    /*******************************Add Factor*********************************************/
+
+    function promptUserBeforeSavingFactor() {
+        swal({
+            title: 'Confirm?',
+            html: 'Save record?',
+            type: 'info',
+            showCancelButton: true,
+            confirmButtonClass: 'btn btn-info',
+            cancelButtonClass: 'btn btn-primary',
+            confirmButtonText: '<i class="fa fa-thumbs-up"></i> Save',
+            cancelButtonText: '<i class="fa fa-thumbs-down"></i> Cancel',
+            allowOutsideClick: false
+        }).then(function () {
+            var result = ValidateFactorForm();
+            if (result == true) {
+                $('#addFactor').modal("hide");
+                return saveFactor();
+            }
+            if (result == false) {
+                var infoMsg = "Please specify an <b>Factor name</b> before progressing to save record!";
+                swal({
+                    title: 'Warning!',
+                    html: infoMsg,
+                    type: 'warning'
+                });
+                return;
+            }
+            if (result == -1) {
+                return;
+            }
+        });
+    }
+
+    function promptUserBeforeClosingFactorModal() {
+        swal({
+            title: 'Are you sure?',
+            html: 'Inputs will be lost',
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonClass: 'btn btn-info',
+            cancelButtonClass: 'btn btn-primary',
+            confirmButtonText: '<i class="fa fa-thumbs-up"></i> Okay',
+            cancelButtonText: '<i class="fa fa-thumbs-down"></i> Cancel',
+            allowOutsideClick: false
+        }).then(function () {
+            stopSubmitBecauseFactorNameFlagged = false;
+            $('#addFactor').modal("hide");
+        });
+    }
+
+    function ValidateFactorForm() {
+        var factorName = FactorName.GetValue();
+        if (stopSubmitBecauseFactorNameFlagged == true) {
+            swal({
+                title: 'Warning!',
+                html: factorNameFlaggedErrorMessage,
+                type: 'warning'
+            });
+            return -1;
+        }
+        if (factorName != null) {
+            return true;
+        }
+        return false;
+    }
+
+    function DisplayFactorForm() {
+        FactorName.SetValue(null);
+        $('#addFactor').modal({ backdrop: 'static', keyboard: false });
+        $('#addFactor').modal("show");
+    }
+
+    function ValidateUniquenessOfFactorName() {
+        var factorName = FactorName.GetValue();
+        if (factorName == null) {
+            stopSubmitBecauseFactorNameFlagged = false;
+            return;
+        }
+        $.ajax({
+            url: '@Url.Action("ValidateUniquenessOfFactorName", "Factor",new { Area = "Admin" })',
+            type: 'Post',
+            data: { fName: factorName },
+            success: function (data) {
+                if (data.success == true) {
+                    stopSubmitBecauseFactorNameFlagged = false;
+                    return;
+                }
+                if (data.success == false) {
+                    stopSubmitBecauseFactorNameFlagged = true;
+                    factorNameFlaggedErrorMessage = data.infoMessage;
+                    swal({
+                        title: 'Warning!',
+                        html: factorNameFlaggedErrorMessage,
+                        type: 'warning'
+                    });
+                    return;
+                }
+                if (data.success == -1) {
+                    swal({
+                        title: 'Error!',
+                        html: data.errorMessage,
+                        type: 'error'
+                    });
+                    return;
+                }
+            }
+        });
+    } //Validate Uniqueness Of FactorName
+
+    function saveFactor() {
+        SiteUtils.loading("Saving...");
+        dataArray = {
+            Name: FactorName.GetValue()
+        }
+        $.ajax({
+            url: '@Url.Action("AddFactor", "Factor", new { Area = "Admin" })',
+            type: 'Post',
+            data: { Data: dataArray },
+            success: function (data) {
+                SiteUtils.loadingOff();
+                if (data.success == true) {
+                    FactorGridView.Refresh();
+                    swal({
+                        title: 'Success!',
+                        html: data.infoMessage,
+                        type: 'success'
+                    });
+                    return;
+                }
+                if (data.success == -1) {
+                    swal({
+                        title: 'Error!',
+                        html: data.errorMessage,
+                        type: 'error'
+                    });
+                    return;
+                }
+            }
+        });
+    } //Save Factor
+
+    /********************************************************************************************/ //Add Factor
+
+    /*******************************Update Factor******************************************/
+
+    function promptUserBeforeUpdatingFactor() {
+        swal({
+            title: 'Confirm?',
+            html: 'Update record?',
+            type: 'info',
+            showCancelButton: true,
+            confirmButtonClass: 'btn btn-info',
+            cancelButtonClass: 'btn btn-primary',
+            confirmButtonText: '<i class="fa fa-thumbs-up"></i> Update',
+            cancelButtonText: '<i class="fa fa-thumbs-down"></i> Cancel',
+            allowOutsideClick: false
+        }).then(function () {
+            var result = ValidateEditedFactorForm();
+            if (result == true) {
+                $('#editFactor').modal("hide");
+                return updateFactor();
+            }
+            if (result == false) {
+                var infoMsg = "Please specify a <b>Factor name</b> before progressing to update record!";
+                swal({
+                    title: 'Warning!',
+                    html: infoMsg,
+                    type: 'warning'
+                });
+                return;
+            }
+            if (result == -1) {
+                return;
+            }
+        });
+    }
+
+    function promptUserBeforeClosingEditedFactorModal() {
+        swal({
+            title: 'Are you sure?',
+            html: 'Inputs will be lost',
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonClass: 'btn btn-info',
+            cancelButtonClass: 'btn btn-primary',
+            confirmButtonText: '<i class="fa fa-thumbs-up"></i> Okay',
+            cancelButtonText: '<i class="fa fa-thumbs-down"></i> Cancel',
+            allowOutsideClick: false
+        }).then(function () {
+            stopSubmitBecauseEditedFactorNameFlagged = false;
+            $('#editFactor').modal("hide");
+        });
+    }
+
+    function ValidateEditedFactorForm() {
+        var factorName = E_FactorName.GetValue();
+        if (stopSubmitBecauseEditedFactorNameFlagged == true) {
+            swal({
+                title: 'Warning!',
+                html: editedFactorNameFlaggedErrorMessage,
+                type: 'warning'
+            });
+            return -1;
+        }
+        if (factorName != null) {
+            return true;
+        }
+        return false;
+    }
+
+    function ValidateUniquenessOfEditedFactorName() {
+        var factorName = E_FactorName.GetValue();
+        if (factorName == null || factorName == oldFactorName) {
+            stopSubmitBecauseEditedFactorNameFlagged = false;
+            return;
+        }
+        $.ajax({
+            url: '@Url.Action("ValidateUniquenessOfFactorName", "Factor",new { Area = "Admin" })',
+            type: 'Post',
+            data: { eName: factorName },
+            success: function (data) {
+                if (data.success == true) {
+                    stopSubmitBecauseEditedFactorNameFlagged = false;
+                    return;
+                }
+                if (data.success == false) {
+                    stopSubmitBecauseEditedFactorNameFlagged = true;
+                    editedFactorNameFlaggedErrorMessage = data.infoMessage;
+                    swal({
+                        title: 'Warning!',
+                        html: editedFactorNameFlaggedErrorMessage,
+                        type: 'warning'
+                    });
+                    return;
+                }
+                if (data.success == -1) {
+                    swal({
+                        title: 'Error!',
+                        html: data.errorMessage,
+                        type: 'error'
+                    });
+                    return;
+                }
+            }
+        });
+    } //Validate Uniqueness Of FactorName
+
+    function EditFactor(id) {
+        $.ajax({
+            url: '@Url.Action("EditFactor", "Factor",new { Area = "Admin" })',
+            type: 'Post',
+            data: { factorId: id },
+            success: function (data) {
+                if (data.success == true) {
+                    oldFactorName = data.factorName;
+                    E_FID.SetText(data.FID);
+                    E_FactorName.SetText(data.factorName);
+                    $('#editFactor').modal({ backdrop: 'static', keyboard: false });
+                    $('#editFactor').modal("show");
+                    return;
+                }
+                if (data.success == -1) {
+                    swal({
+                        title: 'Error!',
+                        html: data.errorMessage,
+                        type: 'error'
+                    });
+                    return;
+                }
+            }
+        });
+    } //Edit Factor
+
+    function updateFactor() {
+        SiteUtils.loading("Updating...");
+        dataArray = {
+            FID: E_FID.GetValue(),
+            Name: E_FactorName.GetValue()
+        }
+        $.ajax({
+            url: '@Url.Action("UpdateFactor", "Factor", new { Area = "Admin" })',
+            type: 'Post',
+            data: { Data: dataArray },
+            success: function (data) {
+                SiteUtils.loadingOff();
+                if (data.success == true) {
+                    FactorGridView.Refresh();
+                    swal({
+                        title: 'Success!',
+                        html: data.infoMessage,
+                        type: 'success'
+                    });
+                    return;
+                }
+                if (data.success == -1) {
+                    swal({
+                        title: 'Error!',
+                        html: data.errorMessage,
+                        type: 'error'
+                    });
+                    return;
+                }
+            }
+        });
+    } //Update Factor
+
+    /********************************************************************************************/ //Update Factor
+
+    function DeleteASingleFactor(id) {
+        swal({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonClass: 'btn btn-danger',
+            cancelButtonClass: 'btn btn-primary',
+            confirmButtonText: '<i class="fa fa-thumbs-up"></i> Delete',
+            cancelButtonText: '<i class="fa fa-thumbs-down"></i> Cancel',
+            allowOutsideClick : false
+        }).then(function () {
+            SiteUtils.loading("Deleting...");
+            $.ajax({
+                url: '@Url.Action("DeleteASingleFactor", "Factor", new { Area = "Admin" })',
+                type: 'Post',
+                data: { selectedKey: id },
+                success: function (data) {
+                    SiteUtils.loadingOff();
+                    if (data.success == true) {
+                        FactorGridView.Refresh();
+                        swal({
+                            title: 'Success!',
+                            html: data.infoMessage,
+                            type: 'success',
+                            allowOutsideClick: false
+                        })
+                        return;
+                    }
+                    if (data.success == -1) {
+                        swal({
+                            title: 'Error!',
+                            html: data.errorMessage,
+                            type: 'error',
+                            allowOutsideClick: false
+                        });
+                        return;
+                    }
+                }
+            });
+        });
+    } //Delete A Single Factor
+
+    function DeleteGroupOfFactors() {
+        swal({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonClass: 'btn btn-danger',
+            cancelButtonClass: 'btn btn-primary',
+            confirmButtonText: '<i class="fa fa-thumbs-up"></i> Delete',
+            cancelButtonText: '<i class="fa fa-thumbs-down"></i> Cancel',
+            allowOutsideClick: false
+        }).then(function () {
+            SiteUtils.loading("Deleting...");
+            $.ajax({
+                url: '@Url.Action("DeleteGroupOfFactors", "Factor", new { Area = "Admin" })',
+                type: 'Post',
+                data: { selectedKeys: selectedIDs },
+                success: function (data) {
+                    SiteUtils.loadingOff();
+                    if (data.success == true) {
+                        FactorGridView.Refresh();
+                        swal({
+                            title: 'Success!',
+                            html: data.infoMessage,
+                            type: 'success',
+                            allowOutsideClick: false
+                        }).then(function () {
+                            FactorGridView.UnselectRows();
+                        });
+                        return;
+                    }
+                    if (data.success == -1) {
+                        FactorGridView.UnselectRows();
+                        swal({
+                            title: 'Error!',
+                            html: data.errorMessage,
+                            type: 'error',
+                            allowOutsideClick: false
+                        });
+                        return;
+                    }
+                }
+            });
+
+        });
+    } //Delete A Group Of Factor
+
+    /*******************************Every Other Functions*********************************************/
+    function OnSelectionChanged(s, e) {
+        s.GetSelectedFieldValues("FID", GetSelectedFieldValuesCallback);
+        $("#actions").attr("disabled", false);
+        $("#actions").removeClass("btnDisabled");
+    }
+
+    function GetSelectedFieldValuesCallback(values) {
+        if (values.length == 0) {
+            $("#actions").val("Select Action");
+            $("#actions").attr("disabled", true);
+            $("#actions").addClass("btnDisabled");
+        }
+        selectedIDs = values.join(',');
+        $("#recordCount").text(FactorGridView.GetSelectedRowCount());
+
+    }
+
+    $(document).ready(function () {
+        //Executes a selected action
+        $("#actions").change(function () {
+            var action = $("#actions").val();
+            if (action == "Delete") {
+                DeleteGroupOfFactors();
+            }
+            else {
+                return; //do nothing...
+            }
+        });
+        $("#recordCount").text(0);
+    });
+
+    function OnPopupMenuItemClick(s, e) {
+        var itemName = e.item.name;
+        if (itemName == "Edit") {
+            return EditFactor(getID);
+        }
+        if (itemName == "Delete") {
+            return DeleteASingleFactor(getID);
+        }
+    }
+
+    $(document).on("click", "#FactorGridView tbody tr #dropup", function () {
+        getID = $(this).attr('id-slug');
+    }) //Every other function
+</script>
+
+
+<div class="panel panel-default">
+    <div class="panel-heading nopadding">
+        <div class="row nomargin">
+            <div class="col-md-12 padding5">
+                <div class="col-md-2">
+                    <div class="btn-group">
+                        <h4 class="titleStyle">FACTORS</h4>
+                    </div>
+                </div>
+                <div class="col-md-10 action-wrap">
+                    <div class="form-inline">
+                        <div class="form-group pull-right">
+                            <div class="btn-group">
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    if (User.IsInRole("SU"))
+                                    {
+                                        @Html.DropDownList("Actions", null, null, new { @class = "dropDowns btnDisabled", id = "actions", disabled = true })
+                                    }
+                                }
+                                <div class="pull-right">
+                                    @Html.DevExpress().Button(settings =>
+                               {
+                                   settings.Name = "btnFactor";
+
+                                   settings.Width = 100;
+                                   settings.Text = "Add New";
+                                   settings.ToolTip = " Add factor type.";
+                                   settings.ControlStyle.CssClass = "btn btnETMS";
+                                   settings.ClientSideEvents.Click = "DisplayFactorForm";
+                                   settings.ControlStyle.Border.BorderStyle = BorderStyle.Solid;
+                               }).GetHtml()
+                                </div>
+                            </div>
+                        </div>
+                    </div><!--/form-in-line-->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="addFactor" class="modal fade" tabindex="-1" role="dialog" style="display: none;">
+        <div class="modal-dialog modal-super-scaled">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Add Factor</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-horizontal">
+
+                        <div class="form-group">
+                            <label class="control-label labels col-md-2">Name:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().TextBox(settings =>
+                           {
+                               settings.Name = "FactorName";
+                               settings.ControlStyle.CssClass = "form-control input-sm";
+                               settings.ControlStyle.ForeColor = System.Drawing.Color.Black;
+                               settings.Width = Unit.Percentage(100);
+                               settings.Theme = "MetropolisBlue";
+                               settings.Properties.ClientSideEvents.ValueChanged = "ValidateUniquenessOfFactorName";
+                           }).GetHtml()
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" onclick="promptUserBeforeSavingFactor()"><i class="fa fa-thumbs-up"></i> Save</button>
+                    <button type="button" onclick="promptUserBeforeClosingFactorModal()" class="btn btn-default"><i class="fa fa-thumbs-down"></i> Cancel</button>
+                </div>
+            </div> <!-- / .modal-content -->
+        </div> <!-- / .modal-dialog -->
+    </div>
+
+    <div id="editFactor" class="modal fade" tabindex="-1" role="dialog" style="display: none;">
+        <div class="modal-dialog modal-super-scaled">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Update Factor</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-horizontal">
+
+                        <div class="form-group">
+                            <label class="control-label labels col-md-2">ID:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().TextBox(settings =>
+                           {
+                               settings.Name = "E_FID";
+                               settings.ControlStyle.CssClass = "form-control input-sm disable";
+                               settings.Width = Unit.Percentage(100);
+                               settings.Theme = "MetropolisBlue";
+                               settings.ReadOnly = true;
+                               settings.ControlStyle.ForeColor = System.Drawing.Color.Black;
+                           }).GetHtml()
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-2">Name:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().TextBox(settings =>
+                           {
+                               settings.Name = "E_FactorName";
+                               settings.ControlStyle.CssClass = "form-control input-sm";
+                               settings.ControlStyle.ForeColor = System.Drawing.Color.Black;
+                               settings.Width = Unit.Percentage(100);
+                               settings.Theme = "MetropolisBlue";
+                               settings.Properties.ClientSideEvents.ValueChanged = "ValidateUniquenessOfEditedFactorName";
+                           }).GetHtml()
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" onclick="promptUserBeforeUpdatingFactor()"><i class="fa fa-thumbs-up"></i> Update</button>
+                    <button type="button" onclick="promptUserBeforeClosingEditedFactorModal()" class="btn btn-default"><i class="fa fa-thumbs-down"></i> Cancel</button>
+                </div>
+            </div> <!-- / .modal-content -->
+        </div> <!-- / .modal-dialog -->
+    </div>
+
+    <div class="panel-body" style="background-color:#ffffff !important;">
+        <div class="col-md-12">
+            <div class="" style="overflow-x:auto">
+                <div class="table-responsive">
+                    <a style="color:#000; font-weight:bold; margin-right:0px;" id="helperText">[Total rows selected:]</a>
+                    <a style="color:#000;font-weight:bold; margin-right:20px;" id="recordCount"></a>
+                    @Html.Action("FactorGridViewPartial")
+                </div>
+            </div>
+        </div>
+    </div>
+</div><!-- panel -->

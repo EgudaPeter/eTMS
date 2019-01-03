@@ -1,0 +1,169 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="eTMSModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityContainer Name="eTMSEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="AccountTables" EntityType="eTMSModel.AccountTable" />
+    <EntitySet Name="DealerTables" EntityType="eTMSModel.DealerTable" />
+    <EntitySet Name="TransactionTypeTables" EntityType="eTMSModel.TransactionTypeTable" />
+    <EntitySet Name="Banks" EntityType="eTMSModel.Bank" />
+    <EntitySet Name="TransactionTables" EntityType="eTMSModel.TransactionTable" />
+    <EntitySet Name="TransactionFactorTables" EntityType="eTMSModel.TransactionFactorTable" />
+    <EntitySet Name="GsmValidators" EntityType="eTMSModel.GsmValidator" />
+    <EntitySet Name="Debtors" EntityType="eTMSModel.Debtor" />
+    <EntitySet Name="Debts" EntityType="eTMSModel.Debt" />
+    <EntitySet Name="ProfitAndLosses" EntityType="eTMSModel.ProfitAndLoss" />
+    <EntitySet Name="EventLogs" EntityType="eTMSModel.EventLog" />
+    <EntitySet Name="Setups" EntityType="eTMSModel.Setup" />
+    <EntitySet Name="Annuals" EntityType="eTMSModel.Annual" />
+  </EntityContainer>
+  <EntityType Name="AccountTable">
+    <Key>
+      <PropertyRef Name="AccountID" />
+    </Key>
+    <Property Name="AccountID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="AccountNumber" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="AccountName" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="BankName" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="AmountInAccount" Type="Decimal" Nullable="false" Precision="18" Scale="2" />
+    <Property Name="CapturedBy" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="CapturedDate" Type="DateTime" Nullable="false" Precision="3" />
+    <Property Name="Comments" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="DealerTable">
+    <Key>
+      <PropertyRef Name="DealerID" />
+    </Key>
+    <Property Name="DealerID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="DealerName" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="false" />
+    <Property Name="CapturedBy" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="CapturedDate" Type="DateTime" Nullable="false" Precision="3" />
+    <Property Name="Comments" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="TransactionTypeTable">
+    <Key>
+      <PropertyRef Name="TID" />
+    </Key>
+    <Property Name="TID" Type="String" Nullable="false" MaxLength="5" FixedLength="false" Unicode="false" />
+    <Property Name="Type" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="Bank">
+    <Key>
+      <PropertyRef Name="ID_Bank" />
+    </Key>
+    <Property Name="ID_Bank" Type="String" Nullable="false" MaxLength="4" FixedLength="false" Unicode="false" />
+    <Property Name="BankName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="Address01" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="Address02" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="ID_State" Type="String" MaxLength="3" FixedLength="false" Unicode="false" />
+    <Property Name="OpenAccount" Type="Boolean" />
+    <Property Name="BankGlActNo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+    <Property Name="SwitchCode" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+    <Property Name="BankCode" Type="String" MaxLength="4" FixedLength="false" Unicode="false" />
+    <Property Name="HQRSortCode" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="TransactionTable">
+    <Key>
+      <PropertyRef Name="TransactionID" />
+    </Key>
+    <Property Name="TransactionID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="TID" Type="String" Nullable="false" MaxLength="5" FixedLength="false" Unicode="false" />
+    <Property Name="AmountPaid" Type="Decimal" Nullable="false" Precision="18" Scale="2" />
+    <Property Name="AmountOutstanding" Type="Decimal" Precision="18" Scale="2" />
+    <Property Name="AccountID" Type="Int32" Nullable="false" />
+    <Property Name="EffectiveDate" Type="DateTime" Precision="3" />
+    <Property Name="DealerID" Type="Int32" Nullable="false" />
+    <Property Name="CapturedDate" Type="DateTime" Precision="3" />
+    <Property Name="CapturedBy" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="PaymentMode" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="Narration" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" />
+    <Property Name="Comments" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+    <Property Name="FID" Type="Int32" Nullable="false" />
+    <Property Name="Bank" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="TransactionFactorTable">
+    <Key>
+      <PropertyRef Name="FID" />
+    </Key>
+    <Property Name="FID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Name" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="false" />
+    <Property Name="CapturedBy" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="CapturedDate" Type="DateTime" Nullable="false" Precision="3" />
+    <Property Name="Comments" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="GsmValidator">
+    <Key>
+      <PropertyRef Name="ID_GsmFormat" />
+    </Key>
+    <Property Name="ID_GsmFormat" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="ProviderCode" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+    <Property Name="Gsm1st3Digits" Type="String" MaxLength="3" FixedLength="false" Unicode="false" />
+    <Property Name="GsmNoLenght" Type="Int32" />
+  </EntityType>
+  <EntityType Name="Debtor">
+    <Key>
+      <PropertyRef Name="DebtorID" />
+    </Key>
+    <Property Name="DebtorID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="TransactionID" Type="Int32" Nullable="false" />
+    <Property Name="DeptorName" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="false" />
+    <Property Name="Amount" Type="Decimal" Nullable="false" Precision="18" Scale="2" />
+    <Property Name="EffectiveDate" Type="DateTime" Nullable="false" Precision="3" />
+    <Property Name="Status" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="Debt">
+    <Key>
+      <PropertyRef Name="DebtID" />
+    </Key>
+    <Property Name="DebtID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="TransactionID" Type="Int32" Nullable="false" />
+    <Property Name="DeptName" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="false" />
+    <Property Name="Amount" Type="Decimal" Nullable="false" Precision="18" Scale="2" />
+    <Property Name="EffectiveDate" Type="DateTime" Nullable="false" Precision="3" />
+    <Property Name="Status" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="ProfitAndLoss">
+    <Key>
+      <PropertyRef Name="PLID" />
+    </Key>
+    <Property Name="PLID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="TotalTransactionAmount" Type="Decimal" Nullable="false" Precision="18" Scale="2" />
+    <Property Name="TotalExpense" Type="Decimal" Nullable="false" Precision="18" Scale="2" />
+    <Property Name="TotalIncome" Type="Decimal" Nullable="false" Precision="18" Scale="2" />
+    <Property Name="CapturedDay" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="CapturedMonth" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="CapturedYear" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="CapturedDate" Type="DateTime" Precision="3" />
+    <Property Name="Profit" Type="Decimal" Nullable="false" Precision="18" Scale="2" />
+    <Property Name="Loss" Type="Decimal" Nullable="false" Precision="18" Scale="2" />
+  </EntityType>
+  <EntityType Name="EventLog">
+    <Key>
+      <PropertyRef Name="EventID" />
+    </Key>
+    <Property Name="EventID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="EventType" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="Event" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+    <Property Name="Executioner" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="ExecutionDate" Type="DateTime" Precision="3" />
+  </EntityType>
+  <EntityType Name="Setup">
+    <Key>
+      <PropertyRef Name="SetUpID" />
+    </Key>
+    <Property Name="SetUpID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="MonthOfOperation" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+    <Property Name="EnableWeekendProfitAndLossAnalysis" Type="Boolean" />
+  </EntityType>
+  <EntityType Name="Annual">
+    <Key>
+      <PropertyRef Name="AID" />
+    </Key>
+    <Property Name="AID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Month" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="Year" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="TotalTransactionAmount" Type="Decimal" Nullable="false" Precision="18" Scale="2" />
+    <Property Name="TotalExpense" Type="Decimal" Nullable="false" Precision="18" Scale="2" />
+    <Property Name="TotalIncome" Type="Decimal" Nullable="false" Precision="18" Scale="2" />
+    <Property Name="Profit" Type="Decimal" Nullable="false" Precision="18" Scale="2" />
+    <Property Name="Loss" Type="Decimal" Nullable="false" Precision="18" Scale="2" />
+  </EntityType>
+</Schema>

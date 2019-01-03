@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "noEmitOnError": true,
+    "removeComments": false,
+    "sourceMap": true,
+    "target": "es5",
+    "allowJs": true,
+    "noEmit": true
+  },
+  "exclude": [
+    "/content/js",
+    "/content/theme/lander/assets/javascripts"
+  ]
+}

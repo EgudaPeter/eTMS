@@ -1,0 +1,112 @@
+@using System.Web.UI.WebControls
+
+@{
+    System.Globalization.CultureInfo ci = new System.Globalization.CultureInfo("en-US");
+    ci.NumberFormat.CurrencySymbol = "";
+    System.Threading.Thread.CurrentThread.CurrentCulture = ci;
+}
+
+@{
+    var grid = Html.DevExpress().GridView(settings => {
+        settings.Name = "DashBoard_DebtorsGridView";
+        settings.CallbackRouteValues = new { Controller = "Admin", Action = "DashBoard_DebtorsGridViewPartial" };
+        settings.SettingsSearchPanel.Visible = true;
+        settings.SettingsText.SearchPanelEditorNullText = "Enter Text to Search...";
+        settings.Theme = "MetropolisBlue";
+        settings.Width = Unit.Percentage(100);
+
+        settings.CommandColumn.Visible = false;
+
+        settings.KeyFieldName = "DebtorID";
+        settings.EnableRowsCache = false;
+        settings.SettingsLoadingPanel.Mode = GridViewLoadingPanelMode.Disabled;
+
+
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = false;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.Columns.Add(m=>
+        {
+            m.FieldName = "DebtorID";
+            m.Caption = "ID";
+            m.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+            m.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+            m.Width = 50;
+            m.HeaderStyle.Font.Bold = true;
+            m.HeaderStyle.Font.Size = 11;
+            m.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+        });
+        settings.Columns.Add(m=>
+        {
+            m.FieldName = "TransactionID";
+            m.Caption = "Transaction Name";
+            //m.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+            //m.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+            m.Width = 50;
+            m.HeaderStyle.Font.Bold = true;
+            m.HeaderStyle.Font.Size = 11;
+            m.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+        });
+        settings.Columns.Add(m=>
+        {
+            m.FieldName = "DeptorName";
+            m.Caption = "Debtor Name";
+            //m.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+            //m.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+            m.Width = 50;
+            m.HeaderStyle.Font.Bold = true;
+            m.HeaderStyle.Font.Size = 11;
+            m.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+        });
+        settings.Columns.Add(m=>
+        {
+            m.FieldName = "EffectiveDate";
+            m.Caption = "Captured Date";
+            //m.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+            //m.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+            m.Width = 50;
+            m.HeaderStyle.Font.Bold = true;
+            m.HeaderStyle.Font.Size = 11;
+            m.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+            m.PropertiesEdit.DisplayFormatString = "dd, MMMM yyyy";
+        });
+        settings.Columns.Add(m =>
+        {
+            m.FieldName = "Amount";
+            m.Caption = "Amount";
+            m.HeaderStyle.HorizontalAlign = HorizontalAlign.Right;
+            m.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+            m.Width = 50;
+            m.HeaderStyle.Font.Bold = true;
+            m.HeaderStyle.Font.Size = 11;
+            m.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+        });
+
+        settings.SettingsPager.Visible = true;
+        settings.SettingsPager.FirstPageButton.Visible = true;
+        settings.SettingsPager.LastPageButton.Visible = true;
+        settings.SettingsPager.Mode = GridViewPagerMode.ShowPager;
+        settings.SettingsPager.EllipsisMode = PagerEllipsisMode.InsideNumeric;
+        settings.SettingsPager.Position = PagerPosition.Bottom;
+        settings.SettingsPager.ShowNumericButtons = true;
+        settings.SettingsPager.ShowSeparators = true;
+        settings.SettingsPager.PageSizeItemSettings.Visible = true;
+        settings.SettingsPager.PageSizeItemSettings.Position = PagerPageSizePosition.Left;
+        settings.SettingsPager.PageSize = 5;
+        settings.SettingsPager.PageSizeItemSettings.Items = new string[] { "5", "10" };
+
+        settings.Settings.ShowFooter = true;
+        settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "Amount");
+    });
+    if (ViewData["EditError"] != null){
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

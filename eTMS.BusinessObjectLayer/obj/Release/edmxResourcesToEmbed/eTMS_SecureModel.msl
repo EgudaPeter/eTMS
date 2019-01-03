@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="eTMS_SecureModelStoreContainer" CdmEntityContainer="eTMS_SecureEntities">
+    <EntitySetMapping Name="AdminTables">
+      <EntityTypeMapping TypeName="eTMS_SecureModel.AdminTable">
+        <MappingFragment StoreEntitySet="AdminTable">
+          <ScalarProperty Name="AdminID" ColumnName="AdminID" />
+          <ScalarProperty Name="AdminSurname" ColumnName="AdminSurname" />
+          <ScalarProperty Name="AdminFirstname" ColumnName="AdminFirstname" />
+          <ScalarProperty Name="AdminMiddlename" ColumnName="AdminMiddlename" />
+          <ScalarProperty Name="AdminUsername" ColumnName="AdminUsername" />
+          <ScalarProperty Name="AdminPassword" ColumnName="AdminPassword" />
+          <ScalarProperty Name="AdminUID" ColumnName="AdminUID" />
+          <ScalarProperty Name="AdminPhone" ColumnName="AdminPhone" />
+          <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="UIDTables">
+      <EntityTypeMapping TypeName="eTMS_SecureModel.UIDTable">
+        <MappingFragment StoreEntitySet="UIDTable">
+          <ScalarProperty Name="UID" ColumnName="UID" />
+          <ScalarProperty Name="Code" ColumnName="Code" />
+          <ScalarProperty Name="Description" ColumnName="Description" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="AdminLogins">
+      <EntityTypeMapping TypeName="eTMS_SecureModel.AdminLogin">
+        <MappingFragment StoreEntitySet="AdminLogin">
+          <ScalarProperty Name="adminLoginDate" ColumnName="adminLoginDate" />
+          <ScalarProperty Name="adminPassword" ColumnName="adminPassword" />
+          <ScalarProperty Name="adminUsername" ColumnName="adminUsername" />
+          <ScalarProperty Name="loginID" ColumnName="loginID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="GsmValidators">
+      <EntityTypeMapping TypeName="eTMS_SecureModel.GsmValidator">
+        <MappingFragment StoreEntitySet="GsmValidator">
+          <ScalarProperty Name="GsmNoLenght" ColumnName="GsmNoLenght" />
+          <ScalarProperty Name="Gsm1st3Digits" ColumnName="Gsm1st3Digits" />
+          <ScalarProperty Name="ProviderCode" ColumnName="ProviderCode" />
+          <ScalarProperty Name="ID_GsmFormat" ColumnName="ID_GsmFormat" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping>

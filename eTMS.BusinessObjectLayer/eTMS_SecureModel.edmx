@@ -1,0 +1,177 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="eTMS_SecureModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="AdminLogin">
+          <Key>
+            <PropertyRef Name="loginID" />
+          </Key>
+          <Property Name="loginID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="adminUsername" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="adminPassword" Type="varchar" MaxLength="1000" Nullable="false" />
+          <Property Name="adminLoginDate" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="AdminTable">
+          <Key>
+            <PropertyRef Name="AdminID" />
+          </Key>
+          <Property Name="AdminID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="AdminSurname" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="AdminFirstname" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="AdminMiddlename" Type="varchar" MaxLength="50" />
+          <Property Name="AdminUsername" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="AdminPassword" Type="varchar" MaxLength="1000" Nullable="false" />
+          <Property Name="AdminUID" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="AdminPhone" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="CreatedDate" Type="datetime" />
+        </EntityType>
+        <EntityType Name="GsmValidator">
+          <Key>
+            <PropertyRef Name="ID_GsmFormat" />
+          </Key>
+          <Property Name="ID_GsmFormat" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ProviderCode" Type="varchar" MaxLength="20" />
+          <Property Name="Gsm1st3Digits" Type="varchar" MaxLength="3" />
+          <Property Name="GsmNoLenght" Type="int" />
+        </EntityType>
+        <EntityType Name="UIDTable">
+          <Key>
+            <PropertyRef Name="UID" />
+          </Key>
+          <Property Name="UID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Code" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="Description" Type="varchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityContainer Name="eTMS_SecureModelStoreContainer">
+          <EntitySet Name="AdminLogin" EntityType="Self.AdminLogin" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="AdminTable" EntityType="Self.AdminTable" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="GsmValidator" EntityType="Self.GsmValidator" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="UIDTable" EntityType="Self.UIDTable" Schema="dbo" store:Type="Tables" />
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="eTMS_SecureModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="AdminTable">
+          <Key>
+            <PropertyRef Name="AdminID" />
+          </Key>
+          <Property Name="AdminID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AdminSurname" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="AdminFirstname" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="AdminMiddlename" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="AdminUsername" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="AdminPassword" Type="String" MaxLength="1000" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="AdminUID" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="AdminPhone" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+        </EntityType>
+        <EntityType Name="UIDTable">
+          <Key>
+            <PropertyRef Name="UID" />
+          </Key>
+          <Property Name="UID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Code" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Description" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+        </EntityType>
+        <EntityContainer Name="eTMS_SecureEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="AdminTables" EntityType="Self.AdminTable" />
+          <EntitySet Name="UIDTables" EntityType="Self.UIDTable" />
+          <EntitySet Name="AdminLogins" EntityType="eTMS_SecureModel.AdminLogin" />
+          <EntitySet Name="GsmValidators" EntityType="eTMS_SecureModel.GsmValidator" />
+        </EntityContainer>
+        <EntityType Name="AdminLogin">
+          <Key>
+            <PropertyRef Name="loginID" />
+          </Key>
+          <Property Name="loginID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="adminUsername" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="adminPassword" Type="String" Nullable="false" MaxLength="1000" FixedLength="false" Unicode="false" />
+          <Property Name="adminLoginDate" Type="DateTime" Nullable="false" Precision="3" />
+        </EntityType>
+        <EntityType Name="GsmValidator">
+          <Key>
+            <PropertyRef Name="ID_GsmFormat" />
+          </Key>
+          <Property Name="ID_GsmFormat" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ProviderCode" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="Gsm1st3Digits" Type="String" MaxLength="3" FixedLength="false" Unicode="false" />
+          <Property Name="GsmNoLenght" Type="Int32" />
+        </EntityType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="eTMS_SecureModelStoreContainer" CdmEntityContainer="eTMS_SecureEntities">
+          <EntitySetMapping Name="AdminTables">
+            <EntityTypeMapping TypeName="eTMS_SecureModel.AdminTable">
+              <MappingFragment StoreEntitySet="AdminTable">
+                <ScalarProperty Name="AdminID" ColumnName="AdminID" />
+                <ScalarProperty Name="AdminSurname" ColumnName="AdminSurname" />
+                <ScalarProperty Name="AdminFirstname" ColumnName="AdminFirstname" />
+                <ScalarProperty Name="AdminMiddlename" ColumnName="AdminMiddlename" />
+                <ScalarProperty Name="AdminUsername" ColumnName="AdminUsername" />
+                <ScalarProperty Name="AdminPassword" ColumnName="AdminPassword" />
+                <ScalarProperty Name="AdminUID" ColumnName="AdminUID" />
+                <ScalarProperty Name="AdminPhone" ColumnName="AdminPhone" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="UIDTables">
+            <EntityTypeMapping TypeName="eTMS_SecureModel.UIDTable">
+              <MappingFragment StoreEntitySet="UIDTable">
+                <ScalarProperty Name="UID" ColumnName="UID" />
+                <ScalarProperty Name="Code" ColumnName="Code" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="AdminLogins">
+            <EntityTypeMapping TypeName="eTMS_SecureModel.AdminLogin">
+              <MappingFragment StoreEntitySet="AdminLogin">
+                <ScalarProperty Name="adminLoginDate" ColumnName="adminLoginDate" />
+                <ScalarProperty Name="adminPassword" ColumnName="adminPassword" />
+                <ScalarProperty Name="adminUsername" ColumnName="adminUsername" />
+                <ScalarProperty Name="loginID" ColumnName="loginID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="GsmValidators">
+            <EntityTypeMapping TypeName="eTMS_SecureModel.GsmValidator">
+              <MappingFragment StoreEntitySet="GsmValidator">
+                <ScalarProperty Name="GsmNoLenght" ColumnName="GsmNoLenght" />
+                <ScalarProperty Name="Gsm1st3Digits" ColumnName="Gsm1st3Digits" />
+                <ScalarProperty Name="ProviderCode" ColumnName="ProviderCode" />
+                <ScalarProperty Name="ID_GsmFormat" ColumnName="ID_GsmFormat" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

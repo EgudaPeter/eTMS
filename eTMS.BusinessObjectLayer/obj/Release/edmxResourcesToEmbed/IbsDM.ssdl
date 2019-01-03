@@ -1,0 +1,208 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="IbsMdmModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityType Name="GsmValidator">
+    <Key>
+      <PropertyRef Name="ID_GsmFormat" />
+    </Key>
+    <Property Name="ID_GsmFormat" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="ProviderCode" Type="varchar" MaxLength="20" />
+    <Property Name="Gsm1st3Digits" Type="varchar" MaxLength="3" />
+    <Property Name="GsmNoLenght" Type="int" />
+  </EntityType>
+  <EntityType Name="IBS_Application">
+    <Key>
+      <PropertyRef Name="ID_Application" />
+    </Key>
+    <Property Name="ID_Application" Type="varchar" MaxLength="4" Nullable="false" />
+    <Property Name="Name" Type="varchar" MaxLength="50" />
+    <Property Name="Money4PaymentActNo" Type="varchar" MaxLength="20" />
+    <Property Name="Money4LodgementActNo" Type="varchar" MaxLength="20" />
+    <Property Name="LastVoucherNo" Type="int" />
+  </EntityType>
+  <EntityType Name="IBS_Banks">
+    <Key>
+      <PropertyRef Name="ID_Bank" />
+    </Key>
+    <Property Name="ID_Bank" Type="varchar" MaxLength="4" Nullable="false" />
+    <Property Name="BankName" Type="varchar" MaxLength="50" />
+    <Property Name="Address01" Type="varchar" MaxLength="50" />
+    <Property Name="Address02" Type="varchar" MaxLength="50" />
+    <Property Name="ID_State" Type="varchar" MaxLength="3" />
+    <Property Name="OpenAccount" Type="bit" />
+    <Property Name="BankGlActNo" Type="varchar" MaxLength="20" />
+    <Property Name="SwitchCode" Type="varchar" MaxLength="20" />
+    <Property Name="BankCode" Type="varchar" MaxLength="4" />
+    <Property Name="HQRSortCode" Type="varchar" MaxLength="20" />
+  </EntityType>
+  <EntityType Name="IBS_Branches">
+    <Key>
+      <PropertyRef Name="ID_Branch" />
+    </Key>
+    <Property Name="ID_Branch" Type="varchar" MaxLength="4" Nullable="false" />
+    <Property Name="Name" Type="varchar" MaxLength="50" />
+    <Property Name="AccessLevel" Type="varchar" MaxLength="50" />
+  </EntityType>
+  <EntityType Name="IBS_Country">
+    <Key>
+      <PropertyRef Name="ID_Country" />
+    </Key>
+    <Property Name="ID_Country" Type="varchar" MaxLength="3" Nullable="false" />
+    <Property Name="Country" Type="varchar" MaxLength="100" />
+  </EntityType>
+  <EntityType Name="IBS_Currency">
+    <Key>
+      <PropertyRef Name="ID_Currency" />
+    </Key>
+    <Property Name="ID_Currency" Type="varchar" MaxLength="3" Nullable="false" />
+    <Property Name="Currency" Type="varchar" MaxLength="50" />
+    <Property Name="Unit" Type="varchar" MaxLength="50" />
+  </EntityType>
+  <EntityType Name="IBS_ExcRate">
+    <Key>
+      <PropertyRef Name="ExcRate_ID" />
+    </Key>
+    <Property Name="ExcRate_ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="CurrencyID" Type="varchar" MaxLength="3" />
+    <Property Name="EffectiveDate" Type="datetime" />
+    <Property Name="ExchangeRate" Type="decimal" Precision="18" Scale="4" />
+  </EntityType>
+  <EntityType Name="IBS_PFA">
+    <Key>
+      <PropertyRef Name="ID_PFA" />
+    </Key>
+    <Property Name="ID_PFA" Type="varchar" MaxLength="4" Nullable="false" />
+    <Property Name="PFA_Name" Type="varchar" MaxLength="100" />
+    <Property Name="Address01" Type="varchar" MaxLength="100" />
+    <Property Name="Address02" Type="varchar" MaxLength="100" />
+    <Property Name="ID_State" Type="varchar" MaxLength="3" />
+    <Property Name="ContactPerson" Type="varchar" MaxLength="100" />
+    <Property Name="GSM_Phone1" Type="varchar" MaxLength="20" />
+    <Property Name="GSM_Phone2" Type="varchar" MaxLength="20" />
+    <Property Name="Email" Type="varchar" MaxLength="150" />
+    <Property Name="WebSite" Type="varchar" MaxLength="150" />
+  </EntityType>
+  <EntityType Name="IBS_PostCode">
+    <Key>
+      <PropertyRef Name="PostCode" />
+    </Key>
+    <Property Name="PostCode" Type="varchar" MaxLength="10" Nullable="false" />
+    <Property Name="Name" Type="varchar" MaxLength="50" />
+  </EntityType>
+  <EntityType Name="IBS_ProductLine">
+    <Key>
+      <PropertyRef Name="ID_ProductLine" />
+    </Key>
+    <Property Name="ID_ProductLine" Type="varchar" MaxLength="4" Nullable="false" />
+    <Property Name="ProductLine" Type="varchar" MaxLength="50" Nullable="false" />
+  </EntityType>
+  <EntityType Name="IBS_States">
+    <Key>
+      <PropertyRef Name="ID_State" />
+    </Key>
+    <Property Name="ID_State" Type="varchar" MaxLength="3" Nullable="false" />
+    <Property Name="Title" Type="varchar" MaxLength="20" />
+  </EntityType>
+  <EntityType Name="IbsPeople">
+    <Key>
+      <PropertyRef Name="UCID" />
+    </Key>
+    <Property Name="UCID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Email" Type="varchar" MaxLength="150" />
+    <Property Name="LastName" Type="varchar" MaxLength="100" />
+    <Property Name="OtherNames" Type="varchar" MaxLength="100" />
+    <Property Name="Company" Type="bit" />
+    <Property Name="RCNumber" Type="varchar" MaxLength="20" />
+    <Property Name="MobilePhone" Type="varchar" MaxLength="20" />
+    <Property Name="OtherPhones" Type="varchar" MaxLength="50" />
+    <Property Name="FaxNumber" Type="varchar" MaxLength="20" />
+    <Property Name="ID_Country" Type="varchar" MaxLength="3" />
+    <Property Name="Address01" Type="varchar" MaxLength="100" />
+    <Property Name="Address02" Type="varchar" MaxLength="100" />
+    <Property Name="City" Type="varchar" MaxLength="50" />
+    <Property Name="ID_State" Type="varchar" MaxLength="3" />
+    <Property Name="Gender" Type="char" MaxLength="1" />
+    <Property Name="DOB" Type="datetime" />
+    <Property Name="Customer" Type="bit" />
+    <Property Name="Supplier" Type="bit" />
+    <Property Name="Employee" Type="bit" />
+    <Property Name="ID_Application" Type="varchar" MaxLength="4" />
+    <Property Name="ID_IdentifyWith" Type="varchar" MaxLength="2" />
+    <Property Name="IDNumber" Type="varchar" MaxLength="50" />
+    <Property Name="IdentifiedBy" Type="varchar" MaxLength="20" />
+    <Property Name="CreationDate" Type="datetime" />
+    <Property Name="Status" Type="char" MaxLength="1" />
+    <Property Name="Comments" Type="text" />
+    <Property Name="DatabaseName" Type="varchar" MaxLength="50" />
+    <Property Name="TableName" Type="varchar" MaxLength="50" />
+    <Property Name="PccNo" Type="varchar" MaxLength="20" />
+  </EntityType>
+  <EntityType Name="IbsTransactionClass">
+    <Key>
+      <PropertyRef Name="ID_TransClass" />
+    </Key>
+    <Property Name="ID_TransClass" Type="char" MaxLength="1" Nullable="false" />
+    <Property Name="TransClass" Type="varchar" MaxLength="100" />
+  </EntityType>
+  <EntityType Name="IdentifyPeopleWith">
+    <Key>
+      <PropertyRef Name="ID_IdentifyWith" />
+    </Key>
+    <Property Name="ID_IdentifyWith" Type="varchar" MaxLength="2" Nullable="false" />
+    <Property Name="IdentifyWith" Type="varchar" MaxLength="50" />
+  </EntityType>
+  <EntityType Name="Location">
+    <Key>
+      <PropertyRef Name="ID_Location" />
+    </Key>
+    <Property Name="ID_Location" Type="varchar" MaxLength="4" Nullable="false" />
+    <Property Name="Location" Type="varchar" MaxLength="50" Nullable="false" />
+  </EntityType>
+  <EntityType Name="ReceiptType">
+    <Key>
+      <PropertyRef Name="ID_ReceiptType" />
+    </Key>
+    <Property Name="ID_ReceiptType" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="ReceiptType" Type="varchar" MaxLength="50" Nullable="false" />
+  </EntityType>
+  <Association Name="FK_IBS_ExcRate_IBS_Currency">
+    <End Role="IBS_Currency" Type="Self.IBS_Currency" Multiplicity="0..1" />
+    <End Role="IBS_ExcRate" Type="Self.IBS_ExcRate" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="IBS_Currency">
+        <PropertyRef Name="ID_Currency" />
+      </Principal>
+      <Dependent Role="IBS_ExcRate">
+        <PropertyRef Name="CurrencyID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Function Name="Universal_sp_CreatePccNo" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="CreationDate" Type="datetime" Mode="In" />
+    <Parameter Name="PccNo" Type="varchar" Mode="InOut" />
+  </Function>
+  <Function Name="Universal_sp_CreatePccNo_V1" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+    <Parameter Name="CreationDate" Type="datetime" Mode="In" />
+  </Function>
+  <EntityContainer Name="IbsMdmModelStoreContainer">
+    <EntitySet Name="GsmValidator" EntityType="Self.GsmValidator" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="IBS_Application" EntityType="Self.IBS_Application" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="IBS_Banks" EntityType="Self.IBS_Banks" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="IBS_Branches" EntityType="Self.IBS_Branches" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="IBS_Country" EntityType="Self.IBS_Country" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="IBS_Currency" EntityType="Self.IBS_Currency" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="IBS_ExcRate" EntityType="Self.IBS_ExcRate" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="IBS_PFA" EntityType="Self.IBS_PFA" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="IBS_PostCode" EntityType="Self.IBS_PostCode" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="IBS_ProductLine" EntityType="Self.IBS_ProductLine" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="IBS_States" EntityType="Self.IBS_States" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="IbsPeople" EntityType="Self.IbsPeople" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="IbsTransactionClass" EntityType="Self.IbsTransactionClass" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="IdentifyPeopleWith" EntityType="Self.IdentifyPeopleWith" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Location" EntityType="Self.Location" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="ReceiptType" EntityType="Self.ReceiptType" Schema="dbo" store:Type="Tables" />
+    <AssociationSet Name="FK_IBS_ExcRate_IBS_Currency" Association="Self.FK_IBS_ExcRate_IBS_Currency">
+      <End Role="IBS_Currency" EntitySet="IBS_Currency" />
+      <End Role="IBS_ExcRate" EntitySet="IBS_ExcRate" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>

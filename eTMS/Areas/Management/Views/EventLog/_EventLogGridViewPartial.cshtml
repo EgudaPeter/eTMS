@@ -1,0 +1,101 @@
+@using System.Web.UI.WebControls
+
+@{
+    var grid = Html.DevExpress().GridView(settings => {
+        settings.Name = "EventLogGridView";
+        settings.CallbackRouteValues = new { Controller = "EventLog", Action = "EventLogGridViewPartial" };
+        settings.SettingsSearchPanel.Visible = true;
+        settings.SettingsText.SearchPanelEditorNullText = "Enter Text to Search...";
+        settings.Width = Unit.Percentage(100);
+        settings.Settings.ShowTitlePanel = true;
+        //settings.Styles.TitlePanel.CssClass = "titleContainer";
+        settings.Theme = "MetropolisBlue";
+
+        settings.CommandColumn.Visible = false;
+
+        settings.KeyFieldName = "EventID";
+        settings.EnableRowsCache = false;
+        settings.SettingsLoadingPanel.Mode = GridViewLoadingPanelMode.Disabled;
+
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = false;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.Columns.Add(m =>
+        {
+            m.FieldName = "EventID";
+            m.Caption = "ID";
+            m.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+            m.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+            m.Width = 50;
+            m.HeaderStyle.Font.Bold = true;
+            m.HeaderStyle.Font.Size = 11;
+            m.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+        });
+        settings.Columns.Add(m =>
+        {
+            m.FieldName = "EventType";
+            m.Caption = "Event Type";
+            //m.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+            //m.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+            m.Width = 50;
+            m.HeaderStyle.Font.Bold = true;
+            m.HeaderStyle.Font.Size = 11;
+            m.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+
+        });
+        settings.Columns.Add(m =>
+        {
+            m.FieldName = "Event";
+            m.Caption = "Event";
+            //m.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+            //m.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+            m.Width = 50;
+            m.HeaderStyle.Font.Bold = true;
+            m.HeaderStyle.Font.Size = 11;
+            m.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+            m.CellStyle.Wrap = DefaultBoolean.False;
+        });
+        settings.Columns.Add(m =>
+        {
+            m.FieldName = "Executioner";
+            m.Caption = "Executioner";
+            //m.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+            //m.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+            m.Width = 50;
+            m.HeaderStyle.Font.Bold = true;
+            m.HeaderStyle.Font.Size = 11;
+            m.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+        });
+        settings.Columns.Add(m =>
+        {
+            m.FieldName = "ExecutionDate";
+            m.Caption = "Execution Date";
+            //m.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+            //m.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+            m.Width = 50;
+            m.HeaderStyle.Font.Bold = true;
+            m.HeaderStyle.Font.Size = 11;
+            m.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+            m.PropertiesEdit.DisplayFormatString = "dd, MMMM yyyy";
+        });
+
+        settings.CustomJSProperties = (sender, e) =>
+        {
+            MVCxGridView ProfitAndLoss_MonthlyGridView = (MVCxGridView)sender;
+            e.Properties["cpVisibleRowCount"] = ProfitAndLoss_MonthlyGridView.VisibleRowCount;
+        };
+
+        settings.ClientSideEvents.EndCallback = "getRecordCountOfResults";
+    });
+    if (ViewData["EditError"] != null){
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

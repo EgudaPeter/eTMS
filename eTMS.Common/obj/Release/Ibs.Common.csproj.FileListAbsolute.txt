@@ -1,0 +1,5 @@
+C:\MultiplanWEB\multiplan\ibs.common\bin\Release\Ibs.Common.dll
+C:\MultiplanWEB\multiplan\ibs.common\bin\Release\Ibs.Common.pdb
+C:\MultiplanWEB\multiplan\ibs.common\obj\Release\Ibs.Common.csprojResolveAssemblyReference.cache
+C:\MultiplanWEB\multiplan\ibs.common\obj\Release\Ibs.Common.dll
+C:\MultiplanWEB\multiplan\ibs.common\obj\Release\Ibs.Common.pdb

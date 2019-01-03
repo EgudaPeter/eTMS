@@ -1,0 +1,169 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="eTMSModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityType Name="AccountTable">
+    <Key>
+      <PropertyRef Name="AccountID" />
+    </Key>
+    <Property Name="AccountID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="AccountNumber" Type="varchar" MaxLength="50" Nullable="false" />
+    <Property Name="AccountName" Type="varchar" MaxLength="50" Nullable="false" />
+    <Property Name="BankName" Type="varchar" MaxLength="50" Nullable="false" />
+    <Property Name="AmountInAccount" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+    <Property Name="CapturedBy" Type="varchar" MaxLength="50" Nullable="false" />
+    <Property Name="CapturedDate" Type="datetime" Nullable="false" />
+    <Property Name="Comments" Type="text" />
+  </EntityType>
+  <EntityType Name="Annual">
+    <Key>
+      <PropertyRef Name="AID" />
+    </Key>
+    <Property Name="AID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Month" Type="varchar" MaxLength="50" />
+    <Property Name="Year" Type="varchar" MaxLength="50" />
+    <Property Name="TotalTransactionAmount" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+    <Property Name="TotalExpense" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+    <Property Name="TotalIncome" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+    <Property Name="Profit" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+    <Property Name="Loss" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Banks">
+    <Key>
+      <PropertyRef Name="ID_Bank" />
+    </Key>
+    <Property Name="ID_Bank" Type="varchar" MaxLength="4" Nullable="false" />
+    <Property Name="BankName" Type="varchar" MaxLength="50" />
+    <Property Name="Address01" Type="varchar" MaxLength="50" />
+    <Property Name="Address02" Type="varchar" MaxLength="50" />
+    <Property Name="ID_State" Type="varchar" MaxLength="3" />
+    <Property Name="OpenAccount" Type="bit" />
+    <Property Name="BankGlActNo" Type="varchar" MaxLength="20" />
+    <Property Name="SwitchCode" Type="varchar" MaxLength="20" />
+    <Property Name="BankCode" Type="varchar" MaxLength="4" />
+    <Property Name="HQRSortCode" Type="varchar" MaxLength="20" />
+  </EntityType>
+  <EntityType Name="DealerTable">
+    <Key>
+      <PropertyRef Name="DealerID" />
+    </Key>
+    <Property Name="DealerID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="DealerName" Type="varchar" MaxLength="200" Nullable="false" />
+    <Property Name="CapturedBy" Type="varchar" MaxLength="50" Nullable="false" />
+    <Property Name="CapturedDate" Type="datetime" Nullable="false" />
+    <Property Name="Comments" Type="text" />
+  </EntityType>
+  <EntityType Name="Debtors">
+    <Key>
+      <PropertyRef Name="DebtorID" />
+    </Key>
+    <Property Name="DebtorID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="TransactionID" Type="int" Nullable="false" />
+    <Property Name="DeptorName" Type="varchar" MaxLength="200" Nullable="false" />
+    <Property Name="Amount" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+    <Property Name="EffectiveDate" Type="datetime" Nullable="false" />
+    <Property Name="Status" Type="varchar" MaxLength="10" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Debts">
+    <Key>
+      <PropertyRef Name="DebtID" />
+    </Key>
+    <Property Name="DebtID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="TransactionID" Type="int" Nullable="false" />
+    <Property Name="DeptName" Type="varchar" MaxLength="200" Nullable="false" />
+    <Property Name="Amount" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+    <Property Name="EffectiveDate" Type="datetime" Nullable="false" />
+    <Property Name="Status" Type="varchar" MaxLength="10" Nullable="false" />
+  </EntityType>
+  <EntityType Name="EventLogs">
+    <Key>
+      <PropertyRef Name="EventID" />
+    </Key>
+    <Property Name="EventID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="EventType" Type="varchar" MaxLength="100" />
+    <Property Name="Event" Type="text" />
+    <Property Name="Executioner" Type="varchar" MaxLength="100" />
+    <Property Name="ExecutionDate" Type="datetime" />
+  </EntityType>
+  <EntityType Name="GsmValidator">
+    <Key>
+      <PropertyRef Name="ID_GsmFormat" />
+    </Key>
+    <Property Name="ID_GsmFormat" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="ProviderCode" Type="varchar" MaxLength="20" />
+    <Property Name="Gsm1st3Digits" Type="varchar" MaxLength="3" />
+    <Property Name="GsmNoLenght" Type="int" />
+  </EntityType>
+  <EntityType Name="ProfitAndLoss">
+    <Key>
+      <PropertyRef Name="PLID" />
+    </Key>
+    <Property Name="PLID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="TotalTransactionAmount" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+    <Property Name="TotalExpense" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+    <Property Name="TotalIncome" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+    <Property Name="CapturedDay" Type="varchar" MaxLength="50" />
+    <Property Name="CapturedMonth" Type="varchar" MaxLength="50" />
+    <Property Name="CapturedYear" Type="varchar" MaxLength="50" />
+    <Property Name="CapturedDate" Type="datetime" />
+    <Property Name="Profit" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+    <Property Name="Loss" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Setups">
+    <Key>
+      <PropertyRef Name="SetUpID" />
+    </Key>
+    <Property Name="SetUpID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="MonthOfOperation" Type="varchar" MaxLength="200" />
+    <Property Name="EnableWeekendProfitAndLossAnalysis" Type="bit" />
+  </EntityType>
+  <EntityType Name="TransactionFactorTable">
+    <Key>
+      <PropertyRef Name="FID" />
+    </Key>
+    <Property Name="FID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="varchar" MaxLength="200" Nullable="false" />
+    <Property Name="CapturedBy" Type="varchar" MaxLength="50" Nullable="false" />
+    <Property Name="CapturedDate" Type="datetime" Nullable="false" />
+    <Property Name="Comments" Type="text" />
+  </EntityType>
+  <EntityType Name="TransactionTable">
+    <Key>
+      <PropertyRef Name="TransactionID" />
+    </Key>
+    <Property Name="TransactionID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="TID" Type="varchar" MaxLength="5" Nullable="false" />
+    <Property Name="AmountPaid" Type="decimal" Precision="18" Scale="2" Nullable="false" />
+    <Property Name="AmountOutstanding" Type="decimal" Precision="18" Scale="2" />
+    <Property Name="AccountID" Type="int" Nullable="false" />
+    <Property Name="EffectiveDate" Type="datetime" />
+    <Property Name="DealerID" Type="int" Nullable="false" />
+    <Property Name="CapturedDate" Type="datetime" />
+    <Property Name="CapturedBy" Type="varchar" MaxLength="50" Nullable="false" />
+    <Property Name="PaymentMode" Type="varchar" MaxLength="50" Nullable="false" />
+    <Property Name="Narration" Type="varchar" MaxLength="1000" />
+    <Property Name="Comments" Type="text" />
+    <Property Name="FID" Type="int" Nullable="false" />
+    <Property Name="Bank" Type="varchar" MaxLength="100" />
+  </EntityType>
+  <EntityType Name="TransactionTypeTable">
+    <Key>
+      <PropertyRef Name="TID" />
+    </Key>
+    <Property Name="TID" Type="varchar" MaxLength="5" Nullable="false" />
+    <Property Name="Type" Type="varchar" MaxLength="10" />
+  </EntityType>
+  <EntityContainer Name="eTMSModelStoreContainer">
+    <EntitySet Name="AccountTable" EntityType="Self.AccountTable" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Annual" EntityType="Self.Annual" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Banks" EntityType="Self.Banks" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="DealerTable" EntityType="Self.DealerTable" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Debtors" EntityType="Self.Debtors" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Debts" EntityType="Self.Debts" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="EventLogs" EntityType="Self.EventLogs" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="GsmValidator" EntityType="Self.GsmValidator" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="ProfitAndLoss" EntityType="Self.ProfitAndLoss" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="Setups" EntityType="Self.Setups" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="TransactionFactorTable" EntityType="Self.TransactionFactorTable" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="TransactionTable" EntityType="Self.TransactionTable" Schema="dbo" store:Type="Tables" />
+    <EntitySet Name="TransactionTypeTable" EntityType="Self.TransactionTypeTable" Schema="dbo" store:Type="Tables" />
+  </EntityContainer>
+</Schema>

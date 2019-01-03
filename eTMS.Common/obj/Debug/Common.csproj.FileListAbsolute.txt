@@ -1,0 +1,4 @@
+C:\TMSWeb\eTMS\ibs.common\bin\Debug\Ibs.Common.dll
+C:\TMSWeb\eTMS\ibs.common\bin\Debug\Ibs.Common.pdb
+C:\TMSWeb\eTMS\ibs.common\obj\Debug\Ibs.Common.dll
+C:\TMSWeb\eTMS\ibs.common\obj\Debug\Ibs.Common.pdb

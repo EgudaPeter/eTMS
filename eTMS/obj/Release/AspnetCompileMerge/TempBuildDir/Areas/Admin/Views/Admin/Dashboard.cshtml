@@ -1,0 +1,990 @@
+﻿
+@using System.Web.UI.WebControls
+
+@using System.Drawing
+
+@{
+    ViewBag.Title = "Dashboard";
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+}
+
+<script>
+    @*setInterval(function () {
+        $.ajax({
+            url: '@Url.Action("GetRecordsCount","Admin")',
+            type: 'Post',
+            success: function (data) {
+                $("#customerRecordsCount").text(data.customerCount);
+                $("#policyRecordsCount").text(data.policieCount);
+                $("#receiptRecordsCount").text(data.receiptCount);
+                return;
+            }
+        });
+    }, 180 * 1000)*@
+
+    function RefreshScreen() {
+         var sDate = startDate.GetDate();
+         var eDate = endDate.GetDate();
+         if (sDate == null || sDate == "") {
+             swal({
+                 title: "Warning!",
+                 html: "Please specify a <b> Start Date </b>!",
+                 type: 'warning',
+                 allowOutsideClick:false
+             });
+             return;
+         }
+         if (eDate == null || eDate == "") {
+             swal({
+                 title: "Warning!",
+                 html: "Please specify an <b> End Date </b>!",
+                 type: 'warning',
+                 allowOutsideClick: false
+             });
+             return;
+         }
+
+         SiteUtils.loading("Refreshing...");
+
+         DashBoard_TransactionsGridView.PerformCallback({
+             _startDate: sDate,
+             _endDate:eDate
+         });
+         DashBoard_ReceiptsGridView.PerformCallback({
+             _startDate: sDate,
+             _endDate: eDate
+         });
+         DashBoard_AccountsGridView.PerformCallback({
+             _startDate: sDate,
+             _endDate: eDate
+         });
+         DashBoard_DebtorsGridView.PerformCallback({
+             _startDate: sDate,
+             _endDate: eDate
+         });
+         DashBoard_ResolvedDebtorsGridView.PerformCallback({
+             _startDate: sDate,
+             _endDate: eDate
+         });
+         DashBoard_DealersGridView.PerformCallback({
+             _startDate: sDate,
+             _endDate: eDate
+         });
+         DashBoard_DebtsGridView.PerformCallback({
+             _startDate: sDate,
+             _endDate: eDate
+         });
+         DashBoard_ResolvedDebtsGridView.PerformCallback({
+             _startDate: sDate,
+             _endDate: eDate
+         });
+         DashBoard_ProfitAndLossGridView.PerformCallback({
+             _startDate: sDate,
+             _endDate: eDate
+         });
+
+         $.ajax({
+             url: '@Url.Action("RefreshScreen", "Admin",new { Area = "Admin" })',
+             type: 'Post',
+             data: { _startDate: sDate, _endDate: eDate },
+             success: function (data) {
+                 SiteUtils.loadingOff();
+                 if (data.success == true) {
+                     $("#transactions").text(data.transactions);
+                     $("#transactions_amount").text(data.transactions_amount);
+
+                     $("#receipts").text(data.receipts);
+                     $("#receipts_amount").text(data.receipts_amount);
+
+                     $("#accounts").text(data.accounts);
+                     $("#accounts_amount").text(data.accounts_amount);
+
+                     $("#debtors").text(data.debtors);
+                     $("#debtors_amount").text(data.debtors_amount);
+
+                     $("#resolvedDebtors").text(data.resolvedDebtors);
+                     $("#resolvedDebtors_amount").text(data.resolvedDebtors_amount);
+
+                     $("#dealers").text(data.dealers);
+
+                     $("#debts").text(data.debts);
+                     $("#debts_amount").text(data.debts_amount);
+
+                     $("#resolvedDebts").text(data.resolvedDebts);
+                     $("#resolvedDebts_amount").text(data.resolvedDebts_amount);
+
+                     $("#profit").text(data.profit);
+                     $("#loss").text(data.loss);
+                     return;
+                 }
+                 if (data.success == -1) {
+                     swal({
+                         title: 'Error!',
+                         html: data.errorMessage,
+                         type: 'error',
+                         allowOutsideClick:false
+                     });
+                     return;
+                 }
+             }
+         });
+    } //Refresh Screen
+
+    function GetAllStats() {
+        if (startDate.GetDate() != null) {
+            startDate.SetDate(null);
+        }
+        if (endDate.GetDate() != null) {
+            endDate.SetDate(null);
+        }
+        SiteUtils.loading("Please wait...");
+        $.ajax({
+            url: '@Url.Action("ClearStaticDateFields", "Admin",new { Area = "Admin" })',
+            type:'Post',
+            data: {},
+            success: function (data) {
+                if (data.success == true) {
+                    location.reload();
+                    return;
+                }
+                if (data.success == -1) {
+                    swal({
+                        title: 'Error!',
+                        html: data.errorMessage,
+                        type: 'error',
+                        allowOutsideClick: false
+                    });
+                    return;
+                }
+            }
+        });
+    } //Get all stats
+
+    function ViewTransactions() {
+        $("#ViewTransaction").modal({ backdrop: 'static', keyboard: false });
+        $("#ViewTransaction").modal("show");
+    }
+    function ViewReceipts() {
+        $("#ViewReceipts").modal({ backdrop: 'static', keyboard: false });
+        $("#ViewReceipts").modal("show");
+    }
+    function ViewAccounts() {
+        $("#ViewAccounts").modal({ backdrop: 'static', keyboard: false });
+        $("#ViewAccounts").modal("show");
+    }
+    function ViewDebtors() {
+        $("#ViewDebtors").modal({ backdrop: 'static', keyboard: false });
+        $("#ViewDebtors").modal("show");
+    }
+    function ViewResolvedDebtors() {
+        $("#ViewResolvedDebtors").modal({ backdrop: 'static', keyboard: false });
+        $("#ViewResolvedDebtors").modal("show");
+    }
+    function ViewDealers() {
+        $("#ViewDealers").modal({ backdrop: 'static', keyboard: false });
+        $("#ViewDealers").modal("show");
+    }
+    function ViewDebts() {
+        $("#ViewDebts").modal({ backdrop: 'static', keyboard: false });
+        $("#ViewDebts").modal("show");
+    }
+    function ViewResolvedDebts() {
+        $("#ViewResolvedDebts").modal({ backdrop: 'static', keyboard: false });
+        $("#ViewResolvedDebts").modal("show");
+    }
+    function ViewProfitAndLoss() {
+        $("#ViewProfitAndLoss").modal({ backdrop: 'static', keyboard: false });
+        $("#ViewProfitAndLoss").modal("show");
+    }
+
+    function CloseTransactionsModal() {
+        $("#ViewTransaction").modal("hide");
+    }
+    function CloseReceiptsModal() {
+        $("#ViewReceipts").modal("hide");
+    }
+    function CloseAccountsModal() {
+        $("#ViewAccounts").modal("hide");
+    }
+    function CloseDebtorsModal() {
+        $("#ViewDebtors").modal("hide");
+    }
+    function CloseResolvedDebtorsModal() {
+        $("#ViewResolvedDebtors").modal("hide");
+    }
+    function CloseDealersModal() {
+        $("#ViewDealers").modal("hide");
+    }
+    function CloseDebtsModal() {
+        $("#ViewDebts").modal("hide");
+    }
+    function CloseResolvedDebtsModal() {
+        $("#ViewResolvedDebts").modal("hide");
+    }
+    function CloseProfitAndLossModal() {
+        $("#ViewProfitAndLoss").modal("hide");
+    }
+
+</script>
+
+<div class="panel panel-default">
+
+    <div class="panel-heading nopadding">
+        <div class="row nomargin">
+            <div class="col-md-12 padding5">
+                <div class="col-md-2">
+                    <h4 class="titleStyle">DASHBOARD</h4>
+                </div>
+                <div class="col-md-10 action-wrap">
+                    <div class="form-inline">
+                        <div class="form-group pull-right">
+                            <div class="form-group">
+                                <div class="btn-group pull-right">
+                                    @Html.DevExpress().Button(settings =>
+                                        {
+                                            settings.Name = "btn_GetAllStats";
+
+                                            settings.Width = 100;
+                                            settings.Text = "Get all stats";
+                                            settings.ToolTip = " Get all Stats";
+                                            settings.ControlStyle.CssClass = "btn btnGetAllStats";
+                                            settings.ClientSideEvents.Click = "GetAllStats";
+                                            settings.ControlStyle.Border.BorderStyle = BorderStyle.Solid;
+                                        }).GetHtml()
+                                    @Html.DevExpress().DateEdit(s =>
+                                 {
+                                     s.Name = "startDate";
+                                     s.Properties.UseMaskBehavior = true;
+                                     s.Properties.EditFormat = EditFormat.Custom;
+                                     s.Properties.EditFormatString = "dd/MM/yyyy";
+                                     s.Properties.DisplayFormatString = "dd/MM/yyyy";
+                                     s.Width = 190;
+                                     s.Theme = "MetropolisBlue";
+                                     s.Properties.NullText = "Start Date: dd/mm/yyyy";
+                                     s.ControlStyle.CssClass = "form-control input-sm";
+                                     s.ControlStyle.ForeColor = Color.Black;
+                                 }).GetHtml()
+                                    @Html.DevExpress().DateEdit(s =>
+                                 {
+                                     s.Name = "endDate";
+                                     s.Properties.UseMaskBehavior = true;
+                                     s.Properties.EditFormat = EditFormat.Custom;
+                                     s.Properties.EditFormatString = "dd/MM/yyyy";
+                                     s.Properties.DisplayFormatString = "dd/MM/yyyy";
+                                     s.Width = 190;
+                                     s.Theme = "MetropolisBlue";
+                                     s.Properties.NullText = "End Date: dd/mm/yyyy";
+                                     s.ControlStyle.CssClass = "form-control input-sm";
+                                     s.ControlStyle.ForeColor = Color.Black;
+                                 }).GetHtml()
+                                    <div class="pull-right">
+                                        @Html.DevExpress().Button(settings =>
+                                           {
+                                               settings.Name = "btn_Refresh";
+
+                                               settings.Width = 100;
+                                               settings.Text = "Refresh";
+                                               settings.ToolTip = " Refresh screen";
+                                               settings.ControlStyle.CssClass = "btn btnETMS";
+                                               settings.ClientSideEvents.Click = "RefreshScreen";
+                                               settings.ControlStyle.Border.BorderStyle = BorderStyle.Solid;
+                                           }).GetHtml()
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!--/form-inline-->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="ViewTransaction" class="modal fade" tabindex="-1" role="dialog" style="display: none;">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Transactions</h4>
+                </div>
+                <div class="modal-body">
+                    <div style="overflow-x:auto">
+                        <div class="table-responsive">
+                            @Html.Action("DashBoard_TransactionsGridViewPartial")
+                        </div>
+                    </div>                    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" onclick="CloseTransactionsModal()"><i class="fa fa-times"></i> Close</button>
+                </div>
+            </div> <!-- / .modal-content -->
+        </div> <!-- / .modal-dialog -->
+    </div>
+
+    <div id="ViewReceipts" class="modal fade" tabindex="-1" role="dialog" style="display: none;">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Receipts</h4>
+                </div>
+                <div class="modal-body">
+                    <div style="overflow-x:auto">
+                        <div class="table-responsive">
+                            @Html.Action("DashBoard_ReceiptsGridViewPartial")
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" onclick="CloseReceiptsModal()"><i class="fa fa-times"></i> Close</button>
+                </div>
+            </div> <!-- / .modal-content -->
+        </div> <!-- / .modal-dialog -->
+    </div>
+
+    <div id="ViewAccounts" class="modal fade" tabindex="-1" role="dialog" style="display: none;">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Accounts</h4>
+                </div>
+                <div class="modal-body">
+                    <div style="overflow-x:auto">
+                        <div class="table-responsive">
+                            @Html.Action("DashBoard_AccountsGridViewPartial")
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" onclick="CloseAccountsModal()"><i class="fa fa-times"></i> Close</button>
+                </div>
+            </div> <!-- / .modal-content -->
+        </div> <!-- / .modal-dialog -->
+    </div>
+
+    <div id="ViewDebtors" class="modal fade" tabindex="-1" role="dialog" style="display: none;">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Debtors</h4>
+                </div>
+                <div class="modal-body">
+                    <div style="overflow-x:auto">
+                        <div class="table-responsive">
+                            @Html.Action("DashBoard_DebtorsGridViewPartial")
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" onclick="CloseDebtorsModal()"><i class="fa fa-times"></i> Close</button>
+                </div>
+            </div> <!-- / .modal-content -->
+        </div> <!-- / .modal-dialog -->
+    </div>
+
+    <div id="ViewResolvedDebtors" class="modal fade" tabindex="-1" role="dialog" style="display: none;">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Resolved Debtors</h4>
+                </div>
+                <div class="modal-body">
+                    <div style="overflow-x:auto">
+                        <div class="table-responsive">
+                            @Html.Action("DashBoard_ResolvedDebtorsGridViewPartial")
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" onclick="CloseResolvedDebtorsModal()"><i class="fa fa-times"></i> Close</button>
+                </div>
+            </div> <!-- / .modal-content -->
+        </div> <!-- / .modal-dialog -->
+    </div>
+
+    <div id="ViewDealers" class="modal fade" tabindex="-1" role="dialog" style="display: none;">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Dealers</h4>
+                </div>
+                <div class="modal-body">
+                    <div style="overflow-x:auto">
+                        <div class="table-responsive">
+                            @Html.Action("DashBoard_DealersGridViewPartial")
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" onclick="CloseDealersModal()"><i class="fa fa-times"></i> Close</button>
+                </div>
+            </div> <!-- / .modal-content -->
+        </div> <!-- / .modal-dialog -->
+    </div>
+
+    <div id="ViewDebts" class="modal fade" tabindex="-1" role="dialog" style="display: none;">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Debts</h4>
+                </div>
+                <div class="modal-body">
+                    <div style="overflow-x:auto">
+                        <div class="table-responsive">
+                            @Html.Action("DashBoard_DebtsGridViewPartial")
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" onclick="CloseDebtsModal()"><i class="fa fa-times"></i> Close</button>
+                </div>
+            </div> <!-- / .modal-content -->
+        </div> <!-- / .modal-dialog -->
+    </div>
+
+    <div id="ViewResolvedDebts" class="modal fade" tabindex="-1" role="dialog" style="display: none;">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Resolved Debts</h4>
+                </div>
+                <div class="modal-body">
+                    <div style="overflow-x:auto">
+                        <div class="table-responsive">
+                            @Html.Action("DashBoard_ResolvedDebtsGridViewPartial")
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" onclick="CloseResolvedDebtsModal()"><i class="fa fa-times"></i> Close</button>
+                </div>
+            </div> <!-- / .modal-content -->
+        </div> <!-- / .modal-dialog -->
+    </div>
+
+    <div id="ViewProfitAndLoss" class="modal fade" tabindex="-1" role="dialog" style="display: none;">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Profit & Loss</h4>
+                </div>
+                <div class="modal-body">
+                    <div style="overflow-x:auto">
+                        <div class="table-responsive">
+                            @Html.Action("DashBoard_ProfitAndLossGridViewPartial")
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" onclick="CloseProfitAndLossModal()"><i class="fa fa-times"></i> Close</button>
+                </div>
+            </div> <!-- / .modal-content -->
+        </div> <!-- / .modal-dialog -->
+    </div>
+
+    <div class="panel-body" style="background-color:#ffffff !important;">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row">
+
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        if (User.IsInRole("SA"))
+                        {
+                            <div class="col-xs-4">
+                                <div class="stat-panel text-center">
+                                    <div class="stat-row">
+                                        <!-- Dark gray background, small padding, extra small text, semibold text -->
+                                        <div class="stat-cell padding-sm text-xs text-semibold" style="background-image:linear-gradient(to right, #259dab 0%, #2574ab 100%); color:#fff">
+                                            <i class="fa fa-shopping-cart"></i>&nbsp;&nbsp;TRANSACTIONS
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                    <div class="stat-row">
+                                        <!-- Bordered, without top border, without horizontal padding -->
+                                        <div class="stat-cell bordered no-border-t no-padding-hr">
+                                            <div class="pie-chart" data-percent="75" id="easy-pie-chart-3">
+                                                <div class="statsInDashboard">
+                                                    <b>Number: </b> <b id="transactions"> @ViewBag.Transactions </b> <br />
+                                                    <b>Amount: </b> <b id="transactions_amount"> @ViewBag.Transactions_Amount </b><br />
+                                                    <input type="button" onclick="ViewTransactions()" value="View" class="btn-info" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                </div> <!-- /.stat-panel -->
+                            </div> @*TRANSACTIONS*@
+
+                            <div class="col-xs-4">
+                                <div class="stat-panel text-center">
+                                    <div class="stat-row">
+                                        <!-- Dark gray background, small padding, extra small text, semibold text -->
+                                        <div class="stat-cell padding-sm text-xs text-semibold" style="background-image:linear-gradient(to right, #259dab 0%, #2574ab 100%); color:#fff">
+                                            <i class="glyphicon glyphicon-list"></i>&nbsp;&nbsp;RECEIPTS
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                    <div class="stat-row">
+                                        <!-- Bordered, without top border, without horizontal padding -->
+                                        <div class="stat-cell bordered no-border-t no-padding-hr">
+                                            <div class="pie-chart" data-percent="75" id="easy-pie-chart-3">
+                                                <div class="statsInDashboard">
+                                                    <b>Number: </b> <b id="receipts"> @ViewBag.Receipts </b> <br />
+                                                    <b>Amount: </b> <b id="receipts_amount"> @ViewBag.Receipts_Amount </b><br />
+                                                    <input type="button" onclick="ViewReceipts()" value="View" class="btn-info" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                </div> <!-- /.stat-panel -->
+                            </div> @*RECEIPTS*@
+
+                            <div class="col-xs-4">
+                                <div class="stat-panel text-center">
+                                    <div class="stat-row">
+                                        <!-- Dark gray background, small padding, extra small text, semibold text -->
+                                        <div class="stat-cell padding-sm text-xs text-semibold" style="background-image:linear-gradient(to right, #259dab 0%, #2574ab 100%); color:#fff">
+                                            <i class="fa fa-globe"></i>&nbsp;&nbsp;DEALERS
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                    <div class="stat-row">
+                                        <!-- Bordered, without top border, without horizontal padding -->
+                                        <div class="stat-cell bordered no-border-t no-padding-hr">
+                                            <div class="pie-chart" data-percent="75" id="easy-pie-chart-3">
+                                                <div class="statsInDashboard">
+                                                    <b>Number: </b> <b id="dealers"> @ViewBag.Dealers </b> <br />
+                                                    <br />
+                                                    <input type="button" onclick="ViewDealers()" value="View" class="btn-info" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                </div> <!-- /.stat-panel -->
+                            </div> @*DEALERS*@
+                        }
+                        if (User.IsInRole("SU"))
+                        {
+                            @*FIRST LEVEL*@
+                            <div class="col-xs-4">
+                                <div class="stat-panel text-center">
+                                    <div class="stat-row">
+                                        <!-- Dark gray background, small padding, extra small text, semibold text -->
+                                        <div class="stat-cell padding-sm text-xs text-semibold" style="background-image:linear-gradient(to right, #259dab 0%, #2574ab 100%); color:#fff">
+                                            <i class="fa fa-shopping-cart"></i>&nbsp;&nbsp;TRANSACTIONS
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                    <div class="stat-row">
+                                        <!-- Bordered, without top border, without horizontal padding -->
+                                        <div class="stat-cell bordered no-border-t no-padding-hr">
+                                            <div class="pie-chart" data-percent="75" id="easy-pie-chart-3">
+                                                <div class="statsInDashboard">
+                                                    <b>Number: </b> <b id="transactions"> @ViewBag.Transactions </b> <br />
+                                                    <b>Amount: </b> <b id="transactions_amount"> @ViewBag.Transactions_Amount </b><br />
+                                                    <input type="button" onclick="ViewTransactions()" value="View" class="btn-info" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                </div> <!-- /.stat-panel -->
+                            </div> @*TRANSACTIONS*@
+
+                            <div class="col-xs-4">
+                                <div class="stat-panel text-center">
+                                    <div class="stat-row">
+                                        <!-- Dark gray background, small padding, extra small text, semibold text -->
+                                        <div class="stat-cell padding-sm text-xs text-semibold" style="background-image:linear-gradient(to right, #259dab 0%, #2574ab 100%); color:#fff">
+                                            <i class="glyphicon glyphicon-list"></i>&nbsp;&nbsp;RECEIPTS
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                    <div class="stat-row">
+                                        <!-- Bordered, without top border, without horizontal padding -->
+                                        <div class="stat-cell bordered no-border-t no-padding-hr">
+                                            <div class="pie-chart" data-percent="75" id="easy-pie-chart-3">
+                                                <div class="statsInDashboard">
+                                                    <b>Number: </b> <b id="receipts"> @ViewBag.Receipts </b> <br />
+                                                    <b>Amount: </b> <b id="receipts_amount"> @ViewBag.Receipts_Amount </b><br />
+                                                    <input type="button" onclick="ViewReceipts()" value="View" class="btn-info" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                </div> <!-- /.stat-panel -->
+                            </div> @*RECEIPTS*@
+
+                            <div class="col-xs-4">
+                                <div class="stat-panel text-center">
+                                    <div class="stat-row">
+                                        <!-- Dark gray background, small padding, extra small text, semibold text -->
+                                        <div class="stat-cell padding-sm text-xs text-semibold" style="background-image:linear-gradient(to right, #259dab 0%, #2574ab 100%); color:#fff">
+                                            <i class="fa fa-money"></i>&nbsp;&nbsp;ACCOUNTS
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                    <div class="stat-row">
+                                        <!-- Bordered, without top border, without horizontal padding -->
+                                        <div class="stat-cell bordered no-border-t no-padding-hr">
+                                            <div class="pie-chart" data-percent="75" id="easy-pie-chart-3">
+                                                <div class="statsInDashboard">
+                                                    <b>Number: </b> <b id="accounts"> @ViewBag.Accounts </b> <br />
+                                                    <b>Amount: </b> <b id="accounts_amount"> @ViewBag.Accounts_Amount </b><br />
+                                                    <input type="button" onclick="ViewAccounts()" value="View" class="btn-info" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                </div> <!-- /.stat-panel -->
+                            </div> @*ACCOUNTS*@
+
+                            @*SECOND LEVEL*@
+                            <div class="col-xs-4">
+                                <div class="stat-panel text-center">
+                                    <div class="stat-row">
+                                        <!-- Dark gray background, small padding, extra small text, semibold text -->
+                                        <div class="stat-cell padding-sm text-xs text-semibold" style="background-image:linear-gradient(to right, #f72e2e 0%, #ff0000 100%); color:#fff">
+                                            <i class="fa fa-thumbs-down"></i>&nbsp;&nbsp;DEBTORS
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                    <div class="stat-row">
+                                        <!-- Bordered, without top border, without horizontal padding -->
+                                        <div class="stat-cell bordered no-border-t no-padding-hr">
+                                            <div class="pie-chart" data-percent="75" id="easy-pie-chart-3">
+                                                <div class="statsInDashboard">
+                                                    <b>Number: </b> <b id="debtors"> @ViewBag.Debtors </b> <br />
+                                                    <b>Amount: </b> <b id="debtors_amount"> @ViewBag.Debtors_Amount </b><br />
+                                                    <input type="button" onclick="ViewDebtors()" value="View" class="btn-danger" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                </div> <!-- /.stat-panel -->
+                            </div> @*DEPTORS*@
+
+                            <div class="col-xs-4">
+                                <div class="stat-panel text-center">
+                                    <div class="stat-row">
+                                        <!-- Dark gray background, small padding, extra small text, semibold text -->
+                                        <div class="stat-cell padding-sm text-xs text-semibold" style="background-image:linear-gradient(to right, #f72e2e 0%, #ff0000 100%); color:#fff">
+                                            <i class="fa fa-thumbs-up"></i>&nbsp;&nbsp;RESOLVED DEBTORS
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                    <div class="stat-row">
+                                        <!-- Bordered, without top border, without horizontal padding -->
+                                        <div class="stat-cell bordered no-border-t no-padding-hr">
+                                            <div class="pie-chart" data-percent="75" id="easy-pie-chart-3">
+                                                <div class="statsInDashboard">
+                                                    <b>Number: </b> <b id="resolvedDebtors"> @ViewBag.ResolvedDebtors </b> <br />
+                                                    <b>Amount: </b> <b id="resolvedDebtors_amount"> @ViewBag.ResolvedDebtors_Amount </b><br />
+                                                    <input type="button" onclick="ViewResolvedDebtors()" value="View" class="btn-danger" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                </div> <!-- /.stat-panel -->
+                            </div> @*RESOLVED DEPTORS*@
+
+                            <div class="col-xs-4">
+                                <div class="stat-panel text-center">
+                                    <div class="stat-row">
+                                        <!-- Dark gray background, small padding, extra small text, semibold text -->
+                                        <div class="stat-cell padding-sm text-xs text-semibold" style="background-image:linear-gradient(to right, #259dab 0%, #2574ab 100%); color:#fff">
+                                            <i class="fa fa-globe"></i>&nbsp;&nbsp;DEALERS
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                    <div class="stat-row">
+                                        <!-- Bordered, without top border, without horizontal padding -->
+                                        <div class="stat-cell bordered no-border-t no-padding-hr">
+                                            <div class="pie-chart" data-percent="75" id="easy-pie-chart-3">
+                                                <div class="statsInDashboard">
+                                                    <b>Number: </b> <b id="dealers"> @ViewBag.Dealers </b> <br />
+                                                    <br />
+                                                    <input type="button" onclick="ViewDealers()" value="View" class="btn-info" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                </div> <!-- /.stat-panel -->
+                            </div> @*DEALERS*@
+
+                            @*THIRD LEVEL*@
+                            <div class="col-xs-4">
+                                <div class="stat-panel text-center">
+                                    <div class="stat-row">
+                                        <!-- Dark gray background, small padding, extra small text, semibold text -->
+                                        <div class="stat-cell padding-sm text-xs text-semibold" style="background-image:linear-gradient(to right, #f72e2e 0%, #ff0000 100%); color:#fff">
+                                            <i class="fa fa-frown-o"></i>&nbsp;&nbsp;DEPTS
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                    <div class="stat-row">
+                                        <!-- Bordered, without top border, without horizontal padding -->
+                                        <div class="stat-cell bordered no-border-t no-padding-hr">
+                                            <div class="pie-chart" data-percent="75" id="easy-pie-chart-3">
+                                                <div class="statsInDashboard">
+                                                    <b>Number: </b> <b id="debts"> @ViewBag.Debts </b> <br />
+                                                    <b>Amount: </b> <b id="debts_amount"> @ViewBag.Debts_Amount </b><br />
+                                                    <input type="button" onclick="ViewDebts()" value="View" class="btn-danger" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                </div> <!-- /.stat-panel -->
+                            </div> @*DEPTS*@
+
+                            <div class="col-xs-4">
+                                <div class="stat-panel text-center">
+                                    <div class="stat-row">
+                                        <!-- Dark gray background, small padding, extra small text, semibold text -->
+                                        <div class="stat-cell padding-sm text-xs text-semibold" style="background-image:linear-gradient(to right, #f72e2e 0%, #ff0000 100%); color:#fff">
+                                            <i class="fa fa-smile-o"></i>&nbsp;&nbsp;RESOLVED DEPTS
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                    <div class="stat-row">
+                                        <!-- Bordered, without top border, without horizontal padding -->
+                                        <div class="stat-cell bordered no-border-t no-padding-hr">
+                                            <div class="pie-chart" data-percent="75" id="easy-pie-chart-3">
+                                                <div class="statsInDashboard">
+                                                    <b>Number: </b> <b id="resolvedDebts"> @ViewBag.ResolvedDebts </b> <br />
+                                                    <b>Amount: </b> <b id="resolvedDebts_amount"> @ViewBag.ResolvedDebts_Amount </b><br />
+                                                    <input type="button" onclick="ViewResolvedDebts()" value="View" class="btn-danger" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                </div> <!-- /.stat-panel -->
+                            </div> @*RESOLVED DEPTS*@
+
+                            <div class="col-xs-4">
+                                <div class="stat-panel text-center">
+                                    <div class="stat-row">
+                                        <!-- Dark gray background, small padding, extra small text, semibold text -->
+                                        <div class="stat-cell padding-sm text-xs text-semibold" style="background-image:linear-gradient(to right, #259dab 0%, #2574ab 100%); color:#fff">
+                                            <i class="fa fa-briefcase"></i>&nbsp;&nbsp;PROFIT & LOSS
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                    <div class="stat-row">
+                                        <!-- Bordered, without top border, without horizontal padding -->
+                                        <div class="stat-cell bordered no-border-t no-padding-hr">
+                                            <div class="pie-chart" data-percent="75" id="easy-pie-chart-3">
+                                                <div class="statsInDashboard">
+                                                    <b>Profit: </b> <b class="profit" id="profit"> @ViewBag.Profit </b> <br />
+                                                    <b>Loss: </b> <b class="loss" id="loss"> @ViewBag.Loss </b><br />
+                                                    <input type="button" onclick="ViewProfitAndLoss()" value="View" class="btn-info" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                </div> <!-- /.stat-panel -->
+                            </div> @*PROFIT&LOSS*@
+                        }
+
+                        if (User.IsInRole("AC"))
+                        {
+                            @*FIRST LEVEL*@
+                            <div class="col-xs-4">
+                                <div class="stat-panel text-center">
+                                    <div class="stat-row">
+                                        <!-- Dark gray background, small padding, extra small text, semibold text -->
+                                        <div class="stat-cell padding-sm text-xs text-semibold" style="background-image:linear-gradient(to right, #259dab 0%, #2574ab 100%); color:#fff">
+                                            <i class="fa fa-shopping-cart"></i>&nbsp;&nbsp;TRANSACTIONS
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                    <div class="stat-row">
+                                        <!-- Bordered, without top border, without horizontal padding -->
+                                        <div class="stat-cell bordered no-border-t no-padding-hr">
+                                            <div class="pie-chart" data-percent="75" id="easy-pie-chart-3">
+                                                <div class="statsInDashboard">
+                                                    <b>Number: </b> <b id="transactions"> @ViewBag.Transactions </b> <br />
+                                                    <b>Amount: </b> <b id="transactions_amount"> @ViewBag.Transactions_Amount </b><br />
+                                                    <input type="button" onclick="ViewTransactions()" value="View" class="btn-info" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                </div> <!-- /.stat-panel -->
+                            </div> @*TRANSACTIONS*@
+
+                            <div class="col-xs-4">
+                                <div class="stat-panel text-center">
+                                    <div class="stat-row">
+                                        <!-- Dark gray background, small padding, extra small text, semibold text -->
+                                        <div class="stat-cell padding-sm text-xs text-semibold" style="background-image:linear-gradient(to right, #259dab 0%, #2574ab 100%); color:#fff">
+                                            <i class="glyphicon glyphicon-list"></i>&nbsp;&nbsp;RECEIPTS
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                    <div class="stat-row">
+                                        <!-- Bordered, without top border, without horizontal padding -->
+                                        <div class="stat-cell bordered no-border-t no-padding-hr">
+                                            <div class="pie-chart" data-percent="75" id="easy-pie-chart-3">
+                                                <div class="statsInDashboard">
+                                                    <b>Number: </b> <b id="receipts"> @ViewBag.Receipts </b> <br />
+                                                    <b>Amount: </b> <b id="receipts_amount"> @ViewBag.Receipts_Amount </b><br />
+                                                    <input type="button" onclick="ViewReceipts()" value="View" class="btn-info" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                </div> <!-- /.stat-panel -->
+                            </div> @*RECEIPTS*@
+
+                            <div class="col-xs-4">
+                                <div class="stat-panel text-center">
+                                    <div class="stat-row">
+                                        <!-- Dark gray background, small padding, extra small text, semibold text -->
+                                        <div class="stat-cell padding-sm text-xs text-semibold" style="background-image:linear-gradient(to right, #259dab 0%, #2574ab 100%); color:#fff">
+                                            <i class="fa fa-money"></i>&nbsp;&nbsp;ACCOUNTS
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                    <div class="stat-row">
+                                        <!-- Bordered, without top border, without horizontal padding -->
+                                        <div class="stat-cell bordered no-border-t no-padding-hr">
+                                            <div class="pie-chart" data-percent="75" id="easy-pie-chart-3">
+                                                <div class="statsInDashboard">
+                                                    <b>Number: </b> <b id="accounts"> @ViewBag.Accounts </b> <br />
+                                                    <b>Amount: </b> <b id="accounts_amount"> @ViewBag.Accounts_Amount </b><br />
+                                                    <input type="button" onclick="ViewAccounts()" value="View" class="btn-info" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                </div> <!-- /.stat-panel -->
+                            </div> @*ACCOUNTS*@
+
+                            @*SECOND LEVEL*@
+                            <div class="col-xs-4">
+                                <div class="stat-panel text-center">
+                                    <div class="stat-row">
+                                        <!-- Dark gray background, small padding, extra small text, semibold text -->
+                                        <div class="stat-cell padding-sm text-xs text-semibold" style="background-image:linear-gradient(to right, #f72e2e 0%, #ff0000 100%); color:#fff">
+                                            <i class="fa fa-thumbs-down"></i>&nbsp;&nbsp;DEBTORS
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                    <div class="stat-row">
+                                        <!-- Bordered, without top border, without horizontal padding -->
+                                        <div class="stat-cell bordered no-border-t no-padding-hr">
+                                            <div class="pie-chart" data-percent="75" id="easy-pie-chart-3">
+                                                <div class="statsInDashboard">
+                                                    <b>Number: </b> <b id="debtors"> @ViewBag.Debtors </b> <br />
+                                                    <b>Amount: </b> <b id="debtors_amount"> @ViewBag.Debtors_Amount </b><br />
+                                                    <input type="button" onclick="ViewDebtors()" value="View" class="btn-danger" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                </div> <!-- /.stat-panel -->
+                            </div> @*DEPTORS*@
+
+                            <div class="col-xs-4">
+                                <div class="stat-panel text-center">
+                                    <div class="stat-row">
+                                        <!-- Dark gray background, small padding, extra small text, semibold text -->
+                                        <div class="stat-cell padding-sm text-xs text-semibold" style="background-image:linear-gradient(to right, #f72e2e 0%, #ff0000 100%); color:#fff">
+                                            <i class="fa fa-thumbs-up"></i>&nbsp;&nbsp;RESOLVED DEBTORS
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                    <div class="stat-row">
+                                        <!-- Bordered, without top border, without horizontal padding -->
+                                        <div class="stat-cell bordered no-border-t no-padding-hr">
+                                            <div class="pie-chart" data-percent="75" id="easy-pie-chart-3">
+                                                <div class="statsInDashboard">
+                                                    <b>Number: </b> <b id="resolvedDebtors"> @ViewBag.ResolvedDebtors </b> <br />
+                                                    <b>Amount: </b> <b id="resolvedDebtors_amount"> @ViewBag.ResolvedDebtors_Amount </b><br />
+                                                    <input type="button" onclick="ViewResolvedDebtors()" value="View" class="btn-danger" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                </div> <!-- /.stat-panel -->
+                            </div> @*RESOLVED DEPTORS*@
+
+                            <div class="col-xs-4">
+                                <div class="stat-panel text-center">
+                                    <div class="stat-row">
+                                        <!-- Dark gray background, small padding, extra small text, semibold text -->
+                                        <div class="stat-cell padding-sm text-xs text-semibold" style="background-image:linear-gradient(to right, #259dab 0%, #2574ab 100%); color:#fff">
+                                            <i class="fa fa-globe"></i>&nbsp;&nbsp;DEALERS
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                    <div class="stat-row">
+                                        <!-- Bordered, without top border, without horizontal padding -->
+                                        <div class="stat-cell bordered no-border-t no-padding-hr">
+                                            <div class="pie-chart" data-percent="75" id="easy-pie-chart-3">
+                                                <div class="statsInDashboard">
+                                                    <b>Number: </b> <b id="dealers"> @ViewBag.Dealers </b> <br />
+                                                    <br />
+                                                    <input type="button" onclick="ViewDealers()" value="View" class="btn-info" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                </div> <!-- /.stat-panel -->
+                            </div> @*DEALERS*@
+
+                            @*THIRD LEVEL*@
+                            <div class="col-xs-4">
+                                <div class="stat-panel text-center">
+                                    <div class="stat-row">
+                                        <!-- Dark gray background, small padding, extra small text, semibold text -->
+                                        <div class="stat-cell padding-sm text-xs text-semibold" style="background-image:linear-gradient(to right, #f72e2e 0%, #ff0000 100%); color:#fff">
+                                            <i class="fa fa-frown-o"></i>&nbsp;&nbsp;DEPTS
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                    <div class="stat-row">
+                                        <!-- Bordered, without top border, without horizontal padding -->
+                                        <div class="stat-cell bordered no-border-t no-padding-hr">
+                                            <div class="pie-chart" data-percent="75" id="easy-pie-chart-3">
+                                                <div class="statsInDashboard">
+                                                    <b>Number: </b> <b id="debts"> @ViewBag.Debts </b> <br />
+                                                    <b>Amount: </b> <b id="debts_amount"> @ViewBag.Debts_Amount </b><br />
+                                                    <input type="button" onclick="ViewDebts()" value="View" class="btn-danger" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                </div> <!-- /.stat-panel -->
+                            </div> @*DEPTS*@
+
+                            <div class="col-xs-4">
+                                <div class="stat-panel text-center">
+                                    <div class="stat-row">
+                                        <!-- Dark gray background, small padding, extra small text, semibold text -->
+                                        <div class="stat-cell padding-sm text-xs text-semibold" style="background-image:linear-gradient(to right, #f72e2e 0%, #ff0000 100%); color:#fff">
+                                            <i class="fa fa-smile-o"></i>&nbsp;&nbsp;RESOLVED DEPTS
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                    <div class="stat-row">
+                                        <!-- Bordered, without top border, without horizontal padding -->
+                                        <div class="stat-cell bordered no-border-t no-padding-hr">
+                                            <div class="pie-chart" data-percent="75" id="easy-pie-chart-3">
+                                                <div class="statsInDashboard">
+                                                    <b>Number: </b> <b id="resolvedDebts"> @ViewBag.ResolvedDebts </b> <br />
+                                                    <b>Amount: </b> <b id="resolvedDebts_amount"> @ViewBag.ResolvedDebts_Amount </b><br />
+                                                    <input type="button" onclick="ViewResolvedDebts()" value="View" class="btn-danger" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                </div> <!-- /.stat-panel -->
+                            </div> @*RESOLVED DEPTS*@
+
+                            <div class="col-xs-4">
+                                <div class="stat-panel text-center">
+                                    <div class="stat-row">
+                                        <!-- Dark gray background, small padding, extra small text, semibold text -->
+                                        <div class="stat-cell padding-sm text-xs text-semibold" style="background-image:linear-gradient(to right, #259dab 0%, #2574ab 100%); color:#fff">
+                                            <i class="fa fa-briefcase"></i>&nbsp;&nbsp;PROFIT & LOSS
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                    <div class="stat-row">
+                                        <!-- Bordered, without top border, without horizontal padding -->
+                                        <div class="stat-cell bordered no-border-t no-padding-hr">
+                                            <div class="pie-chart" data-percent="75" id="easy-pie-chart-3">
+                                                <div class="statsInDashboard">
+                                                    <b>Profit: </b> <b class="profit" id="profit"> @ViewBag.Profit </b> <br />
+                                                    <b>Loss: </b> <b class="loss" id="loss"> @ViewBag.Loss </b><br />
+                                                    <input type="button" onclick="ViewProfitAndLoss()" value="View" class="btn-info" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div> <!-- /.stat-row -->
+                                </div> <!-- /.stat-panel -->
+                            </div> @*PROFIT&LOSS*@
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

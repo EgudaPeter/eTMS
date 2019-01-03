@@ -1,0 +1,283 @@
+@using System.Web.UI.WebControls
+
+@{
+    System.Globalization.CultureInfo ci = new System.Globalization.CultureInfo("en-US");
+    ci.NumberFormat.CurrencySymbol = "";
+    System.Threading.Thread.CurrentThread.CurrentCulture = ci;
+}
+
+@{
+    var grid = Html.DevExpress().GridView(settings => {
+        settings.Name = "TransactionGridView";
+        settings.CallbackRouteValues = new { Controller = "Transactions", Action = "TransactionGridViewPartial" };
+        settings.SettingsSearchPanel.Visible = true;
+        settings.SettingsText.SearchPanelEditorNullText = "Enter Text to Search...";
+        settings.Width = Unit.Percentage(100);
+        settings.Settings.ShowTitlePanel = true;
+        //settings.Styles.TitlePanel.CssClass = "titleContainer";
+        settings.Theme = "MetropolisBlue";
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.Width = 30;
+
+        settings.ClientSideEvents.SelectionChanged = "OnSelectionChanged";
+
+        settings.KeyFieldName = "TransactionID";
+        settings.EnableRowsCache = false;
+        settings.SettingsLoadingPanel.Mode = GridViewLoadingPanelMode.Disabled;
+
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = false;
+        settings.Settings.ShowHeaderFilterButton = true;
+        settings.SettingsBehavior.AllowSelectByRowClick = false;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        if (User.Identity.IsAuthenticated)
+        {
+            if(User.IsInRole("SA") || User.IsInRole("SU"))
+            {
+                settings.Columns.Add(column =>
+                {
+                    column.FieldName = "menu";
+                    column.Caption = "#";
+                    column.Width = 40;
+                    column.UnboundType = DevExpress.Data.UnboundColumnType.String;
+                    column.Settings.AllowHeaderFilter = DefaultBoolean.False;
+                    column.SetDataItemTemplateContent(c =>
+                    {
+                        string itemID = DataBinder.Eval(c.DataItem, "TransactionID").ToString();
+
+                        string menuLink = "<a id=\"menuLink" + itemID + "\" href=\"javascript:void(0)\"><button class=\"btn btn-xs btn-default dropdown\" type=\"button\" data-toggle=\"dropdown\" aria-expanded=\"false\" id-slug='" + itemID + "'  id=\"dropup\"><i class=\"fa fa-bars\"></i></button></a>";
+
+                        string popup = Html.DevExpress().PopupMenu(
+                            settings2 =>
+                            {
+                                settings2.Name = "rowMenu" + itemID;
+                                settings2.PopupElementID = "menuLink" + itemID;
+                                settings2.ShowPopOutImages = DefaultBoolean.True;
+                                settings2.AllowSelectItem = false;
+                                settings2.Theme = "MetropolisBlue";
+
+                                settings2.Items.Add(item =>
+                                {
+                                    item.Text = "View";
+                                    item.Name = "View";
+                                    item.ToolTip = "View Record";
+                                    item.ItemStyle.ForeColor = System.Drawing.Color.White;
+                                    item.ItemStyle.BackColor = System.Drawing.Color.FromArgb(101, 92, 92);
+
+                                });
+
+                                settings2.Items.Add(item =>
+                                {
+                                    item.Text = "Edit";
+                                    item.Name = "Edit";
+                                    item.ToolTip = "Edit Record";
+                                    item.ItemStyle.ForeColor = System.Drawing.Color.White;
+                                    item.ItemStyle.BackColor = System.Drawing.Color.FromArgb(101, 92, 92);
+
+                                });
+                                if (User.IsInRole("SU"))
+                                {
+                                    settings2.Items.Add(item =>
+                                    {
+                                        item.Text = "Delete";
+                                        item.Name = "Delete";
+                                        item.ToolTip = "Delete Record";
+                                        item.ItemStyle.ForeColor = System.Drawing.Color.White;
+                                        item.ItemStyle.BackColor = System.Drawing.Color.FromArgb(101, 92, 92);
+                                    });
+                                }
+                                settings2.ClientSideEvents.ItemClick = "OnPopupMenuItemClick";
+                                settings2.PopupAction = PopupAction.LeftMouseClick;
+                            }
+                            ).GetHtml().ToHtmlString();
+
+                        ViewContext.Writer.Write(menuLink + popup);
+                    });
+                });
+            }
+        }
+
+        settings.Columns.Add(m =>
+        {
+            m.FieldName = "TransactionID";
+            m.Caption = "ID";
+            m.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+            m.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+            m.Width = 50;
+            m.HeaderStyle.Font.Bold = true;
+            m.HeaderStyle.Font.Size = 11;
+            m.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+            m.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        });
+        settings.Columns.Add(m =>
+        {
+            m.FieldName = "TID";
+            m.Caption = "Type";
+            m.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+            m.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+            m.CellStyle.Wrap = DefaultBoolean.False;
+            m.HeaderStyle.Font.Bold = true;
+            m.HeaderStyle.Font.Size = 11;
+            m.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+            m.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        });
+        settings.Columns.Add(m =>
+        {
+            m.FieldName = "FID";
+            m.Caption = "Factor";
+            //m.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+            //m.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+            m.CellStyle.Wrap = DefaultBoolean.False;
+            m.HeaderStyle.Font.Bold = true;
+            m.HeaderStyle.Font.Size = 11;
+            m.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+            m.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        });
+
+        settings.Columns.Add(m =>
+        {
+            m.FieldName = "AccountID";
+            m.Caption = "Account used";
+            m.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+            m.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+            m.CellStyle.Wrap = DefaultBoolean.False;
+            m.HeaderStyle.Font.Bold = true;
+            m.HeaderStyle.Font.Size = 11;
+            m.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+            m.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        });
+        settings.Columns.Add(m =>
+        {
+            m.FieldName = "Bank";
+            m.Caption = "Bank";
+            //m.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+            //m.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+            m.CellStyle.Wrap = DefaultBoolean.False;
+            m.HeaderStyle.Font.Bold = true;
+            m.HeaderStyle.Font.Size = 11;
+            m.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+            m.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        });
+        settings.Columns.Add(m =>
+        {
+            m.FieldName = "DealerID";
+            m.Caption = "Dealer";
+            //m.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+            //m.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+            m.CellStyle.Wrap = DefaultBoolean.False;
+            m.HeaderStyle.Font.Bold = true;
+            m.HeaderStyle.Font.Size = 11;
+            m.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+            m.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        });
+        settings.Columns.Add(m =>
+        {
+            m.FieldName = "EffectiveDate";
+            m.Caption = "Effective Date";
+            m.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+            m.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+            m.CellStyle.Wrap = DefaultBoolean.False;
+            m.HeaderStyle.Font.Bold = true;
+            m.HeaderStyle.Font.Size = 11;
+            m.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+            m.PropertiesEdit.DisplayFormatString = "dd, MMMM yyyy";
+        });
+        settings.Columns.Add(m =>
+        {
+            m.FieldName = "CapturedBy";
+            m.Caption = "Captured By";
+            //m.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+            //m.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+            m.CellStyle.Wrap = DefaultBoolean.False;
+            m.HeaderStyle.Font.Bold = true;
+            m.HeaderStyle.Font.Size = 11;
+            m.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+            m.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        });
+        settings.Columns.Add(m =>
+        {
+            m.FieldName = "PaymentMode";
+            m.Caption = "Payment Mode";
+            m.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+            m.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+            m.CellStyle.Wrap = DefaultBoolean.False;
+            m.HeaderStyle.Font.Bold = true;
+            m.HeaderStyle.Font.Size = 11;
+            m.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+            m.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        });
+        settings.Columns.Add(m =>
+        {
+            m.FieldName = "AmountPaid";
+            m.Caption = "Amount Paid";
+            m.HeaderStyle.HorizontalAlign = HorizontalAlign.Right;
+            m.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+            m.CellStyle.Wrap = DefaultBoolean.False;
+            m.HeaderStyle.Font.Bold = true;
+            m.HeaderStyle.Font.Size = 11;
+            m.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+            m.PropertiesEdit.DisplayFormatString = "c";
+            m.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        });
+        settings.Columns.Add(m =>
+        {
+            m.FieldName = "AmountOutstanding";
+            m.Caption = "Amount Outstanding";
+            m.HeaderStyle.HorizontalAlign = HorizontalAlign.Right;
+            m.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+            m.CellStyle.Wrap = DefaultBoolean.False;
+            m.HeaderStyle.Font.Bold = true;
+            m.HeaderStyle.Font.Size = 11;
+            m.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+            m.PropertiesEdit.DisplayFormatString = "c";
+            m.Settings.AllowHeaderFilter = DefaultBoolean.False;
+        });
+
+        settings.SettingsPager.Visible = true;
+        settings.SettingsPager.FirstPageButton.Visible = true;
+        settings.SettingsPager.LastPageButton.Visible = true;
+        settings.SettingsPager.Mode = GridViewPagerMode.ShowPager;
+        settings.SettingsPager.EllipsisMode = PagerEllipsisMode.InsideNumeric;
+        settings.SettingsPager.Position = PagerPosition.Bottom;
+        settings.SettingsPager.ShowNumericButtons = true;
+        settings.SettingsPager.ShowSeparators = true;
+        settings.SettingsPager.PageSizeItemSettings.Visible = true;
+        settings.SettingsPager.PageSizeItemSettings.Items = new string[] { "10", "30" };
+
+        settings.Settings.ShowFooter = true;
+        settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "AmountPaid");
+        settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "AmountOutstanding");
+
+        settings.HtmlRowCreated = (s, e) =>
+        {
+            var gridView = s as MVCxGridView;
+            if (ViewBag.Key != null)
+            {
+                gridView.SettingsBehavior.AllowFocusedRow = true;
+                gridView.FocusedRowIndex = gridView.FindVisibleIndexByKeyValue(ViewBag.Key);
+            }
+            else
+            {
+                gridView.SettingsBehavior.AllowFocusedRow = false;
+            }
+        };
+
+        settings.SetTitlePanelTemplateContent(c =>
+        {
+            //ViewContext.Writer.Write(@"<a class=""btn"" style = ""color:#000;margin-top:5px; margin-right:1110px;margin-bottom:3px; font-weight:bold;"" onClick=""DisplayTransactionForm()"">Make a Transaction</a>");
+        });
+    });
+    if (ViewData["EditError"] != null){
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

@@ -1,0 +1,15 @@
+E:\TMSWeb\eTMS\eTMS.Common\bin\Debug\eTMS.Common.dll
+E:\TMSWeb\eTMS\eTMS.Common\bin\Debug\eTMS.Common.pdb
+E:\TMSWeb\eTMS\eTMS.Common\obj\Debug\eTMS.Common.csprojResolveAssemblyReference.cache
+E:\TMSWeb\eTMS\eTMS.Common\obj\Debug\eTMS.Common.dll
+E:\TMSWeb\eTMS\eTMS.Common\obj\Debug\eTMS.Common.pdb
+C:\TMSWeb\eTMS\eTMS.Common\bin\Debug\eTMS.Common.dll
+C:\TMSWeb\eTMS\eTMS.Common\bin\Debug\eTMS.Common.pdb
+C:\TMSWeb\eTMS\eTMS.Common\obj\Debug\eTMS.Common.csprojResolveAssemblyReference.cache
+C:\TMSWeb\eTMS\eTMS.Common\obj\Debug\eTMS.Common.dll
+C:\TMSWeb\eTMS\eTMS.Common\obj\Debug\eTMS.Common.pdb
+F:\Projects\TMSWeb\eTMS\eTMS.Common\bin\Debug\eTMS.Common.dll
+F:\Projects\TMSWeb\eTMS\eTMS.Common\bin\Debug\eTMS.Common.pdb
+F:\Projects\TMSWeb\eTMS\eTMS.Common\obj\Debug\eTMS.Common.csprojResolveAssemblyReference.cache
+F:\Projects\TMSWeb\eTMS\eTMS.Common\obj\Debug\eTMS.Common.dll
+F:\Projects\TMSWeb\eTMS\eTMS.Common\obj\Debug\eTMS.Common.pdb

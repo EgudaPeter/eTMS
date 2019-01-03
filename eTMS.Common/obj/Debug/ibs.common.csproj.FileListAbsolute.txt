@@ -1,0 +1,12 @@
+C:\Projects\Web\Multiplan\ibs.common\bin\Debug\Ibs.Common.dll
+C:\Projects\Web\Multiplan\ibs.common\bin\Debug\Ibs.Common.pdb
+C:\Projects\Web\Multiplan\ibs.common\obj\Debug\Ibs.Common.dll
+C:\Projects\Web\Multiplan\ibs.common\obj\Debug\Ibs.Common.pdb
+C:\WebProject\iMultiplan\ibs.common\bin\Debug\Ibs.Common.dll
+C:\WebProject\iMultiplan\ibs.common\bin\Debug\Ibs.Common.pdb
+C:\WebProject\iMultiplan\ibs.common\obj\Debug\Ibs.Common.dll
+C:\WebProject\iMultiplan\ibs.common\obj\Debug\Ibs.Common.pdb
+C:\MultiplanWEB\multiplan\ibs.common\bin\Debug\Ibs.Common.dll
+C:\MultiplanWEB\multiplan\ibs.common\bin\Debug\Ibs.Common.pdb
+C:\MultiplanWEB\multiplan\ibs.common\obj\Debug\Ibs.Common.dll
+C:\MultiplanWEB\multiplan\ibs.common\obj\Debug\Ibs.Common.pdb

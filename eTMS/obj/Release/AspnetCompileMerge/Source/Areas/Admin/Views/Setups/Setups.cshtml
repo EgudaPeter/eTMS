@@ -1,0 +1,172 @@
+﻿@model eTMS.BusinessObjectLayer.Setup
+
+@using System.Web.UI.WebControls
+@using System.Drawing
+
+@{
+    ViewBag.Title = "Setups";
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+}
+
+<script>
+
+    $(document).ready(function () {
+        $.ajax({
+            url: '@Url.Action("GetValues", "Setups", new { Area = "Admin" })',
+            type: 'Post',
+            data: {},
+            success: function (data) {
+                if (data.success == true) {
+                    Months_ComboBox.SetValue(data.month);
+                    CheckBox_Enable.SetValue(data.enableCheckbox);
+                    return;
+                }
+                if (data.success == -1) {
+                    swal({
+                        title: 'Error!',
+                        html: data.errorMessage,
+                        type: 'error',
+                        allowOutsideClick: false
+                    });
+                    return;
+                }
+            }
+        });
+    }); //On document ready
+
+    function SaveSettings() {
+        var month = Months_ComboBox.GetValue();
+        var checkBox = CheckBox_Enable.GetValue();
+        if (month == null || month == "") {
+             swal({
+                 title: 'Warning!',
+                 html: 'Please specify a month of operation!',
+                 type: 'warning',
+                 allowOutsideClick:false
+             });
+             return;
+         }
+         $.ajax({
+             url: '@Url.Action("SaveSettings","Setups", new { Area = "Admin" })',
+             type: 'Post',
+             data: { _month: month, enableCheckbox:checkBox },
+             success: function (data) {
+                 if (data.success == true) {
+                     swal({
+                         title: 'Success!',
+                         html: data.infoMessage,
+                         type: 'success',
+                         allowOutsideClick: false
+                     });
+                     return;
+                 }
+                 if (data.success == -1) {
+                     swal({
+                         title: 'Error!',
+                         html: data.errorMessage,
+                         type: 'error',
+                         allowOutsideClick: false
+                     });
+                     return;
+                 }
+             }
+         });
+    } //Save
+
+</script>
+
+<div class="panel panel-default">
+    <div class="panel-heading nopadding">
+        <div class="row nomargin">
+            <div class="col-md-12 padding5">
+                <div class="col-md-2">
+                    <div class="btn-group">
+                        <h4 class="titleStyle">SETTINGS</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-body" style="background-color:#ffffff !important;">
+        @Html.DevExpress().FormLayout(settings =>
+   {
+       settings.Name = "FormLayout";
+
+
+       settings.SettingsItems.ShowCaption = DefaultBoolean.True;
+       settings.SettingsItemCaptions.Location = LayoutItemCaptionLocation.Left;
+       settings.Theme = "MetropolisBlue";
+       settings.AlignItemCaptions = true;
+       settings.AlignItemCaptionsInAllGroups = true;
+       settings.Width = Unit.Percentage(100);
+
+       settings.Items.AddGroupItem(group =>
+       {
+           group.Caption = "Provide information below";
+           group.GroupBoxDecoration = GroupBoxDecoration.HeadingLine;
+           group.Items.Add(m =>
+           {
+               m.Caption = "Month Of Operation:";
+               m.SetNestedContent(() =>
+               {
+                   Html.DevExpress().ComboBox(s =>
+                   {
+                       s.Name = "Months_ComboBox";
+                       s.Theme = "MetropolisBlue";
+                       s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+                       s.Properties.DropDownStyle = DropDownStyle.DropDown;
+                       s.Properties.Items.Add("January");
+                       s.Properties.Items.Add("February");
+                       s.Properties.Items.Add("March");
+                       s.Properties.Items.Add("April");
+                       s.Properties.Items.Add("May");
+                       s.Properties.Items.Add("June");
+                       s.Properties.Items.Add("July");
+                       s.Properties.Items.Add("August");
+                       s.Properties.Items.Add("September");
+                       s.Properties.Items.Add("October");
+                       s.Properties.Items.Add("November");
+                       s.Properties.Items.Add("December");
+                       s.Properties.NullDisplayText = "Select Month";
+                       s.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                   }).GetHtml();
+
+               });
+           });
+           group.Items.Add(m =>
+           {
+               m.Caption = "Enable weekend profit and loss analysis:";
+               m.SetNestedContent(() =>
+               {
+                   Html.DevExpress().CheckBox(s =>
+                   {
+                       s.Name = "CheckBox_Enable";
+                       s.Theme = "MetropolisBlue";
+                       s.Checked = false;
+                       //s.Text = "CheckBox";
+                   }).GetHtml();
+
+               });
+           });
+           group.Items.Add(m =>
+           {
+               m.Caption = "";
+               m.SetNestedContent(() =>
+               {
+                   Html.DevExpress().Button(s =>
+                   {
+                       s.Name = "btnSubmit";
+                       s.Theme = "MetropolisBlue";
+                       s.Text = "Save";
+                       s.ClientSideEvents.Click = "SaveSettings";
+                   }).GetHtml();
+               });
+           });
+       });
+   }).GetHtml()
+
+
+    </div>
+</div><!-- panel -->
+

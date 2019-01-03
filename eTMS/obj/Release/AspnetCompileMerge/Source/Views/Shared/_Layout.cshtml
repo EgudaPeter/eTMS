@@ -1,0 +1,313 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<!--[if IE 8]>         <html class="ie8"> <![endif]-->
+<!--[if IE 9]>         <html class="ie9 gt-ie8"> <![endif]-->
+<!--[if gt IE 9]><!-->
+
+<html class="gt-ie8 gt-ie9 not-ie" lang="en">
+<!--<![endif]-->
+<head>
+    @Html.DevExpress().GetStyleSheets(
+        new StyleSheet { ExtensionSuite = ExtensionSuite.NavigationAndLayout, Theme = "MetropolisBlue" },
+        new StyleSheet { ExtensionSuite = ExtensionSuite.Editors, Theme = "MetropolisBlue" },
+        new StyleSheet { ExtensionSuite = ExtensionSuite.GridView, Theme = "MetropolisBlue" }
+    )
+    @Html.DevExpress().GetScripts(
+        new Script { ExtensionSuite = ExtensionSuite.NavigationAndLayout },
+        new Script { ExtensionSuite = ExtensionSuite.Editors },
+        new Script { ExtensionSuite = ExtensionSuite.GridView }
+    )
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+    <meta name="description" content="bootstrap admin template">
+    <meta name="author" content="">
+    <title>eTMS | @ViewBag.Title</title>
+    <!-- Open Sans font from Google CDN -->
+    @*<link href="http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,300&amp;subset=latin" rel="stylesheet" type="text/css">*@
+    <!-- LanderApp's stylesheets -->
+    @*@Url.Content("~/Content/")*@
+    <link href="@Url.Content("~/Content/theme/lander/assets/stylesheets/bootstrap.min.css")" rel="stylesheet" type="text/css">
+    <link href="@Url.Content("~/Content/theme/lander/assets/stylesheets/landerapp.min.css")" rel="stylesheet" type="text/css">
+    <link href="@Url.Content("~/Content/theme/lander/assets/stylesheets/widgets.min.css")" rel="stylesheet" type="text/css">
+    <link href="@Url.Content("~/Content/theme/lander/assets/stylesheets/rtl.min.css")" rel="stylesheet" type="text/css">
+    <link href="@Url.Content("~/Content/theme/lander/assets/stylesheets/themes.min.css")" rel="stylesheet" type="text/css">
+    <link href="@Url.Content("~/Content/theme/lander/assets/stylesheets/custom.css")" rel="stylesheet" />
+    @*<link href="@Url.Content("~/Content/theme/lander/assets/stylesheets/mark.cssloader.css")" rel="stylesheet" />*@
+    <link href="@Url.Content("~/Content/css/eTMS.css")" rel="stylesheet" />
+
+    <link href="@Url.Content("~/Content/css/override.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/loader/css/loader.css")" rel="stylesheet" />
+    <script src="@Url.Content("~/Content/theme/lander/assets/javascripts/jquery.min.js")"></script>
+    <link href="@Url.Content("~/Content/assets/css/sweetalert2.min.css")" rel="stylesheet" />
+</head>
+
+<!-- 1. $BODY ======================================================================================
+
+    Body
+
+    Classes:
+    * 'theme-{THEME NAME}'
+    * 'right-to-left'      - Sets text direction to right-to-left
+    * 'main-menu-right'    - Places the main menu on the right side
+    * 'no-main-menu'       - Hides the main menu
+    * 'main-navbar-fixed'  - Fixes the main navigation
+    * 'main-menu-fixed'    - Fixes the main menu
+    * 'main-menu-animated' - Animate main menu
+-->
+
+<body class="theme-dust main-menu-animated main-navbar-fixed main-menu-fixed">
+
+    <style>
+        a.navbar-brand {
+            margin: 4px !important;
+            border: 1px solid #933a35 !important;
+            height: 42px !important;
+            width: 180px;
+            border-radius: 4px;
+        }
+
+            a.navbar-brand h4 {
+                margin: 3px 0;
+                text-align: center;
+                color: #ff0000;
+            }
+    </style>
+
+    <div class="hidden">
+
+        <div id="main-wrapper">
+
+            <!-- 2. $MAIN_NAVIGATION ===========================================================================
+
+                Main navigation
+            -->
+            <div id="main-navbar" class="navbar navbar-inverse" role="navigation">
+                <!-- Main menu toggle -->
+                <button type="button" id="main-menu-toggle"><i class="navbar-icon fa fa-bars icon"></i><span class="hide-menu-text">HIDE MENU</span></button>
+
+                <div class="navbar-inner">
+                    <!-- Main navbar header -->
+                    <section class="logo-holder">
+                        <div class="navbar-header">
+                            <!-- Logo -->
+                            <a href="~/" class="navbar-brand">
+                                @*<img src="~/Content/assets/images/apple-touch-icon.png" alt="" />*@
+                                <h4 style="color:#ff6a00;font-size:28px;">eTMS</h4>
+                            </a>
+                            <!-- Main navbar toggle -->
+                            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-navbar-collapse"><i class="navbar-icon fa fa-bars"></i></button>
+                        </div> <!-- / .navbar-header -->
+                    </section>
+                    <div id="main-navbar-collapse" class="collapse navbar-collapse main-navbar-collapse">
+                        <div>
+
+                            <div class="right clearfix">
+                                <ul class="nav navbar-nav pull-right right-navbar-nav">
+                                    <!-- 3. $NAVBAR_ICON_BUTTONS =======================================================================
+
+                                                                Navbar Icon Buttons
+
+                                                                NOTE: .nav-icon-btn triggers a dropdown menu on desktop screens only. On small screens .nav-icon-btn acts like a hyperlink.
+
+                                                                Classes:
+                                                                * 'nav-icon-btn-info'
+                                                                * 'nav-icon-btn-success'
+                                                                * 'nav-icon-btn-warning'
+                                                                * 'nav-icon-btn-danger'
+                                    -->
+                                    <!-- /3. $END_NAVBAR_ICON_BUTTONS -->
+                                    @*<li>
+                                            <form class="navbar-form pull-left">
+                                                <input type="text" class="form-control" placeholder="Search">
+                                            </form>
+                                        </li>*@
+                                    <li class="dropdown">
+                                        <a href="#" class="dropdown-toggle user-menu" data-toggle="dropdown">
+                                            @*<img src="assets/demo/avatars/1.jpg" alt="">*@
+                                            @*@Html.Action("UserDetails", "Home", new { area = "" })*@
+                                            <p>Profile</p>
+                                        </a>
+                                        <ul class="dropdown-menu">
+                                            <li><a href="'@Url.Action("","",new {Area = "User" })'">Profile</a></li>
+                                            <li><a href="'@Url.Action("","",new {Area = "User" })'">Account</a></li>
+                                            @*<li><a href="#"><i class="dropdown-icon fa fa-cog"></i>&nbsp;&nbsp;Settings</a></li>*@
+                                            <li class="divider"></li>
+                                            @*<li><a href='@Url.Action("logOut","auth",new {Area = "" })'><i class="dropdown-icon fa fa-power-off"></i>&nbsp;&nbsp;Log Out</a></li>*@
+                                            <li><a href='@Url.Action("login","auth",new {Area = "" })'><i class="dropdown-icon fa fa-power-off"></i>&nbsp;&nbsp;Log Out</a></li>
+                                        </ul>
+                                    </li>
+                                </ul> <!-- / .navbar-nav -->
+                            </div> <!-- / .right -->
+                        </div>
+                    </div> <!-- / #main-navbar-collapse -->
+                </div> <!-- / .navbar-inner -->
+            </div> <!-- / #main-navbar -->
+            <!-- /2. $END_MAIN_NAVIGATION -->
+            <!-- 4. $MAIN_MENU =================================================================================
+
+                    Main menu
+
+                    Notes:
+                    * to make the menu item active, add a class 'active' to the <li>
+                      example: <li class="active">...</li>
+                    * multilevel submenu example:
+                        <li class="mm-dropdown">
+                          <a href="#"><span class="mm-text">Submenu item text 1</span></a>
+                          <ul>
+                            <li>...</li>
+                            <li class="mm-dropdown">
+                              <a href="#"><span class="mm-text">Submenu item text 2</span></a>
+                              <ul>
+                                <li>...</li>
+                                ...
+                              </ul>
+                            </li>
+                            ...
+                          </ul>
+                        </li>
+            -->
+            <div id="main-menu" role="navigation">
+                <div id="main-menu-inner">
+                    <ul class="navigation">
+                        @*@if (User.Identity.IsAuthenticated)
+                            {
+                                if(User.IsInRole())
+                            }*@
+                        <li class="active">
+                            <a id="Dashboard" href='@Url.Action("Dashboard","Admin",new { Area = "Admin" })'><i class="menu-icon fa fa-dashboard"></i><span class="mm-text">Dashboard</span></a>
+                        </li>
+
+                        <li>
+                            <a href="@Url.Action("","",new { Area = "" })"><i class="menu-icon fa fa-shopping-cart"></i><span class="mm-text">Transactions</</span></a>
+                        </li>
+
+                        <li class="mm-dropdown">
+                            <a href="#"><i class="menu-icon fa fa-briefcase"></i><span class="mm-text">Transaction Types</span></a>
+                            <ul>
+                                <li>
+                                    <a tabindex="-1" href='@Url.Action("ExpenseType","Expense",new { Area = "Admin" })'><span class="mm-text">Expense</span></a>
+                                </li>
+                                <li>
+                                    <a tabindex="-1" href='@Url.Action("IncomeType","Income",new { Area = "Admin" })'><span class="mm-text">Income</span></a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <a href="@Url.Action("Dealers","Dealers",new { Area = "Admin" })"><i class="menu-icon fa fa-users"></i><span class="mm-text">Dealers</</span></a>
+                        </li>
+
+                        <li class="mm-dropdown">
+                            <a href="#"><i class="menu-icon fa fa-money"></i><span class="mm-text">Accounting</span></a>
+                            <ul>
+                                <li>
+                                    <a tabindex="-1" href='@Url.Action("Accounts","Accounts",new { Area = "Admin" })'><span class="mm-text">Accounts</span></a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li class="mm-dropdown">
+                            <a href="#"><i class="menu-icon fa fa-stack-exchange"></i><span class="mm-text">Profit/Loss</span></a>
+                            <ul>
+                                <li>
+                                    <a tabindex="-1" href='@Url.Action("","",new { Area = "Admin" })'><span class="mm-text">Loss Summary</span></a>
+                                </li>
+                                <li>
+                                    <a tabindex="-1" href='@Url.Action("","",new { Area = "Admin" })'><span class="mm-text">Profit Summary</span></a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            <a href="@Url.Action("","",new { Area = "User" })"><i class="menu-icon fa fa-user"></i><span class="mm-text">User Management</</span></a>
+                        </li>
+
+                    </ul>
+
+                </div> <!-- / #main-menu-inner -->
+            </div> <!-- / #main-menu -->
+            <!-- /4. $MAIN_MENU -->
+            <div id="content-wrapper">
+                @*<div class="page-header">
+                        <h1><span class="text-dark">@ViewBag.ViewTitle</span></h1>
+                    </div>*@
+                <div class="row">
+                    <div class="col-md-12">
+                        @RenderBody()
+                    </div>
+                </div>
+            </div>
+
+
+            <div id="main-menu-bg"></div>
+
+        </div> <!-- / #main-wrapper -->
+    </div>
+    <script>var init = [];</script>
+    <!-- LanderApp's javascripts -->
+    <script src="@Url.Content("~/Content/theme/assets/js/jquery-1.10.2.min.js")"></script>
+    <script src="@Url.Content("~/Content/theme/lander/assets/javascripts/bootstrap.min.js")"></script>
+    <script src="@Url.Content("~/Content/theme/lander/assets/javascripts/mark.loader.js")"></script>
+    <script src="@Url.Content("~/Content/theme/lander/assets/javascripts/landerapp.min.js")"></script>
+    <script src="@Url.Content("~/Content/loader/js/AppUtils.js")"></script>
+    <script src="@Url.Content("~/Content/assets/js/sweetalert2.min.js")"></script>
+    <script type="text/javascript">
+        init.push(function () {
+            // Javascript code here
+        })
+        window.LanderApp.start(init);
+
+        $(document).ready(function () {
+            $('.panel-body').css('min-height', ($("#main-menu").height() - 275) + 'px');
+        });
+
+        var url = location.pathname;
+        $navigation = $("ul.navigation li");
+        $navigation.removeClass('li.mm-dropdown open');
+        $("ul.navigation li ul li").removeClass('active');
+
+        if (url.indexOf("Customer") != -1 || url.indexOf("customer") != -1) {
+            var $dropDownLi = $("ul.navigation li a.customers").parents('li.mm-dropdown');
+            $("ul.navigation li a.customers").parent('li').addClass('active');
+            $dropDownLi.addClass('open');
+        }
+        else if (url.indexOf("Proposal") != -1 || url.indexOf("proposal") != -1) {
+            var $dropDownLi = $("ul.navigation li a.proposals").parents('li.mm-dropdown');
+            $("ul.navigation li a.proposals").parent('li').addClass('active');
+            $dropDownLi.addClass('open');
+        }
+        else {
+            var $dropDownLi = $("ul.navigation li a[href='" + url + "']").parents('li.mm-dropdown');
+            $("ul.navigation li a[href='" + url + "']").parent('li').addClass('active');
+            $dropDownLi.addClass('open');
+        }
+    </script>
+
+
+    <script>
+        $('div.hidden').fadeIn(1500).removeClass('hidden');
+        $("#Dashboard").click(function () {
+            SiteUtils.loading("Please wait...");
+        });
+
+        $("#Proposal").click(function () {
+            SiteUtils.loading("Please wait...");
+        });
+        $("#Customer").click(function () {
+            SiteUtils.loading("Please wait...");
+        });
+        $("#Receipts").click(function () {
+            SiteUtils.loading("Please wait...");
+        });
+    </script>
+    @RenderSection("scripts", required: false)
+
+</body>
+
+</html>

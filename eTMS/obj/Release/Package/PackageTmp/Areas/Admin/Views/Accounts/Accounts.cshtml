@@ -1,0 +1,873 @@
+﻿@model eTMS.BusinessObjectLayer.AccountTable
+
+@using System.Web.UI.WebControls
+
+@{
+    System.Globalization.CultureInfo ci = new System.Globalization.CultureInfo("en-US");
+    ci.NumberFormat.CurrencySymbol = "";
+    System.Threading.Thread.CurrentThread.CurrentCulture = ci;
+}
+
+@{
+    ViewBag.Title = "Accounts";
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+}
+
+<script>
+    var getID;
+    var selectedIDs;
+    var oldAccountNumber = null;
+
+    var stopSubmitBecauseAccountNumberFlagged = false;
+    var stopSubmitBecauseEditedAccountNumberFlagged = false;
+
+    var editedAccountNumberFlaggedErrorMessage = null;
+    var accountNumberFlaggedErrorMessage = null; //Global Variables
+
+    /*******************************Add Account*********************************************/
+
+    function promptUserBeforeSavingAccount() {
+        swal({
+            title: 'Confirm?',
+            html: 'Save record?',
+            type: 'info',
+            showCancelButton: true,
+            confirmButtonClass: 'btn btn-info',
+            cancelButtonClass: 'btn btn-primary',
+            confirmButtonText: '<i class="fa fa-thumbs-up"></i> Save',
+            cancelButtonText: '<i class="fa fa-thumbs-down"></i> Cancel',
+            allowOutsideClick: false
+        }).then(function () {
+            var result = ValidateAccountForm();
+            if (result == true) {
+                $('#addAccount').modal("hide");
+                return saveAccount();
+            }
+            if (result == false) {
+                var infoMsg = "Please define required fields <b>Account number, Account name, Bank name and Amount in account</b> before progressing to save record!";
+                swal({
+                    title: 'Warning!',
+                    html: infoMsg,
+                    type: 'warning'
+                });
+                return;
+            }
+            if (result == -1) {
+                return;
+            }
+        });
+    }
+
+    function promptUserBeforeClosingAccountModal() {
+        swal({
+            title: 'Are you sure?',
+            html: 'Inputs will be lost',
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonClass: 'btn btn-info',
+            cancelButtonClass: 'btn btn-primary',
+            confirmButtonText: '<i class="fa fa-thumbs-up"></i> Okay',
+            cancelButtonText: '<i class="fa fa-thumbs-down"></i> Cancel',
+            allowOutsideClick: false
+        }).then(function () {
+            stopSubmitBecauseAccountNumberFlagged = false;
+            $('#addAccount').modal("hide");
+        });
+    }
+
+    function ValidateAccountForm() {
+        var accountNumber = AccountNumber.GetValue();
+        var accountName = AccountName.GetValue();
+        var bank = ID_Bank.GetValue();
+        var amount = Amount.GetValue();
+        if (stopSubmitBecauseAccountNumberFlagged == true) {
+            swal({
+                title: 'Warning!',
+                html: accountNumberFlaggedErrorMessage,
+                type: 'warning'
+            });
+            return -1;
+        }
+        if (accountNumber != null && accountName != null && bank != null && amount != null) {
+            return true;
+        }
+        return false;
+    }
+
+    function DisplayAccountForm() {
+        AccountNumber.SetValue(null);
+        AccountName.SetValue(null);
+        ID_Bank.SetValue(null);
+        Amount.SetValue(null);
+        $('#addAccount').modal({ backdrop: 'static', keyboard: false });
+        $('#addAccount').modal("show");
+    }
+
+    function ValidateUniquenessOfAccountNumber() {
+        var accountNumber = AccountNumber.GetValue();
+        if (accountNumber == null) {
+            stopSubmitBecauseAccountNumberFlagged = false;
+            return;
+        }
+        $.ajax({
+            url: '@Url.Action("ValidateUniquenessOfAccountNumber", "Accounts",new { Area = "Admin" })',
+            type: 'Post',
+            data: { aNumber: accountNumber },
+            success: function (data) {
+                if (data.success == true) {
+                    stopSubmitBecauseAccountNumberFlagged = false;
+                    return;
+                }
+                if (data.success == false) {
+                    stopSubmitBecauseAccountNumberFlagged = true;
+                    accountNumberFlaggedErrorMessage = data.infoMessage;
+                    swal({
+                        title: 'Warning!',
+                        html: accountNumberFlaggedErrorMessage,
+                        type: 'warning'
+                    });
+                    return;
+                }
+                if (data.success == -1) {
+                    swal({
+                        title: 'Error!',
+                        html: data.errorMessage,
+                        type: 'error'
+                    });
+                    return;
+                }
+            }
+        });
+    } //Validate Uniqueness Of AccountName
+
+    function saveAccount() {
+        SiteUtils.loading("Saving...");
+        dataArray = {
+            AccountNumber : AccountNumber.GetValue(),
+            AccountName: AccountName.GetValue(),
+            BankName: ID_Bank.GetValue(),
+            AmountInAccount: Amount.GetValue()
+        }
+        $.ajax({
+            url: '@Url.Action("AddAccount", "Accounts", new { Area = "Admin" })',
+            type: 'Post',
+            data: { Data: dataArray },
+            success: function (data) {
+                SiteUtils.loadingOff();
+                if (data.success == true) {
+                    AccountGridView.Refresh();
+                    swal({
+                        title: 'Success!',
+                        html: data.infoMessage,
+                        type: 'success'
+                    });
+                    return;
+                }
+                if (data.success == -1) {
+                    swal({
+                        title: 'Error!',
+                        html: data.errorMessage,
+                        type: 'error'
+                    });
+                    return;
+                }
+            }
+        });
+    } //Save Account
+
+    /********************************************************************************************/  //Add Account
+
+    /*******************************Update Account******************************************/
+
+    function promptUserBeforeUpdatingAccount() {
+        swal({
+            title: 'Confirm?',
+            html: 'Update record?',
+            type: 'info',
+            showCancelButton: true,
+            confirmButtonClass: 'btn btn-info',
+            cancelButtonClass: 'btn btn-primary',
+            confirmButtonText: '<i class="fa fa-thumbs-up"></i> Update',
+            cancelButtonText: '<i class="fa fa-thumbs-down"></i> Cancel',
+            allowOutsideClick: false
+        }).then(function () {
+            var result = ValidateEditedAccountForm();
+            if (result == true) {
+                $('#editAccount').modal("hide");
+                return updateAccount();
+            }
+            if (result == false) {
+                var infoMsg = "Please define required fields <b>Account number, Account name, Bank name and Amount in account</b> before progressing to update record!";
+                swal({
+                    title: 'Warning!',
+                    html: infoMsg,
+                    type: 'warning'
+                });
+                return;
+            }
+            if (result == -1) {
+                return;
+            }
+        });
+    }
+
+    function promptUserBeforeClosingEditedAccountModal() {
+        swal({
+            title: 'Are you sure?',
+            html: 'Inputs will be lost',
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonClass: 'btn btn-info',
+            cancelButtonClass: 'btn btn-primary',
+            confirmButtonText: '<i class="fa fa-thumbs-up"></i> Okay',
+            cancelButtonText: '<i class="fa fa-thumbs-down"></i> Cancel',
+            allowOutsideClick: false
+        }).then(function () {
+            stopSubmitBecauseEditedAccountNumberFlagged = false;
+            $('#editAccount').modal("hide");
+        });
+    }
+
+    function ValidateEditedAccountForm() {
+        var accountNumber = E_AccountNumber.GetValue();
+        var accountName = E_AccountName.GetValue();
+        var bank = E_ID_Bank.GetValue();
+        var amount = E_Amount.GetValue();
+        if (stopSubmitBecauseEditedAccountNumberFlagged == true) {
+            swal({
+                title: 'Warning!',
+                html: editedAccountNumberFlaggedErrorMessage,
+                type: 'warning'
+            });
+            return -1;
+        }
+        if (accountNumber != null && accountName != null && bank != null && amount != null) {
+            return true;
+        }
+        return false;
+    }
+
+    function ValidateUniquenessOfEditedAccountNumber() {
+        var accountNumber = E_AccountName.GetValue();
+        if (accountNumber == null || accountNumber == oldAccountNumber) {
+            stopSubmitBecauseEditedAccountNumberFlagged = false;
+            return;
+        }
+        $.ajax({
+            url: '@Url.Action("ValidateUniquenessOfAccountNumber", "Accounts",new { Area = "Admin" })',
+            type: 'Post',
+            data: { aNumber: accountNumber },
+            success: function (data) {
+                if (data.success == true) {
+                    stopSubmitBecauseEditedAccountNumberFlagged = false;
+                    return;
+                }
+                if (data.success == false) {
+                    stopSubmitBecauseEditedAccountNumberFlagged = true;
+                    editedAccountNumberFlaggedErrorMessage = data.infoMessage;
+                    swal({
+                        title: 'Warning!',
+                        html: editedAccountNumberFlaggedErrorMessage,
+                        type: 'warning'
+                    });
+                    return;
+                }
+                if (data.success == -1) {
+                    swal({
+                        title: 'Error!',
+                        html: data.errorMessage,
+                        type: 'error'
+                    });
+                    return;
+                }
+            }
+        });
+    } //Validate Uniqueness Of AccountName
+
+    function EditAccount(id) {
+        $.ajax({
+            url: '@Url.Action("EditAccount", "Accounts",new { Area = "Admin" })',
+            type: 'Post',
+            data: { accountId: id },
+            success: function (data) {
+                if (data.success == true) {
+                    oldAccountNumber = data.accountNumber;
+                    E_AccountID.SetText(data.accountID);
+                    E_AccountNumber.SetText(data.accountNumber);
+                    E_AccountName.SetText(data.accountName);
+                    E_ID_Bank.SetValue(data.bankID);
+                    E_Amount.SetValue(data.amount);
+                    $('#editAccount').modal({ backdrop: 'static', keyboard: false });
+                    $('#editAccount').modal("show");
+                    return;
+                }
+                if (data.success == -1) {
+                    swal({
+                        title: 'Error!',
+                        html: data.errorMessage,
+                        type: 'error'
+                    });
+                    return;
+                }
+            }
+        });
+    } //Edit Account
+
+    function updateAccount() {
+        SiteUtils.loading("Updating...");
+        dataArray = {
+            AccountID: E_AccountID.GetValue(),
+            AccountNumber : E_AccountNumber.GetValue(),
+            AccountName: E_AccountName.GetValue(),
+            BankName: E_ID_Bank.GetValue(),
+            AmountInAccount: E_Amount.GetValue()
+        }
+        $.ajax({
+            url: '@Url.Action("UpdateAccount", "Accounts", new { Area = "Admin" })',
+            type: 'Post',
+            data: { Data: dataArray },
+            success: function (data) {
+                SiteUtils.loadingOff();
+                if (data.success == true) {
+                    AccountGridView.Refresh();
+                    swal({
+                        title: 'Success!',
+                        html: data.infoMessage,
+                        type: 'success'
+                    });
+                    return;
+                }
+                if (data.success == -1) {
+                    swal({
+                        title: 'Error!',
+                        html: data.errorMessage,
+                        type: 'error'
+                    });
+                    return;
+                }
+            }
+        });
+    } //Update Account
+
+    /********************************************************************************************/ //Update Account
+
+    function ViewAccount(id) {
+        $.ajax({
+            url: '@Url.Action("ViewAccount", "Accounts",new { Area = "Admin" })',
+            type: 'Post',
+            data: { accountId: id },
+            success: function (data) {
+                if (data.success == true) {
+                    $('#viewAccount').modal({ backdrop: 'static', keyboard: false });
+                    $('#viewAccount').modal("show");
+                    V_ID_Bank.GetInputElement().readOnly = true;
+                    ASPxClientUtils.AttachEventToElement(V_ID_Bank.GetMainElement(), "mousedown", OnMouseDown);
+                    V_AccountID.SetText(data.accountID);
+                    V_AccountNumber.SetText(data.accountNumber);
+                    V_AccountName.SetText(data.accountName);
+                    V_ID_Bank.SetValue(data.bankID);
+                    V_Amount.SetValue(data.amount);
+                    return;
+                }
+                if (data.success == -1) {
+                    swal({
+                        title: 'Error!',
+                        html: data.errorMessage,
+                        type: 'error'
+                    });
+                    return;
+                }
+            }
+        });
+    } //View Account
+
+    function DeleteASingleAccount(id) {
+        swal({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonClass: 'btn btn-danger',
+            cancelButtonClass: 'btn btn-primary',
+            confirmButtonText: '<i class="fa fa-thumbs-up"></i> Delete',
+            cancelButtonText: '<i class="fa fa-thumbs-down"></i> Cancel',
+            allowOutsideClick: false
+        }).then(function () {
+            SiteUtils.loading("Deleting...");
+            $.ajax({
+                url: '@Url.Action("DeleteASingleAccount", "Accounts", new { Area = "Admin" })',
+                type: 'Post',
+                data: { selectedKey: id },
+                success: function (data) {
+                    SiteUtils.loadingOff();
+                    if (data.success == true) {
+                        AccountGridView.Refresh();
+                        swal({
+                            title: 'Success!',
+                            html: data.infoMessage,
+                            type: 'success',
+                            allowOutsideClick: false
+                        });
+                        return;
+                    }
+                    if (data.success == -1) {
+                        swal({
+                            title: 'Error!',
+                            html: data.errorMessage,
+                            type: 'error',
+                            allowOutsideClick: false
+                        });
+                        return;
+                    }
+                }
+            });
+        });
+    } //Delete A Single Account
+
+    function DeleteGroupOfAccounts() {
+        swal({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonClass: 'btn btn-danger',
+            cancelButtonClass: 'btn btn-primary',
+            confirmButtonText: '<i class="fa fa-thumbs-up"></i> Delete',
+            cancelButtonText: '<i class="fa fa-thumbs-down"></i> Cancel',
+            allowOutsideClick: false
+        }).then(function () {
+            SiteUtils.loading("Deleting...");
+            $.ajax({
+                url: '@Url.Action("DeleteGroupOfAccounts", "Accounts", new { Area = "Admin" })',
+                type: 'Post',
+                data: { selectedKeys: selectedIDs },
+                success: function (data) {
+                    SiteUtils.loadingOff();
+                    if (data.success == true) {
+                        AccountGridView.Refresh();
+                        swal({
+                            title: 'Success!',
+                            html: data.infoMessage,
+                            type: 'success',
+                            allowOutsideClick: false
+                        }).then(function () {
+                            AccountGridView.UnselectRows();
+                        });
+                        return;
+                    }
+                    if (data.success == -1) {
+                        AccountGridView.UnselectRows();
+                        swal({
+                            title: 'Error!',
+                            html: data.errorMessage,
+                            type: 'error',
+                            allowOutsideClick: false
+                        });
+                        return;
+                    }
+                }
+            });
+
+        });
+    } //Delete A Group Of Accounts
+
+    /*******************************Every Other Functions*********************************************/
+    function OnSelectionChanged(s, e) {
+        s.GetSelectedFieldValues("AccountID", GetSelectedFieldValuesCallback);
+        $("#actions").attr("disabled", false);
+        $("#actions").removeClass("btnDisabled");
+    }
+
+    function GetSelectedFieldValuesCallback(values) {
+        if (values.length == 0) {
+            $("#actions").val("Select Action");
+            $("#actions").attr("disabled", true);
+            $("#actions").addClass("btnDisabled");
+        }
+        selectedIDs = values.join(',');
+        $("#recordCount").text(AccountGridView.GetSelectedRowCount());
+
+    }
+
+    function CloseViewModal() {
+        $("#viewAccount").modal('hide');
+    }
+
+    function OnMouseDown(event) {
+        ASPxClientUtils.PreventEventAndBubble(event);
+    }
+
+    $(document).ready(function () {
+        //Executes a selected action
+        $("#actions").change(function () {
+            var action = $("#actions").val();
+            if (action == "Delete") {
+                DeleteGroupOfAccounts();
+            }
+            else {
+                return; //do nothing...
+            }
+        });
+        $("#recordCount").text(0);
+    });
+
+    function OnPopupMenuItemClick(s, e) {
+        var itemName = e.item.name;      
+        if (itemName == "Edit") {
+            return EditAccount(getID);
+        }
+        if (itemName == "View") {
+            return ViewAccount(getID);
+        }
+        if (itemName == "Delete") {
+            return DeleteASingleAccount(getID);
+        }
+    }
+
+    $(document).on("click", "#AccountGridView tbody tr #dropup", function () {
+        getID = $(this).attr('id-slug');
+    }) //Every other function
+</script>
+
+
+<div class="panel panel-default">
+    <div class="panel-heading nopadding">
+        <div class="row nomargin">
+            <div class="col-md-12 padding5">
+                <div class="col-md-2">
+                    <div class="btn-group">
+                        <h4 class="titleStyle">ACCOUNTS</h4>
+                    </div>
+                </div>
+                <div class="col-md-10 action-wrap">
+                    <div class="form-inline">
+                        <div class="form-group pull-right">
+                            <div class="btn-group">
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    if (User.IsInRole("SU"))
+                                    {
+                                        @Html.DropDownList("Actions", null, null, new { @class = "dropDowns btnDisabled", id = "actions", disabled = true })
+                                    }
+                                }
+                                <div class="pull-right">
+                                    @Html.DevExpress().Button(settings =>
+                               {
+                                   settings.Name = "btnAccount";
+
+                                   settings.Width = 100;
+                                   settings.Text = "Add New";
+                                   settings.ToolTip = " Add account.";
+                                   settings.ControlStyle.CssClass = "btn btnETMS";
+                                   settings.ClientSideEvents.Click = "DisplayAccountForm";
+                                   settings.ControlStyle.Border.BorderStyle = BorderStyle.Solid;
+                               }).GetHtml()
+                                </div>
+                            </div>
+                        </div>
+                    </div><!--/form-inline-->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="addAccount" class="modal fade" tabindex="-1" role="dialog" style="display: none;">
+        <div class="modal-dialog modal-super-scaled">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Add Account</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-horizontal">
+
+                        <div class="form-group">
+                            <label class="control-label labels col-md-2 Required">Number:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().TextBox(settings =>
+                           {
+                               settings.Name = "AccountNumber";
+                               settings.ControlStyle.CssClass = "form-control input-sm";
+                               settings.ControlStyle.ForeColor = System.Drawing.Color.Black;
+                               settings.Width = Unit.Percentage(100);
+                               settings.Theme = "MetropolisBlue";
+                               settings.Properties.MaxLength = 10;
+                               settings.Properties.DisplayFormatInEditMode = true;
+                               settings.Properties.DisplayFormatString = "d10";
+                               settings.Properties.ClientSideEvents.ValueChanged = "ValidateUniquenessOfAccountNumber";
+                           }).GetHtml()
+                            </div>
+                            <label class="control-label labels col-md-2 Required">Name:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().TextBox(settings =>
+                           {
+                               settings.Name = "AccountName";
+                               settings.ControlStyle.CssClass = "form-control input-sm";
+                               settings.ControlStyle.ForeColor = System.Drawing.Color.Black;
+                               settings.Width = Unit.Percentage(100);
+                               settings.Theme = "MetropolisBlue";
+                           }).GetHtml()
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label labels col-md-2 Required">Bank:</label>
+                            <div class="col-md-4">
+                            @Html.DevExpress().ComboBox(
+                                    s =>
+                                    {
+                                        s.Name = "ID_Bank";
+                                        s.Width = Unit.Percentage(100);
+                                        s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                                        s.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                                        s.ControlStyle.CssClass = "form-control input-sm";
+                                        s.Properties.TextField = "BankName";
+                                        s.Properties.ValueField = "ID_Bank";
+                                        s.Theme = "MetropolisBlue";
+                                        s.Properties.NullText = "--Select Bank--";
+                                        s.ShowModelErrors = true;
+                                        s.ControlStyle.ForeColor = System.Drawing.Color.Black;
+                                        s.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                                    }).BindList(ViewBag.Banks).GetHtml()
+                            </div>
+                            <label class="control-label labels col-md-2 Required">Amount:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().SpinEdit(settings =>
+                               {
+                                   settings.Name = "Amount";
+                                   settings.ControlStyle.CssClass = "form-control input-sm";
+                                   settings.ControlStyle.ForeColor = System.Drawing.Color.Black;
+                                   settings.Width = Unit.Percentage(100);
+                                   settings.Theme = "MetropolisBlue";
+                                   settings.Properties.DisplayFormatInEditMode = true;
+                                   settings.Properties.DisplayFormatString = "c2";
+                                   settings.Properties.SpinButtons.ShowIncrementButtons = false;
+                                   settings.Properties.NumberType = SpinEditNumberType.Float;
+                               }).GetHtml()
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" onclick="promptUserBeforeSavingAccount()"><i class="fa fa-thumbs-up"></i> Save</button>
+                    <button type="button" onclick="promptUserBeforeClosingAccountModal()" class="btn btn-default"><i class="fa fa-thumbs-down"></i> Cancel</button>
+                </div>
+            </div> <!-- / .modal-content -->
+        </div> <!-- / .modal-dialog -->
+    </div>
+
+    <div id="editAccount" class="modal fade" tabindex="-1" role="dialog" style="display: none;">
+        <div class="modal-dialog modal-super-scaled">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Update Account</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-horizontal">
+
+                        <div class="form-group">
+                            <label class="control-label labels col-md-2">ID:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().TextBox(settings =>
+                           {
+                               settings.Name = "E_AccountID";
+                               settings.ControlStyle.CssClass = "form-control input-sm disable";
+                               settings.Width = Unit.Percentage(100);
+                               settings.Theme = "MetropolisBlue";
+                               settings.ReadOnly = true;
+                               settings.ControlStyle.ForeColor = System.Drawing.Color.Black;
+                           }).GetHtml()
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-2 labels Required">Number:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().TextBox(settings =>
+                           {
+                               settings.Name = "E_AccountNumber";
+                               settings.ControlStyle.CssClass = "form-control input-sm";
+                               settings.ControlStyle.ForeColor = System.Drawing.Color.Black;
+                               settings.Width = Unit.Percentage(100);
+                               settings.Theme = "MetropolisBlue";
+                               settings.Properties.MaxLength = 10;
+                               settings.Properties.DisplayFormatInEditMode = true;
+                               settings.Properties.DisplayFormatString = "d10";
+                               settings.Properties.ClientSideEvents.ValueChanged = "ValidateUniquenessOfAccountNumber";
+                           }).GetHtml()
+                            </div>
+                            <label class="control-label col-md-2 labels Required">Name:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().TextBox(settings =>
+                           {
+                               settings.Name = "E_AccountName";
+                               settings.ControlStyle.CssClass = "form-control input-sm";
+                               settings.ControlStyle.ForeColor = System.Drawing.Color.Black;
+                               settings.Width = Unit.Percentage(100);
+                               settings.Theme = "MetropolisBlue";
+                           }).GetHtml()
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label labels col-md-2 Required">Bank:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().ComboBox(
+                                    s =>
+                                    {
+                                        s.Name = "E_ID_Bank";
+                                        s.Width = Unit.Percentage(100);
+                                        s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                                        s.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                                        s.ControlStyle.CssClass = "form-control input-sm";
+                                        s.Properties.TextField = "BankName";
+                                        s.Properties.ValueField = "ID_Bank";
+                                        s.Theme = "MetropolisBlue";
+                                        s.Properties.NullText = "--Select Bank--";
+                                        s.ShowModelErrors = true;
+                                        s.ControlStyle.ForeColor = System.Drawing.Color.Black;
+                                        s.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                                    }).BindList(ViewBag.Banks).GetHtml()
+                            </div>
+                            <label class="control-label col-md-2 labels Required">Amount:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().SpinEdit(settings =>
+                               {
+                                   settings.Name = "E_Amount";
+                                   settings.ControlStyle.CssClass = "form-control input-sm";
+                                   settings.ControlStyle.ForeColor = System.Drawing.Color.Black;
+                                   settings.Width = Unit.Percentage(100);
+                                   settings.Theme = "MetropolisBlue";
+                                   settings.Properties.DisplayFormatInEditMode = true;
+                                   settings.Properties.DisplayFormatString = "c2";
+                                   settings.Properties.SpinButtons.ShowIncrementButtons = false;
+                                   settings.Properties.NumberType = SpinEditNumberType.Float;
+                               }).GetHtml()
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" onclick="promptUserBeforeUpdatingAccount()"><i class="fa fa-thumbs-up"></i> Update</button>
+                    <button type="button" onclick="promptUserBeforeClosingEditedAccountModal()" class="btn btn-default"><i class="fa fa-thumbs-down"></i> Cancel</button>
+                </div>
+            </div> <!-- / .modal-content -->
+        </div> <!-- / .modal-dialog -->
+    </div>
+
+    <div id="viewAccount" class="modal fade" tabindex="-1" role="dialog" style="display: none;">
+        <div class="modal-dialog modal-super-scaled">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">View Account</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-horizontal">
+
+                        <div class="form-group">
+                            <label class="control-label labels col-md-2">ID:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().TextBox(settings =>
+                           {
+                               settings.Name = "V_AccountID";
+                               settings.ControlStyle.CssClass = "form-control input-sm";
+                               settings.Width = Unit.Percentage(100);
+                               settings.Theme = "MetropolisBlue";
+                               settings.ReadOnly = true;
+                               settings.ControlStyle.ForeColor = System.Drawing.Color.Black;
+                           }).GetHtml()
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label labels col-md-2 Required">Number:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().TextBox(settings =>
+                           {
+                               settings.Name = "V_AccountNumber";
+                               settings.ControlStyle.CssClass = "form-control input-sm";
+                               settings.ControlStyle.ForeColor = System.Drawing.Color.Black;
+                               settings.Width = Unit.Percentage(100);
+                               settings.Theme = "MetropolisBlue";
+                               settings.Properties.MaxLength = 10;
+                               settings.ReadOnly = true;
+                               settings.Properties.DisplayFormatInEditMode = true;
+                               settings.Properties.DisplayFormatString = "d10";
+                           }).GetHtml()
+                            </div>
+                            <label class="control-label labels col-md-2 Required">Name:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().TextBox(settings =>
+                           {
+                               settings.Name = "V_AccountName";
+                               settings.ReadOnly = true;
+                               settings.ControlStyle.CssClass = "form-control input-sm";
+                               settings.ControlStyle.ForeColor = System.Drawing.Color.Black;
+                               settings.Width = Unit.Percentage(100);
+                               settings.Theme = "MetropolisBlue";
+                           }).GetHtml()
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label labels col-md-2 Required">Bank:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().ComboBox(
+                                    s =>
+                                    {
+                                        s.Name = "V_ID_Bank";
+                                        s.ReadOnly = true;
+                                        s.Width = Unit.Percentage(100);
+                                        s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.Contains;
+                                        s.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                                        s.ControlStyle.CssClass = "form-control input-sm";
+                                        s.Properties.TextField = "BankName";
+                                        s.Properties.ValueField = "ID_Bank";
+                                        s.Theme = "MetropolisBlue";
+                                        s.Properties.NullText = "--Select Bank--";
+                                        s.ShowModelErrors = true;
+                                        s.ControlStyle.ForeColor = System.Drawing.Color.Black;
+                                        s.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                                    }).BindList(ViewBag.Banks).GetHtml()
+                            </div>
+                            <label class="control-label labels col-md-2 Required">Amount:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().SpinEdit(settings =>
+                               {
+                                   settings.Name = "V_Amount";
+                                   settings.ReadOnly = true;
+                                   settings.ControlStyle.CssClass = "form-control input-sm";
+                                   settings.ControlStyle.ForeColor = System.Drawing.Color.Black;
+                                   settings.Width = Unit.Percentage(100);
+                                   settings.Theme = "MetropolisBlue";
+                                   settings.Properties.DisplayFormatInEditMode = true;
+                                   settings.Properties.DisplayFormatString = "c2";
+                                   settings.Properties.SpinButtons.ShowIncrementButtons = false;
+                                   settings.Properties.NumberType = SpinEditNumberType.Float;
+                               }).GetHtml()
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" onclick="CloseViewModal()" class="btn btn-default"><i class="fa fa-times"></i> Cancel</button>
+                </div>
+            </div> <!-- / .modal-content -->
+        </div> <!-- / .modal-dialog -->
+    </div>
+
+    <div class="panel-body" style="background-color:#ffffff !important;">
+        <div class="col-md-12">
+            <div class="" style="overflow-x:auto">
+                <div class="table-responsive">
+                    <a style="color:#000; font-weight:bold; margin-right:0px;" id="helperText">[Total rows selected:]</a>
+                    <a style="color:#000;font-weight:bold; margin-right:20px;" id="recordCount"></a>
+                    @Html.Action("AccountGridViewPartial")
+                </div>
+            </div>
+        </div>
+    </div>
+</div><!-- panel -->
+

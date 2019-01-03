@@ -1,0 +1,89 @@
+﻿@model eTMS.BusinessObjectLayer.ProfitAndLoss
+
+@using System.Drawing
+@using System.Web.UI.WebControls
+
+@{
+    ViewBag.Title = "MonthlyReport";
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+}
+
+<script>
+
+    function GenerateRecords() {
+        var month = $("#months").val();
+        if (month == "" || month == null) {
+            swal({
+                title: 'Warning!',
+                html: 'Please select a month!',
+                type: 'warning',
+                allowOutsideClick:false
+            });
+            return;
+        }
+        SiteUtils.loading("Generating...");
+      return  ProfitAndLoss_MonthlyGridView.PerformCallback({ _month: month });
+    }
+
+    function getRecordCountOfResults(s, e) {
+        SiteUtils.loadingOff();
+        var recordCount = s.cpVisibleRowCount;
+        if (recordCount == 0) {
+            swal({
+                title: 'Information!',
+                html: "No records generated for this month!",
+                type: 'info',
+                allowOutsideClick: false
+            });
+            return;
+        }
+    }
+
+</script>
+
+<div class="panel panel-default">
+    <div class="panel-heading nopadding">
+        <div class="row nomargin">
+            <div class="col-md-12 padding5">
+                <div class="col-md-2">
+                    <div class="btn-group">
+                        <h4 class="titleStyle">MONTHLY REPORT</h4>
+                    </div>
+                </div>
+                <div class="col-md-10 action-wrap">
+                    <div class="form-inline">
+                        <div class="form-group pull-right">
+                            <div class="btn-group">
+                             @Html.DropDownList("Months", null, "Select Month", new { @class = "dropDowns ", id = "months" })
+                                <div class="pull-right">
+                                    @Html.DevExpress().Button(settings =>
+                               {
+                                   settings.Name = "btnGenerate";
+
+                                   settings.Width = 100;
+                                   settings.Text = "Generate";
+                                   settings.ToolTip = " Generate records.";
+                                   settings.ControlStyle.CssClass = "btn btnETMS";
+                                   settings.ClientSideEvents.Click = "GenerateRecords";
+                                   settings.ControlStyle.Border.BorderStyle = BorderStyle.Solid;
+                               }).GetHtml()
+                                </div>
+                            </div>
+                        </div>
+                    </div><!--/form-inline-->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-body" style="background-color:#ffffff !important;">
+        <div class="col-md-12">
+            <div class="" style="overflow-x:auto">
+                <div class="table-responsive">
+                    @Html.Action("ProfitAndLoss_MonthlyGridViewPartial")
+                </div>
+            </div>
+        </div>
+    </div>
+</div><!-- panel -->
+

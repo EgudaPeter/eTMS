@@ -1,0 +1,186 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="IbsMdmModelStoreContainer" CdmEntityContainer="IbsMdmEntities1">
+    <EntitySetMapping Name="GsmValidators">
+      <EntityTypeMapping TypeName="IbsMdmModel.GsmValidator">
+        <MappingFragment StoreEntitySet="GsmValidator">
+          <ScalarProperty Name="ID_GsmFormat" ColumnName="ID_GsmFormat" />
+          <ScalarProperty Name="ProviderCode" ColumnName="ProviderCode" />
+          <ScalarProperty Name="Gsm1st3Digits" ColumnName="Gsm1st3Digits" />
+          <ScalarProperty Name="GsmNoLenght" ColumnName="GsmNoLenght" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="IBS_Application">
+      <EntityTypeMapping TypeName="IbsMdmModel.IBS_Application">
+        <MappingFragment StoreEntitySet="IBS_Application">
+          <ScalarProperty Name="ID_Application" ColumnName="ID_Application" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="Money4PaymentActNo" ColumnName="Money4PaymentActNo" />
+          <ScalarProperty Name="Money4LodgementActNo" ColumnName="Money4LodgementActNo" />
+          <ScalarProperty Name="LastVoucherNo" ColumnName="LastVoucherNo" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="IBS_Banks">
+      <EntityTypeMapping TypeName="IbsMdmModel.IBS_Banks">
+        <MappingFragment StoreEntitySet="IBS_Banks">
+          <ScalarProperty Name="ID_Bank" ColumnName="ID_Bank" />
+          <ScalarProperty Name="BankName" ColumnName="BankName" />
+          <ScalarProperty Name="Address01" ColumnName="Address01" />
+          <ScalarProperty Name="Address02" ColumnName="Address02" />
+          <ScalarProperty Name="ID_State" ColumnName="ID_State" />
+          <ScalarProperty Name="OpenAccount" ColumnName="OpenAccount" />
+          <ScalarProperty Name="BankGlActNo" ColumnName="BankGlActNo" />
+          <ScalarProperty Name="SwitchCode" ColumnName="SwitchCode" />
+          <ScalarProperty Name="BankCode" ColumnName="BankCode" />
+          <ScalarProperty Name="HQRSortCode" ColumnName="HQRSortCode" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="IBS_Branches">
+      <EntityTypeMapping TypeName="IbsMdmModel.IBS_Branches">
+        <MappingFragment StoreEntitySet="IBS_Branches">
+          <ScalarProperty Name="ID_Branch" ColumnName="ID_Branch" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="AccessLevel" ColumnName="AccessLevel" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="IBS_Country">
+      <EntityTypeMapping TypeName="IbsMdmModel.IBS_Country">
+        <MappingFragment StoreEntitySet="IBS_Country">
+          <ScalarProperty Name="ID_Country" ColumnName="ID_Country" />
+          <ScalarProperty Name="Country" ColumnName="Country" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="IBS_Currency">
+      <EntityTypeMapping TypeName="IbsMdmModel.IBS_Currency">
+        <MappingFragment StoreEntitySet="IBS_Currency">
+          <ScalarProperty Name="ID_Currency" ColumnName="ID_Currency" />
+          <ScalarProperty Name="Currency" ColumnName="Currency" />
+          <ScalarProperty Name="Unit" ColumnName="Unit" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="IBS_ExcRate">
+      <EntityTypeMapping TypeName="IbsMdmModel.IBS_ExcRate">
+        <MappingFragment StoreEntitySet="IBS_ExcRate">
+          <ScalarProperty Name="ExcRate_ID" ColumnName="ExcRate_ID" />
+          <ScalarProperty Name="CurrencyID" ColumnName="CurrencyID" />
+          <ScalarProperty Name="EffectiveDate" ColumnName="EffectiveDate" />
+          <ScalarProperty Name="ExchangeRate" ColumnName="ExchangeRate" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="IBS_PFA">
+      <EntityTypeMapping TypeName="IbsMdmModel.IBS_PFA">
+        <MappingFragment StoreEntitySet="IBS_PFA">
+          <ScalarProperty Name="ID_PFA" ColumnName="ID_PFA" />
+          <ScalarProperty Name="PFA_Name" ColumnName="PFA_Name" />
+          <ScalarProperty Name="Address01" ColumnName="Address01" />
+          <ScalarProperty Name="Address02" ColumnName="Address02" />
+          <ScalarProperty Name="ID_State" ColumnName="ID_State" />
+          <ScalarProperty Name="ContactPerson" ColumnName="ContactPerson" />
+          <ScalarProperty Name="GSM_Phone1" ColumnName="GSM_Phone1" />
+          <ScalarProperty Name="GSM_Phone2" ColumnName="GSM_Phone2" />
+          <ScalarProperty Name="Email" ColumnName="Email" />
+          <ScalarProperty Name="WebSite" ColumnName="WebSite" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="IBS_PostCode">
+      <EntityTypeMapping TypeName="IbsMdmModel.IBS_PostCode">
+        <MappingFragment StoreEntitySet="IBS_PostCode">
+          <ScalarProperty Name="PostCode" ColumnName="PostCode" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="IBS_ProductLine">
+      <EntityTypeMapping TypeName="IbsMdmModel.IBS_ProductLine">
+        <MappingFragment StoreEntitySet="IBS_ProductLine">
+          <ScalarProperty Name="ID_ProductLine" ColumnName="ID_ProductLine" />
+          <ScalarProperty Name="ProductLine" ColumnName="ProductLine" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="IBS_States">
+      <EntityTypeMapping TypeName="IbsMdmModel.IBS_States">
+        <MappingFragment StoreEntitySet="IBS_States">
+          <ScalarProperty Name="ID_State" ColumnName="ID_State" />
+          <ScalarProperty Name="Title" ColumnName="Title" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="IbsPeoples">
+      <EntityTypeMapping TypeName="IbsMdmModel.IbsPeople">
+        <MappingFragment StoreEntitySet="IbsPeople">
+          <ScalarProperty Name="UCID" ColumnName="UCID" />
+          <ScalarProperty Name="Email" ColumnName="Email" />
+          <ScalarProperty Name="LastName" ColumnName="LastName" />
+          <ScalarProperty Name="OtherNames" ColumnName="OtherNames" />
+          <ScalarProperty Name="Company" ColumnName="Company" />
+          <ScalarProperty Name="RCNumber" ColumnName="RCNumber" />
+          <ScalarProperty Name="MobilePhone" ColumnName="MobilePhone" />
+          <ScalarProperty Name="OtherPhones" ColumnName="OtherPhones" />
+          <ScalarProperty Name="FaxNumber" ColumnName="FaxNumber" />
+          <ScalarProperty Name="ID_Country" ColumnName="ID_Country" />
+          <ScalarProperty Name="Address01" ColumnName="Address01" />
+          <ScalarProperty Name="Address02" ColumnName="Address02" />
+          <ScalarProperty Name="City" ColumnName="City" />
+          <ScalarProperty Name="ID_State" ColumnName="ID_State" />
+          <ScalarProperty Name="Gender" ColumnName="Gender" />
+          <ScalarProperty Name="DOB" ColumnName="DOB" />
+          <ScalarProperty Name="Customer" ColumnName="Customer" />
+          <ScalarProperty Name="Supplier" ColumnName="Supplier" />
+          <ScalarProperty Name="Employee" ColumnName="Employee" />
+          <ScalarProperty Name="ID_Application" ColumnName="ID_Application" />
+          <ScalarProperty Name="ID_IdentifyWith" ColumnName="ID_IdentifyWith" />
+          <ScalarProperty Name="IDNumber" ColumnName="IDNumber" />
+          <ScalarProperty Name="IdentifiedBy" ColumnName="IdentifiedBy" />
+          <ScalarProperty Name="CreationDate" ColumnName="CreationDate" />
+          <ScalarProperty Name="Status" ColumnName="Status" />
+          <ScalarProperty Name="Comments" ColumnName="Comments" />
+          <ScalarProperty Name="DatabaseName" ColumnName="DatabaseName" />
+          <ScalarProperty Name="TableName" ColumnName="TableName" />
+          <ScalarProperty Name="PccNo" ColumnName="PccNo" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="IbsTransactionClasses">
+      <EntityTypeMapping TypeName="IbsMdmModel.IbsTransactionClass">
+        <MappingFragment StoreEntitySet="IbsTransactionClass">
+          <ScalarProperty Name="ID_TransClass" ColumnName="ID_TransClass" />
+          <ScalarProperty Name="TransClass" ColumnName="TransClass" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="IdentifyPeopleWiths">
+      <EntityTypeMapping TypeName="IbsMdmModel.IdentifyPeopleWith">
+        <MappingFragment StoreEntitySet="IdentifyPeopleWith">
+          <ScalarProperty Name="ID_IdentifyWith" ColumnName="ID_IdentifyWith" />
+          <ScalarProperty Name="IdentifyWith" ColumnName="IdentifyWith" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Locations">
+      <EntityTypeMapping TypeName="IbsMdmModel.Location">
+        <MappingFragment StoreEntitySet="Location">
+          <ScalarProperty Name="ID_Location" ColumnName="ID_Location" />
+          <ScalarProperty Name="Location1" ColumnName="Location" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="ReceiptTypes">
+      <EntityTypeMapping TypeName="IbsMdmModel.ReceiptType">
+        <MappingFragment StoreEntitySet="ReceiptType">
+          <ScalarProperty Name="ID_ReceiptType" ColumnName="ID_ReceiptType" />
+          <ScalarProperty Name="ReceiptType1" ColumnName="ReceiptType" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <FunctionImportMapping FunctionImportName="Universal_sp_CreatePccNo_V1" FunctionName="IbsMdmModel.Store.Universal_sp_CreatePccNo_V1" />
+  </EntityContainerMapping>
+</Mapping>

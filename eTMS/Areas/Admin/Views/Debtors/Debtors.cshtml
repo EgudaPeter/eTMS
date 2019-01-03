@@ -1,0 +1,69 @@
+﻿@model eTMS.BusinessObjectLayer.Debtor
+
+@{
+    ViewBag.Title = "Debtors";
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+}
+
+<script>
+
+    $(window).on('beforeunload', function () {
+        $.ajax({
+            url: '@Url.Action("ClearCurrentStatus","Debtors",new { Area = "Admin" })',
+            type: 'Post',
+            data:{}
+        });
+    }); //Clear Current Status
+
+    function FilterByStatus(status) {
+        DebtorsGridView.PerformCallback({
+            _status: status
+        })
+    }
+
+    $(document).ready(function () {
+        $("#status").change(function () {
+            var status = $("#status").val();
+            if (status != "") {
+                return FilterByStatus(status);
+            }
+            return;
+        });
+    });
+</script>
+
+<div class="panel panel-default">
+    <div class="panel-heading nopadding">
+        <div class="row nomargin">
+            <div class="col-md-12 padding5">
+                <div class="col-md-2">
+                    <div class="btn-group">
+                        <h4 class="titleStyle">DEBTORS</h4>
+                    </div>
+                </div>
+                <div class="col-md-10 action-wrap">
+                    <div class="form-inline">
+                        <div class="form-group pull-right">
+                            <div class="btn-group">
+                                <div class="pull-right">
+                                    @Html.DropDownList("Status", null, "Select Status", new { @class = "dropDowns", id = "status" })
+                                </div>
+                            </div>
+                        </div>
+                    </div><!--/form-inline-->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-body" style="background-color:#ffffff !important;">
+        <div class="col-md-12">
+            <div class="" style="overflow-x:scroll">
+                <div class="table-responsive">
+                    @Html.Action("DebtorsGridViewPartial")
+                </div>
+            </div>
+        </div>
+    </div>
+</div><!-- panel -->
+

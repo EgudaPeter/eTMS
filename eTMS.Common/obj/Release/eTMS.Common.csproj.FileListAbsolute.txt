@@ -1,0 +1,13 @@
+C:\TMSWeb\eTMS\eTMS.Common\bin\Release\eTMS.Common.dll
+C:\TMSWeb\eTMS\eTMS.Common\bin\Release\eTMS.Common.pdb
+C:\TMSWeb\eTMS\eTMS.Common\obj\Release\eTMS.Common.dll
+C:\TMSWeb\eTMS\eTMS.Common\obj\Release\eTMS.Common.pdb
+F:\Projects\TMSWeb\eTMS\eTMS.Common\bin\Release\eTMS.Common.dll
+F:\Projects\TMSWeb\eTMS\eTMS.Common\bin\Release\eTMS.Common.pdb
+F:\Projects\TMSWeb\eTMS\eTMS.Common\obj\Release\eTMS.Common.csprojResolveAssemblyReference.cache
+F:\Projects\TMSWeb\eTMS\eTMS.Common\obj\Release\eTMS.Common.dll
+F:\Projects\TMSWeb\eTMS\eTMS.Common\obj\Release\eTMS.Common.pdb
+C:\eTMS\eTMS.Common\bin\Release\eTMS.Common.dll
+C:\eTMS\eTMS.Common\bin\Release\eTMS.Common.pdb
+C:\eTMS\eTMS.Common\obj\Release\eTMS.Common.dll
+C:\eTMS\eTMS.Common\obj\Release\eTMS.Common.pdb

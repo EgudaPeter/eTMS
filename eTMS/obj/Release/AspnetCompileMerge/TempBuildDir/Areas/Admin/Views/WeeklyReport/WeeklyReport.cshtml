@@ -1,0 +1,143 @@
+﻿@model eTMS.BusinessObjectLayer.ProfitAndLoss
+
+@using System.Drawing
+@using System.Web.UI.WebControls
+
+@{
+    ViewBag.Title = "WeeklyReport";
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+}
+
+<script>
+
+    function CheckRangeOfEnteredDates() {
+        var sDate = startDate.GetValue();
+        var eDate = endDate.GetValue();
+        if (sDate == null || sDate == "") {
+            return;
+        }
+        if (eDate == null || eDate == "") {
+            return;
+        }
+        $.ajax({
+            url: '@Url.Action("CheckRangeOfEnteredDates", "WeeklyReport",new { Area = "Admin" })',
+            type: 'Post',
+            data: { _sDate: sDate, _eDate: eDate },
+            success: function (data) {
+                if (data.success == true) {
+                    SiteUtils.loading("Generating...");
+                    return GenerateReport(sDate, eDate);
+                }
+                if (data.success == false) {
+                    swal({
+                        title: 'Warning!',
+                        html: data.infoMessage,
+                        type: 'warning',
+                        allowOutsideClick:false
+                    });
+                    return;
+                }
+                if (data.success == -1) {
+                    swal({
+                        title: 'Error!',
+                        html: data.errorMessage,
+                        type: 'error',
+                        allowOutsideClick: false
+                    });
+                    return;
+                }
+            }
+        });
+    } //Check Range Of Entered Dates
+
+    function GenerateReport(startDate,endDate) {
+        ProfitAndLoss_WeeklyGridView.PerformCallback({ _sDate: startDate, _eDate: endDate });
+    }
+
+    function getRecordCountOfResults(s, e) {
+        SiteUtils.loadingOff();
+        var recordCount = s.cpVisibleRowCount;
+        if (recordCount == 0) {
+            swal({
+                title: 'Information!',
+                html: "No records generated for this week!",
+                type: 'info',
+                allowOutsideClick: false
+            });
+            return;
+        }
+    }
+</script>
+
+<div class="panel panel-default">
+    <div class="panel-heading nopadding">
+        <div class="row nomargin">
+            <div class="col-md-12 padding5">
+                <div class="col-md-2">
+                    <div class="btn-group">
+                        <h4 class="titleStyle">WEEKLY REPORT</h4>
+                    </div>
+                </div>
+                <div class="col-md-10 action-wrap">
+                    <div class="form-inline">
+                        <div class="form-group pull-right">
+                            <div class="btn-group">
+                                @Html.DevExpress().DateEdit(s =>
+                           {
+                               s.Name = "startDate";
+                               s.Properties.UseMaskBehavior = true;
+                               s.Properties.EditFormat = EditFormat.Custom;
+                               s.Properties.EditFormatString = "dd/MM/yyyy";
+                               s.Properties.DisplayFormatString = "dd/MM/yyyy";
+                               s.Width = 190;
+                               s.Theme = "MetropolisBlue";
+                               s.Properties.NullText = "Start Date: dd/mm/yyyy";
+                               s.ControlStyle.CssClass = "form-control input-sm";
+                               s.ControlStyle.ForeColor = Color.Black;
+                           }).GetHtml()
+                                @Html.DevExpress().DateEdit(s =>
+                           {
+                               s.Name = "endDate";
+                               s.Properties.UseMaskBehavior = true;
+                               s.Properties.EditFormat = EditFormat.Custom;
+                               s.Properties.EditFormatString = "dd/MM/yyyy";
+                               s.Properties.DisplayFormatString = "dd/MM/yyyy";
+                               s.Width = 190;
+                               s.Theme = "MetropolisBlue";
+                               s.Properties.NullText = "End Date : dd/mm/yyyy";
+                               s.ControlStyle.CssClass = "form-control input-sm";
+                               s.ControlStyle.ForeColor = Color.Black;
+                           }).GetHtml()
+                                <div class="pull-right">
+                                    @Html.DevExpress().Button(settings =>
+                               {
+                                   settings.Name = "btnGenerate";
+
+                                   settings.Width = 100;
+                                   settings.Text = "Generate";
+                                   settings.ToolTip = " Generate records.";
+                                   settings.ControlStyle.CssClass = "btn btnETMS";
+                                   settings.ClientSideEvents.Click = "CheckRangeOfEnteredDates";
+                                   settings.ControlStyle.Border.BorderStyle = BorderStyle.Solid;
+                               }).GetHtml()
+                                </div>
+                            </div>
+                        </div>
+                    </div><!--/form-inline-->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-body" style="background-color:#ffffff !important;">
+        <div class="col-md-12">
+            <div class="" style="overflow-x:auto">
+                <div class="table-responsive">
+                    @Html.Action("ProfitAndLoss_WeeklyGridViewPartial")
+                </div>
+            </div>
+        </div>
+    </div>
+</div><!-- panel -->
+
+

@@ -1,0 +1,165 @@
+@using System.Web.UI.WebControls
+
+@{
+    var grid = Html.DevExpress().GridView(settings => {
+        settings.Name = "FactorGridView";
+        settings.CallbackRouteValues = new { Controller = "Factor", Action = "FactorGridViewPartial" };
+        settings.SettingsSearchPanel.Visible = true;
+        settings.SettingsText.SearchPanelEditorNullText = "Enter Text to Search...";
+        settings.Width = Unit.Percentage(100);
+        settings.Settings.ShowTitlePanel = true;
+        //settings.Styles.TitlePanel.CssClass = "titleContainer";
+        settings.Theme = "MetropolisBlue";
+
+
+        settings.CommandColumn.Visible = true;
+        settings.CommandColumn.SelectAllCheckboxMode = GridViewSelectAllCheckBoxMode.Page;
+        settings.CommandColumn.ShowSelectCheckbox = true;
+        settings.CommandColumn.Width = 30;
+
+        settings.ClientSideEvents.SelectionChanged = "OnSelectionChanged";
+
+        settings.KeyFieldName = "FID";
+        settings.EnableRowsCache = false;
+        settings.SettingsLoadingPanel.Mode = GridViewLoadingPanelMode.Disabled;
+
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = false;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.Columns.Add(column =>
+        {
+            column.FieldName = "menu";
+            column.Caption = "#";
+            column.Width = 40;
+            column.UnboundType = DevExpress.Data.UnboundColumnType.String;
+            column.SetDataItemTemplateContent(c =>
+            {
+                string itemID = DataBinder.Eval(c.DataItem, "FID").ToString();
+
+                string menuLink = "<a id=\"menuLink" + itemID + "\" href=\"javascript:void(0)\"><button class=\"btn btn-xs btn-default dropdown\" type=\"button\" data-toggle=\"dropdown\" aria-expanded=\"false\" id-slug='" + itemID + "'  id=\"dropup\"><i class=\"fa fa-bars\"></i></button></a>";
+
+                string popup = Html.DevExpress().PopupMenu(
+                    settings2 =>
+                    {
+                        settings2.Name = "rowMenu" + itemID;
+                        settings2.PopupElementID = "menuLink" + itemID;
+                        settings2.ShowPopOutImages = DefaultBoolean.True;
+                        settings2.AllowSelectItem = false;
+                        settings2.Theme = "MetropolisBlue";
+
+                        settings2.Items.Add(item =>
+                        {
+                            item.Text = "Edit";
+                            item.Name = "Edit";
+                            item.ToolTip = "Edit Record";
+                            item.ItemStyle.ForeColor = System.Drawing.Color.White;
+                            item.ItemStyle.BackColor = System.Drawing.Color.FromArgb(101, 92, 92);
+
+                        });
+                        if (User.Identity.IsAuthenticated)
+                        {
+                            if (User.IsInRole("SU"))
+                            {
+                                settings2.Items.Add(item =>
+                                {
+                                    item.Text = "Delete";
+                                    item.Name = "Delete";
+                                    item.ToolTip = "Delete Record";
+                                    item.ItemStyle.ForeColor = System.Drawing.Color.White;
+                                    item.ItemStyle.BackColor = System.Drawing.Color.FromArgb(101, 92, 92);
+                                });
+                            }
+                        }
+                        settings2.ClientSideEvents.ItemClick = "OnPopupMenuItemClick";
+                        settings2.PopupAction = PopupAction.LeftMouseClick;
+                    }
+                    ).GetHtml().ToHtmlString();
+
+                ViewContext.Writer.Write(menuLink + popup);
+            });
+        });
+
+        settings.Columns.Add(m=>
+        {
+            m.FieldName = "FID";
+            m.Caption = "ID";
+            m.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+            m.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+            m.Width = 50;
+            m.HeaderStyle.Font.Bold = true;
+            m.HeaderStyle.Font.Size = 11;
+            m.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+        });
+        settings.Columns.Add(m=>
+        {
+            m.FieldName = "Name";
+            m.Caption = "Name";
+            //m.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+            //m.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+            m.CellStyle.Wrap = DefaultBoolean.False;
+            m.HeaderStyle.Font.Bold = true;
+            m.HeaderStyle.Font.Size = 11;
+            m.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+        });
+        settings.Columns.Add(m =>
+        {
+            m.FieldName = "CapturedBy";
+            m.Caption = "Captured By";
+            //m.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+            //m.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+            m.CellStyle.Wrap = DefaultBoolean.False;
+            m.HeaderStyle.Font.Bold = true;
+            m.HeaderStyle.Font.Size = 11;
+            m.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+        });
+        settings.Columns.Add(m =>
+        {
+            m.FieldName = "CapturedDate";
+            m.Caption = "Captured Date";
+            //m.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+            //m.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+            m.CellStyle.Wrap = DefaultBoolean.False;
+            m.HeaderStyle.Font.Bold = true;
+            m.HeaderStyle.Font.Size = 11;
+            m.PropertiesEdit.DisplayFormatString = "dd, MMMM yyyy";
+            m.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+        });
+
+        settings.SettingsPager.Visible = true;
+        settings.SettingsPager.FirstPageButton.Visible = true;
+        settings.SettingsPager.LastPageButton.Visible = true;
+        settings.SettingsPager.Mode = GridViewPagerMode.ShowPager;
+        settings.SettingsPager.EllipsisMode = PagerEllipsisMode.InsideNumeric;
+        settings.SettingsPager.Position = PagerPosition.Bottom;
+        settings.SettingsPager.ShowNumericButtons = true;
+        settings.SettingsPager.ShowSeparators = true;
+        settings.SettingsPager.PageSizeItemSettings.Visible = true;
+        settings.SettingsPager.PageSizeItemSettings.Items = new string[] { "10", "30" };
+
+        settings.HtmlRowCreated = (s, e) =>
+        {
+            var gridView = s as MVCxGridView;
+            if (ViewBag.Key != null)
+            {
+                gridView.SettingsBehavior.AllowFocusedRow = true;
+                gridView.FocusedRowIndex = gridView.FindVisibleIndexByKeyValue(ViewBag.Key);
+            }
+            else
+            {
+                gridView.SettingsBehavior.AllowFocusedRow = false;
+            }
+        };
+
+    });
+    if (ViewData["EditError"] != null){
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

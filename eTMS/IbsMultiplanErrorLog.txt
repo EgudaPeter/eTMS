@@ -1,0 +1,214 @@
+23/10/2017 02:17:37 PM: Log Details: 
+ -> Thread: [67]
+ -> Level: ERROR
+ -> Message: The cast to value type 'System.Decimal' failed because the materialized value is null. Either the result type's generic parameter or the query must use a nullable type.
+ -> In-dept Information:
+ System.InvalidOperationException: The cast to value type 'System.Decimal' failed because the materialized value is null. Either the result type's generic parameter or the query must use a nullable type.
+   at System.Data.Entity.Core.Common.Internal.Materialization.Shaper.ErrorHandlingValueReader`1.GetValue(DbDataReader reader, Int32 ordinal)
+   at lambda_method(Closure , Shaper )
+   at System.Data.Entity.Core.Common.Internal.Materialization.Coordinator`1.ReadNextElement(Shaper shaper)
+   at System.Data.Entity.Core.Common.Internal.Materialization.Shaper`1.SimpleEnumerator.MoveNext()
+   at System.Data.Entity.Internal.LazyEnumerator`1.MoveNext()
+   at System.Linq.Enumerable.Single[TSource](IEnumerable`1 source)
+   at System.Data.Entity.Core.Objects.ELinq.ObjectQueryProvider.<GetElementFunction>b__3[TResult](IEnumerable`1 sequence)
+   at System.Data.Entity.Core.Objects.ELinq.ObjectQueryProvider.ExecuteSingle[TResult](IEnumerable`1 query, Expression queryRoot)
+   at System.Data.Entity.Core.Objects.ELinq.ObjectQueryProvider.System.Linq.IQueryProvider.Execute[TResult](Expression expression)
+   at System.Data.Entity.Internal.Linq.DbQueryProvider.Execute[TResult](Expression expression)
+   at System.Linq.Queryable.Sum[TSource](IQueryable`1 source, Expression`1 selector)
+   at eTMS.Repositories.Repositories.LookUpRepo.GetTotalAmountForDeptors() in C:\TMSWeb\eTMS\eTMS.Repositories\Repositories\LookUpRepo.cs:line 71
+   at eTMS.Areas.Admin.Controllers.AdminController.Dashboard() in C:\TMSWeb\eTMS\eTMS\Areas\Admin\Controllers\AdminController.cs:line 40
+23/10/2017 02:28:08 PM: Log Details: 
+ -> Thread: [9]
+ -> Level: ERROR
+ -> Message: The cast to value type 'System.Decimal' failed because the materialized value is null. Either the result type's generic parameter or the query must use a nullable type.
+ -> In-dept Information:
+ System.InvalidOperationException: The cast to value type 'System.Decimal' failed because the materialized value is null. Either the result type's generic parameter or the query must use a nullable type.
+   at System.Data.Entity.Core.Common.Internal.Materialization.Shaper.ErrorHandlingValueReader`1.GetValue(DbDataReader reader, Int32 ordinal)
+   at lambda_method(Closure , Shaper )
+   at System.Data.Entity.Core.Common.Internal.Materialization.Coordinator`1.ReadNextElement(Shaper shaper)
+   at System.Data.Entity.Core.Common.Internal.Materialization.Shaper`1.SimpleEnumerator.MoveNext()
+   at System.Data.Entity.Internal.LazyEnumerator`1.MoveNext()
+   at System.Linq.Enumerable.Single[TSource](IEnumerable`1 source)
+   at System.Data.Entity.Core.Objects.ELinq.ObjectQueryProvider.<GetElementFunction>b__3[TResult](IEnumerable`1 sequence)
+   at System.Data.Entity.Core.Objects.ELinq.ObjectQueryProvider.ExecuteSingle[TResult](IEnumerable`1 query, Expression queryRoot)
+   at System.Data.Entity.Core.Objects.ELinq.ObjectQueryProvider.System.Linq.IQueryProvider.Execute[TResult](Expression expression)
+   at System.Data.Entity.Internal.Linq.DbQueryProvider.Execute[TResult](Expression expression)
+   at System.Linq.Queryable.Sum[TSource](IQueryable`1 source, Expression`1 selector)
+   at eTMS.Repositories.Repositories.LookUpRepo.GetTotalAmountForDeptors() in C:\TMSWeb\eTMS\eTMS.Repositories\Repositories\LookUpRepo.cs:line 71
+   at eTMS.Areas.Admin.Controllers.AdminController.Dashboard() in C:\TMSWeb\eTMS\eTMS\Areas\Admin\Controllers\AdminController.cs:line 40
+23/10/2017 10:07:22 PM: Log Details: 
+ -> Thread: [8]
+ -> Level: ERROR
+ -> Message: Validation failed for one or more entities. See 'EntityValidationErrors' property for more details.
+ -> In-dept Information:
+ System.Data.Entity.Validation.DbEntityValidationException: Validation failed for one or more entities. See 'EntityValidationErrors' property for more details.
+   at System.Data.Entity.Internal.InternalContext.SaveChanges()
+   at System.Data.Entity.Internal.LazyInternalContext.SaveChanges()
+   at System.Data.Entity.DbContext.SaveChanges()
+   at eTMS.Repositories.Repositories.TransactionRepo.SaveAll() in C:\TMSWeb\eTMS\eTMS.Repositories\Repositories\TransactionRepo.cs:line 228
+   at eTMS.Repositories.Repositories.TransactionRepo.AddDebt(Debt debt) in C:\TMSWeb\eTMS\eTMS.Repositories\Repositories\TransactionRepo.cs:line 14
+   at eTMS.Repositories.Repositories.TransactionRepo.AddTransaction(TransactionModel model) in C:\TMSWeb\eTMS\eTMS.Repositories\Repositories\TransactionRepo.cs:line 73
+   at eTMS.Areas.Admin.Controllers.TransactionsController.SaveTransaction(TransactionModel Data) in C:\TMSWeb\eTMS\eTMS\Areas\Admin\Controllers\TransactionsController.cs:line 178
+24/10/2017 09:28:24 AM: Log Details: 
+ -> Thread: [11]
+ -> Level: ERROR
+ -> Message: Object reference not set to an instance of an object.
+ -> In-dept Information:
+ System.NullReferenceException: Object reference not set to an instance of an object.
+   at eTMS.Repositories.Repositories.TransactionRepo.UpdateTransaction(TransactionModel model)
+   at eTMS.Areas.Admin.Controllers.TransactionsController.UpdateTransaction(TransactionModel Data) in C:\TMSWeb\eTMS\eTMS\Areas\Admin\Controllers\TransactionsController.cs:line 219
+24/10/2017 09:43:38 AM: Log Details: 
+ -> Thread: [6]
+ -> Level: ERROR
+ -> Message: Object reference not set to an instance of an object.
+ -> In-dept Information:
+ System.NullReferenceException: Object reference not set to an instance of an object.
+   at eTMS.Repositories.Repositories.TransactionRepo.AddTransaction(TransactionModel model)
+   at eTMS.Areas.Admin.Controllers.TransactionsController.SaveTransaction(TransactionModel Data) in C:\TMSWeb\eTMS\eTMS\Areas\Admin\Controllers\TransactionsController.cs:line 178
+24/10/2017 10:00:56 AM: Log Details: 
+ -> Thread: [21]
+ -> Level: ERROR
+ -> Message: Object reference not set to an instance of an object.
+ -> In-dept Information:
+ System.NullReferenceException: Object reference not set to an instance of an object.
+   at eTMS.Repositories.Repositories.TransactionRepo.UpdateTransaction(TransactionModel model)
+   at eTMS.Areas.Admin.Controllers.TransactionsController.UpdateTransaction(TransactionModel Data) in C:\TMSWeb\eTMS\eTMS\Areas\Admin\Controllers\TransactionsController.cs:line 219
+24/10/2017 10:14:18 AM: Log Details: 
+ -> Thread: [23]
+ -> Level: ERROR
+ -> Message: Exception of type 'System.Exception' was thrown.
+ -> In-dept Information:
+ System.Exception: Exception of type 'System.Exception' was thrown.
+   at eTMS.Repositories.Repositories.TransactionRepo.UpdateTransaction(TransactionModel model)
+   at eTMS.Areas.Admin.Controllers.TransactionsController.UpdateTransaction(TransactionModel Data) in C:\TMSWeb\eTMS\eTMS\Areas\Admin\Controllers\TransactionsController.cs:line 219
+25/10/2017 01:44:26 PM: Log Details: 
+ -> Thread: [48]
+ -> Level: ERROR
+ -> Message: The operation cannot be completed because the DbContext has been disposed.
+ -> In-dept Information:
+ System.InvalidOperationException: The operation cannot be completed because the DbContext has been disposed.
+   at System.Data.Entity.Internal.LazyInternalContext.InitializeContext()
+   at System.Data.Entity.Internal.InternalContext.GetEntitySetAndBaseTypeForType(Type entityType)
+   at System.Data.Entity.Internal.Linq.InternalSet`1.Initialize()
+   at System.Data.Entity.Internal.Linq.InternalSet`1.get_InternalContext()
+   at System.Data.Entity.Infrastructure.DbQuery`1.System.Linq.IQueryable.get_Provider()
+   at System.Linq.Queryable.Count[TSource](IQueryable`1 source, Expression`1 predicate)
+   at eTMS.Areas.Admin.Controllers.AdminController.Dashboard() in C:\TMSWeb\eTMS\eTMS\Areas\Admin\Controllers\AdminController.cs:line 37
+25/10/2017 01:46:15 PM: Log Details: 
+ -> Thread: [46]
+ -> Level: ERROR
+ -> Message: The operation cannot be completed because the DbContext has been disposed.
+ -> In-dept Information:
+ System.InvalidOperationException: The operation cannot be completed because the DbContext has been disposed.
+   at System.Data.Entity.Internal.LazyInternalContext.InitializeContext()
+   at System.Data.Entity.Internal.InternalContext.GetEntitySetAndBaseTypeForType(Type entityType)
+   at System.Data.Entity.Internal.Linq.InternalSet`1.Initialize()
+   at System.Data.Entity.Internal.Linq.InternalSet`1.get_InternalContext()
+   at System.Data.Entity.Infrastructure.DbQuery`1.System.Linq.IQueryable.get_Provider()
+   at System.Linq.Queryable.Count[TSource](IQueryable`1 source, Expression`1 predicate)
+   at eTMS.Areas.Admin.Controllers.AdminController.Dashboard() in C:\TMSWeb\eTMS\eTMS\Areas\Admin\Controllers\AdminController.cs:line 37
+25/10/2017 01:49:42 PM: Log Details: 
+ -> Thread: [8]
+ -> Level: ERROR
+ -> Message: The operation cannot be completed because the DbContext has been disposed.
+ -> In-dept Information:
+ System.InvalidOperationException: The operation cannot be completed because the DbContext has been disposed.
+   at System.Data.Entity.Internal.LazyInternalContext.InitializeContext()
+   at System.Data.Entity.Internal.InternalContext.GetEntitySetAndBaseTypeForType(Type entityType)
+   at System.Data.Entity.Internal.Linq.InternalSet`1.Initialize()
+   at System.Data.Entity.Internal.Linq.InternalSet`1.get_InternalContext()
+   at System.Data.Entity.Infrastructure.DbQuery`1.System.Linq.IQueryable.get_Provider()
+   at System.Linq.Queryable.Count[TSource](IQueryable`1 source, Expression`1 predicate)
+   at eTMS.Areas.Admin.Controllers.AdminController.Dashboard() in C:\TMSWeb\eTMS\eTMS\Areas\Admin\Controllers\AdminController.cs:line 37
+26/10/2017 04:36:00 PM: Log Details: 
+ -> Thread: [174]
+ -> Level: ERROR
+ -> Message: The specified type member 'Date' is not supported in LINQ to Entities. Only initializers, entity members, and entity navigation properties are supported.
+ -> In-dept Information:
+ System.NotSupportedException: The specified type member 'Date' is not supported in LINQ to Entities. Only initializers, entity members, and entity navigation properties are supported.
+   at System.Data.Entity.Core.Objects.ELinq.ExpressionConverter.MemberAccessTranslator.TypedTranslate(ExpressionConverter parent, MemberExpression linq)
+   at System.Data.Entity.Core.Objects.ELinq.ExpressionConverter.TypedTranslator`1.Translate(ExpressionConverter parent, Expression linq)
+   at System.Data.Entity.Core.Objects.ELinq.ExpressionConverter.TranslateExpression(Expression linq)
+   at System.Data.Entity.Core.Objects.ELinq.ExpressionConverter.UnaryTranslator.TypedTranslate(ExpressionConverter parent, UnaryExpression linq)
+   at System.Data.Entity.Core.Objects.ELinq.ExpressionConverter.TypedTranslator`1.Translate(ExpressionConverter parent, Expression linq)
+   at System.Data.Entity.Core.Objects.ELinq.ExpressionConverter.TranslateExpression(Expression linq)
+   at System.Data.Entity.Core.Objects.ELinq.ExpressionConverter.EqualsTranslator.TypedTranslate(ExpressionConverter parent, BinaryExpression linq)
+   at System.Data.Entity.Core.Objects.ELinq.ExpressionConverter.TypedTranslator`1.Translate(ExpressionConverter parent, Expression linq)
+   at System.Data.Entity.Core.Objects.ELinq.ExpressionConverter.TranslateExpression(Expression linq)
+   at System.Data.Entity.Core.Objects.ELinq.ExpressionConverter.TranslateLambda(LambdaExpression lambda, DbExpression input)
+   at System.Data.Entity.Core.Objects.ELinq.ExpressionConverter.TranslateLambda(LambdaExpression lambda, DbExpression input, DbExpressionBinding& binding)
+   at System.Data.Entity.Core.Objects.ELinq.ExpressionConverter.MethodCallTranslator.OneLambdaTranslator.Translate(ExpressionConverter parent, MethodCallExpression call, DbExpression& source, DbExpressionBinding& sourceBinding, DbExpression& lambda)
+   at System.Data.Entity.Core.Objects.ELinq.ExpressionConverter.MethodCallTranslator.OneLambdaTranslator.Translate(ExpressionConverter parent, MethodCallExpression call)
+   at System.Data.Entity.Core.Objects.ELinq.ExpressionConverter.MethodCallTranslator.SequenceMethodTranslator.Translate(ExpressionConverter parent, MethodCallExpression call, SequenceMethod sequenceMethod)
+   at System.Data.Entity.Core.Objects.ELinq.ExpressionConverter.MethodCallTranslator.TypedTranslate(ExpressionConverter parent, MethodCallExpression linq)
+   at System.Data.Entity.Core.Objects.ELinq.ExpressionConverter.TypedTranslator`1.Translate(ExpressionConverter parent, Expression linq)
+   at System.Data.Entity.Core.Objects.ELinq.ExpressionConverter.TranslateExpression(Expression linq)
+   at System.Data.Entity.Core.Objects.ELinq.ExpressionConverter.MethodCallTranslator.UnarySequenceMethodTranslator.Translate(ExpressionConverter parent, MethodCallExpression call)
+   at System.Data.Entity.Core.Objects.ELinq.ExpressionConverter.MethodCallTranslator.SequenceMethodTranslator.Translate(ExpressionConverter parent, MethodCallExpression call, SequenceMethod sequenceMethod)
+   at System.Data.Entity.Core.Objects.ELinq.ExpressionConverter.MethodCallTranslator.TypedTranslate(ExpressionConverter parent, MethodCallExpression linq)
+   at System.Data.Entity.Core.Objects.ELinq.ExpressionConverter.TypedTranslator`1.Translate(ExpressionConverter parent, Expression linq)
+   at System.Data.Entity.Core.Objects.ELinq.ExpressionConverter.TranslateExpression(Expression linq)
+   at System.Data.Entity.Core.Objects.ELinq.ExpressionConverter.Convert()
+   at System.Data.Entity.Core.Objects.ELinq.ELinqQueryState.GetExecutionPlan(Nullable`1 forMergeOption)
+   at System.Data.Entity.Core.Objects.ObjectQuery`1.<>c__DisplayClass7.<GetResults>b__6()
+   at System.Data.Entity.Core.Objects.ObjectContext.ExecuteInTransaction[T](Func`1 func, IDbExecutionStrategy executionStrategy, Boolean startLocalTransaction, Boolean releaseConnectionOnSuccess)
+   at System.Data.Entity.Core.Objects.ObjectQuery`1.<>c__DisplayClass7.<GetResults>b__5()
+   at System.Data.Entity.SqlServer.DefaultSqlExecutionStrategy.Execute[TResult](Func`1 operation)
+   at System.Data.Entity.Core.Objects.ObjectQuery`1.GetResults(Nullable`1 forMergeOption)
+   at System.Data.Entity.Core.Objects.ObjectQuery`1.<System.Collections.Generic.IEnumerable<T>.GetEnumerator>b__0()
+   at System.Data.Entity.Internal.LazyEnumerator`1.MoveNext()
+   at System.Linq.Enumerable.FirstOrDefault[TSource](IEnumerable`1 source)
+   at System.Data.Entity.Core.Objects.ELinq.ObjectQueryProvider.<GetElementFunction>b__1[TResult](IEnumerable`1 sequence)
+   at System.Data.Entity.Core.Objects.ELinq.ObjectQueryProvider.ExecuteSingle[TResult](IEnumerable`1 query, Expression queryRoot)
+   at System.Data.Entity.Core.Objects.ELinq.ObjectQueryProvider.System.Linq.IQueryProvider.Execute[TResult](Expression expression)
+   at System.Data.Entity.Internal.Linq.DbQueryProvider.Execute[TResult](Expression expression)
+   at System.Linq.Queryable.FirstOrDefault[TSource](IQueryable`1 source)
+   at eTMS.Repositories.Repositories.TransactionRepo.AddTransaction(TransactionModel model) in C:\TMSWeb\eTMS\eTMS.Repositories\Repositories\TransactionRepo.cs:line 59
+   at eTMS.Areas.Admin.Controllers.TransactionsController.SaveTransaction(TransactionModel Data) in C:\TMSWeb\eTMS\eTMS\Areas\Admin\Controllers\TransactionsController.cs:line 185
+26/10/2017 05:06:53 PM: Log Details: 
+ -> Thread: [8]
+ -> Level: ERROR
+ -> Message: Object reference not set to an instance of an object.
+ -> In-dept Information:
+ System.NullReferenceException: Object reference not set to an instance of an object.
+   at eTMS.Repositories.Repositories.TransactionRepo.AddTransaction(TransactionModel model)
+   at eTMS.Areas.Admin.Controllers.TransactionsController.SaveTransaction(TransactionModel Data) in C:\TMSWeb\eTMS\eTMS\Areas\Admin\Controllers\TransactionsController.cs:line 185
+30/10/2017 04:54:24 PM: Log Details: 
+ -> Thread: [68]
+ -> Level: ERROR
+ -> Message: The specified method 'eTMS.BusinessObjectLayer.Setup Max[Setup](System.Linq.IQueryable`1[eTMS.BusinessObjectLayer.Setup])' on the type 'System.Linq.Queryable' cannot be translated into a LINQ to Entities store expression because no overload matches the passed arguments.
+ -> In-dept Information:
+ System.NotSupportedException: The specified method 'eTMS.BusinessObjectLayer.Setup Max[Setup](System.Linq.IQueryable`1[eTMS.BusinessObjectLayer.Setup])' on the type 'System.Linq.Queryable' cannot be translated into a LINQ to Entities store expression because no overload matches the passed arguments.
+   at System.Data.Entity.Core.Objects.ELinq.ExpressionConverter.ThrowUnresolvableFunctionOverload(Expression Expression, Boolean isAmbiguous)
+   at System.Data.Entity.Core.Objects.ELinq.ExpressionConverter.FindFunction(String namespaceName, String functionName, IList`1 argumentTypes, Boolean isGroupAggregateFunction, Expression Expression)
+   at System.Data.Entity.Core.Objects.ELinq.ExpressionConverter.MethodCallTranslator.AggregateTranslator.FindFunction(ExpressionConverter parent, MethodCallExpression call, TypeUsage argumentType)
+   at System.Data.Entity.Core.Objects.ELinq.ExpressionConverter.MethodCallTranslator.AggregateTranslator.Translate(ExpressionConverter parent, MethodCallExpression call)
+   at System.Data.Entity.Core.Objects.ELinq.ExpressionConverter.MethodCallTranslator.SequenceMethodTranslator.Translate(ExpressionConverter parent, MethodCallExpression call, SequenceMethod sequenceMethod)
+   at System.Data.Entity.Core.Objects.ELinq.ExpressionConverter.MethodCallTranslator.TypedTranslate(ExpressionConverter parent, MethodCallExpression linq)
+   at System.Data.Entity.Core.Objects.ELinq.ExpressionConverter.TypedTranslator`1.Translate(ExpressionConverter parent, Expression linq)
+   at System.Data.Entity.Core.Objects.ELinq.ExpressionConverter.TranslateExpression(Expression linq)
+   at System.Data.Entity.Core.Objects.ELinq.ExpressionConverter.Convert()
+   at System.Data.Entity.Core.Objects.ELinq.ELinqQueryState.GetExecutionPlan(Nullable`1 forMergeOption)
+   at System.Data.Entity.Core.Objects.ObjectQuery`1.<>c__DisplayClass7.<GetResults>b__6()
+   at System.Data.Entity.Core.Objects.ObjectContext.ExecuteInTransaction[T](Func`1 func, IDbExecutionStrategy executionStrategy, Boolean startLocalTransaction, Boolean releaseConnectionOnSuccess)
+   at System.Data.Entity.Core.Objects.ObjectQuery`1.<>c__DisplayClass7.<GetResults>b__5()
+   at System.Data.Entity.SqlServer.DefaultSqlExecutionStrategy.Execute[TResult](Func`1 operation)
+   at System.Data.Entity.Core.Objects.ObjectQuery`1.GetResults(Nullable`1 forMergeOption)
+   at System.Data.Entity.Core.Objects.ObjectQuery`1.<System.Collections.Generic.IEnumerable<T>.GetEnumerator>b__0()
+   at System.Data.Entity.Internal.LazyEnumerator`1.MoveNext()
+   at System.Linq.Enumerable.Single[TSource](IEnumerable`1 source)
+   at System.Data.Entity.Core.Objects.ELinq.ObjectQueryProvider.<GetElementFunction>b__3[TResult](IEnumerable`1 sequence)
+   at System.Data.Entity.Core.Objects.ELinq.ObjectQueryProvider.ExecuteSingle[TResult](IEnumerable`1 query, Expression queryRoot)
+   at System.Data.Entity.Core.Objects.ELinq.ObjectQueryProvider.System.Linq.IQueryProvider.Execute[TResult](Expression expression)
+   at System.Data.Entity.Internal.Linq.DbQueryProvider.Execute[TResult](Expression expression)
+   at System.Linq.Queryable.Max[TSource](IQueryable`1 source)
+   at eTMS.Repositories.Repositories.SetupRepo.GetSettings() in C:\TMSWeb\eTMS\eTMS.Repositories\Repositories\SetupRepo.cs:line 15
+   at eTMS.Areas.Admin.Controllers.SetupsController.GetValues() in C:\TMSWeb\eTMS\eTMS\Areas\Admin\Controllers\SetupsController.cs:line 70
+31/10/2017 11:29:53 AM: Log Details: 
+ -> Thread: [27]
+ -> Level: ERROR
+ -> Message: Object reference not set to an instance of an object.
+ -> In-dept Information:
+ System.NullReferenceException: Object reference not set to an instance of an object.
+   at eTMS.Repositories.Repositories.TransactionRepo.AddTransaction(TransactionModel model)
+   at eTMS.Areas.Admin.Controllers.TransactionsController.SaveTransaction(TransactionModel Data) in C:\TMSWeb\eTMS\eTMS\Areas\Admin\Controllers\TransactionsController.cs:line 185

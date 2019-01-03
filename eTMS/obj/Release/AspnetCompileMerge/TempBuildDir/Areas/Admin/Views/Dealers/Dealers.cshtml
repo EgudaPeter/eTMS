@@ -1,0 +1,605 @@
+﻿@model eTMS.BusinessObjectLayer.DealerTable
+
+@using System.Web.UI.WebControls
+
+@{
+    ViewBag.Title = "Dealers";
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+}
+
+<script>
+    var getID;
+    var selectedIDs;
+    var oldDealerName = null;
+
+    var stopSubmitBecauseDealerNameFlagged = false;
+    var stopSubmitBecauseEditedDealerNameFlagged = false;
+
+    var editedDealerNameFlaggedErrorMessage = null;
+    var dealerNameFlaggedErrorMessage = null; //Global Variables
+
+    /*******************************Add Dealer*********************************************/
+
+    function promptUserBeforeSavingDealer() {
+        swal({
+            title: 'Confirm?',
+            html: 'Save record?',
+            type: 'info',
+            showCancelButton: true,
+            confirmButtonClass: 'btn btn-info',
+            cancelButtonClass: 'btn btn-primary',
+            confirmButtonText: '<i class="fa fa-thumbs-up"></i> Save',
+            cancelButtonText: '<i class="fa fa-thumbs-down"></i> Cancel',
+            allowOutsideClick: false
+        }).then(function () {
+            var result = ValidateDealerForm();
+            if (result == true) {
+                $('#addDealer').modal("hide");
+                return saveDealer();
+            }
+            if (result == false) {
+                var infoMsg = "Please specify a <b>Dealer name</b> before progressing to save record!";
+                swal({
+                    title: 'Warning!',
+                    html: infoMsg,
+                    type: 'warning'
+                });
+                return;
+            }
+            if (result == -1) {
+                return;
+            }
+        });
+    }
+
+    function promptUserBeforeClosingDealerModal() {
+        swal({
+            title: 'Are you sure?',
+            html: 'Inputs will be lost',
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonClass: 'btn btn-info',
+            cancelButtonClass: 'btn btn-primary',
+            confirmButtonText: '<i class="fa fa-thumbs-up"></i> Okay',
+            cancelButtonText: '<i class="fa fa-thumbs-down"></i> Cancel',
+            allowOutsideClick: false
+        }).then(function () {
+            stopSubmitBecauseDealerNameFlagged = false;
+            $('#addDealer').modal("hide");
+        });
+    }
+
+    function ValidateDealerForm() {
+        var dealerName = DealerName.GetValue();
+        if (stopSubmitBecauseDealerNameFlagged == true) {
+            swal({
+                title: 'Warning!',
+                html: dealerNameFlaggedErrorMessage,
+                type: 'warning'
+            });
+            return -1;
+        }
+        if (dealerName != null) {
+            return true;
+        }
+        return false;
+    }
+
+    function DisplayDealerForm() {
+        DealerName.SetValue(null);
+        $('#addDealer').modal({ backdrop: 'static', keyboard: false });
+        $('#addDealer').modal("show");
+    }
+
+    function ValidateUniquenessOfDealerName() {
+        var dealerName = DealerName.GetValue();
+        if (dealerName == null) {
+            stopSubmitBecauseDealerNameFlagged = false;
+            return;
+        }
+        $.ajax({
+            url: '@Url.Action("ValidateUniquenessOfDealerName", "Dealers",new { Area = "Admin" })',
+            type: 'Post',
+            data: { dName: dealerName },
+            success: function (data) {
+                if (data.success == true) {
+                    stopSubmitBecauseDealerNameFlagged = false;
+                    return;
+                }
+                if (data.success == false) {
+                    stopSubmitBecauseDealerNameFlagged = true;
+                    dealerNameFlaggedErrorMessage = data.infoMessage;
+                    swal({
+                        title: 'Warning!',
+                        html: dealerNameFlaggedErrorMessage,
+                        type: 'warning'
+                    });
+                    return;
+                }
+                if (data.success == -1) {
+                    swal({
+                        title: 'Error!',
+                        html: data.errorMessage,
+                        type: 'error'
+                    });
+                    return;
+                }
+            }
+        });
+    } //Validate Uniqueness Of DealerName
+
+    function saveDealer() {
+        SiteUtils.loading("Saving...");
+        dataArray = {
+            DealerName: DealerName.GetValue()
+        }
+        $.ajax({
+            url: '@Url.Action("AddDealer", "Dealers", new { Area = "Admin" })',
+            type: 'Post',
+            data: { Data: dataArray },
+            success: function (data) {
+                SiteUtils.loadingOff();
+                if (data.success == true) {
+                    DealerGridView.Refresh();
+                    swal({
+                        title: 'Success!',
+                        html: data.infoMessage,
+                        type: 'success'
+                    });
+                    return;
+                }
+                if (data.success == -1) {
+                    swal({
+                        title: 'Error!',
+                        html: data.errorMessage,
+                        type: 'error'
+                    });
+                    return;
+                }
+            }
+        });
+    } //Save Dealer
+
+    /********************************************************************************************/  //Add Dealer
+
+    /*******************************Update Dealer******************************************/
+
+    function promptUserBeforeUpdatingDealer() {
+        swal({
+            title: 'Confirm?',
+            html: 'Update record?',
+            type: 'info',
+            showCancelButton: true,
+            confirmButtonClass: 'btn btn-info',
+            cancelButtonClass: 'btn btn-primary',
+            confirmButtonText: '<i class="fa fa-thumbs-up"></i> Update',
+            cancelButtonText: '<i class="fa fa-thumbs-down"></i> Cancel',
+            allowOutsideClick: false
+        }).then(function () {
+            var result = ValidateEditedDealerForm();
+            if (result == true) {
+                $('#editDealer').modal("hide");
+                return updateDealer();
+            }
+            if (result == false) {
+                var infoMsg = "Please specify a <b>Dealer name</b> before progressing to update record!";
+                swal({
+                    title: 'Warning!',
+                    html: infoMsg,
+                    type: 'warning'
+                });
+                return;
+            }
+            if (result == -1) {
+                return;
+            }
+        });
+    }
+
+    function promptUserBeforeClosingEditedDealerModal() {
+        swal({
+            title: 'Are you sure?',
+            html: 'Inputs will be lost',
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonClass: 'btn btn-info',
+            cancelButtonClass: 'btn btn-primary',
+            confirmButtonText: '<i class="fa fa-thumbs-up"></i> Okay',
+            cancelButtonText: '<i class="fa fa-thumbs-down"></i> Cancel',
+            allowOutsideClick: false
+        }).then(function () {
+            stopSubmitBecauseEditedDealerNameFlagged = false;
+            $('#editDealer').modal("hide");
+        });
+    }
+
+    function ValidateEditedDealerForm() {
+        var dealerName = E_DealerName.GetValue();
+        if (stopSubmitBecauseEditedDealerNameFlagged == true) {
+            swal({
+                title: 'Warning!',
+                html: editedDealerNameFlaggedErrorMessage,
+                type: 'warning'
+            });
+            return -1;
+        }
+        if (dealerName != null) {
+            return true;
+        }
+        return false;
+    }
+
+    function ValidateUniquenessOfEditedDealerName() {
+        var dealerName = E_DealerName.GetValue();
+        if (dealerName == null || dealerName == oldDealerName) {
+            stopSubmitBecauseEditedDealerNameFlagged = false;
+            return;
+        }
+        $.ajax({
+            url: '@Url.Action("ValidateUniquenessOfDealerName", "Dealers",new { Area = "Admin" })',
+            type: 'Post',
+            data: { dName: dealerName },
+            success: function (data) {
+                if (data.success == true) {
+                    stopSubmitBecauseEditedDealerNameFlagged = false;
+                    return;
+                }
+                if (data.success == false) {
+                    stopSubmitBecauseEditedDealerNameFlagged = true;
+                    editedDealerNameFlaggedErrorMessage = data.infoMessage;
+                    swal({
+                        title: 'Warning!',
+                        html: editedDealerNameFlaggedErrorMessage,
+                        type: 'warning'
+                    });
+                    return;
+                }
+                if (data.success == -1) {
+                    swal({
+                        title: 'Error!',
+                        html: data.errorMessage,
+                        type: 'error'
+                    });
+                    return;
+                }
+            }
+        });
+    } //Validate Uniqueness Of DealerName
+
+    function EditDealer(id) {
+        $.ajax({
+            url: '@Url.Action("EditDealer", "Dealers",new { Area = "Admin" })',
+            type: 'Post',
+            data: { dealerId: id },
+            success: function (data) {
+                if (data.success == true) {
+                    oldDealerName = data.dealerName;
+                    E_DealerID.SetText(data.dealerID);
+                    E_DealerName.SetText(data.dealerName);
+                    $('#editDealer').modal({ backdrop: 'static', keyboard: false });
+                    $('#editDealer').modal("show");
+                    return;
+                }
+                if (data.success == -1) {
+                    swal({
+                        title: 'Error!',
+                        html: data.errorMessage,
+                        type: 'error'
+                    });
+                    return;
+                }
+            }
+        });
+    } //Edit Dealer
+
+    function updateDealer() {
+        SiteUtils.loading("Updating...");
+        dataArray = {
+            DealerID: E_DealerID.GetValue(),
+            DealerName: E_DealerName.GetValue()
+        }
+        $.ajax({
+            url: '@Url.Action("UpdateDealer", "Dealers", new { Area = "Admin" })',
+            type: 'Post',
+            data: { Data: dataArray },
+            success: function (data) {
+                SiteUtils.loadingOff();
+                if (data.success == true) {
+                    DealerGridView.Refresh();
+                    swal({
+                        title: 'Success!',
+                        html: data.infoMessage,
+                        type: 'success'
+                    });
+                    return;
+                }
+                if (data.success == -1) {
+                    swal({
+                        title: 'Error!',
+                        html: data.errorMessage,
+                        type: 'error'
+                    });
+                    return;
+                }
+            }
+        });
+    } //Update Dealer
+
+    /********************************************************************************************/ //Update Dealer
+
+    function DeleteASingleDealer(id) {
+        swal({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonClass: 'btn btn-danger',
+            cancelButtonClass: 'btn btn-primary',
+            confirmButtonText: '<i class="fa fa-thumbs-up"></i> Delete',
+            cancelButtonText: '<i class="fa fa-thumbs-down"></i> Cancel',
+            allowOutsideClick: false
+        }).then(function () {
+            SiteUtils.loading("Deleting...");
+            $.ajax({
+                url: '@Url.Action("DeleteASingleDealer", "Dealers", new { Area = "Admin" })',
+                type: 'Post',
+                data: { selectedKey: id },
+                success: function (data) {
+                    SiteUtils.loadingOff();
+                    if (data.success == true) {
+                        DealerGridView.Refresh();
+                        swal({
+                            title: 'Success!',
+                            html: data.infoMessage,
+                            type: 'success',
+                            allowOutsideClick: false
+                        });
+                        return;
+                    }
+                    if (data.success == -1) {
+                        swal({
+                            title: 'Error!',
+                            html: data.errorMessage,
+                            type: 'error',
+                            allowOutsideClick: false
+                        });
+                        return;
+                    }
+                }
+            });
+        });
+    } //Delete A Single Dealer
+
+    function DeleteGroupOfDealers() {
+        swal({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonClass: 'btn btn-danger',
+            cancelButtonClass: 'btn btn-primary',
+            confirmButtonText: '<i class="fa fa-thumbs-up"></i> Delete',
+            cancelButtonText: '<i class="fa fa-thumbs-down"></i> Cancel',
+            allowOutsideClick: false
+        }).then(function () {
+            SiteUtils.loading("Deleting...");
+            $.ajax({
+                url: '@Url.Action("DeleteGroupOfDealers", "Dealers", new { Area = "Admin" })',
+                type: 'Post',
+                data: { selectedKeys: selectedIDs },
+                success: function (data) {
+                    SiteUtils.loadingOff();
+                    if (data.success == true) {
+                        DealerGridView.Refresh();
+                        swal({
+                            title: 'Success!',
+                            html: data.infoMessage,
+                            type: 'success',
+                            allowOutsideClick: false
+                        }).then(function () {
+                            DealerGridView.UnselectRows();
+                        });
+                        return;
+                    }
+                    if (data.success == -1) {
+                        DealerGridView.UnselectRows();
+                        swal({
+                            title: 'Error!',
+                            html: data.errorMessage,
+                            type: 'error',
+                            allowOutsideClick: false
+                        });
+                        return;
+                    }
+                }
+            });
+
+        });
+    } //Delete A Group Of ExpenseType
+
+    /*******************************Every Other Functions*********************************************/
+    function OnSelectionChanged(s, e) {
+        s.GetSelectedFieldValues("DealerID", GetSelectedFieldValuesCallback);
+        $("#actions").attr("disabled", false);
+        $("#actions").removeClass("btnDisabled");
+    }
+
+    function GetSelectedFieldValuesCallback(values) {
+        if (values.length == 0) {
+            $("#actions").val("Select Action");
+            $("#actions").attr("disabled", true);
+            $("#actions").addClass("btnDisabled");
+        }
+        selectedIDs = values.join(',');
+        $("#recordCount").text(DealerGridView.GetSelectedRowCount());
+
+    }
+
+    $(document).ready(function () {
+        //Executes a selected action
+        $("#actions").change(function () {
+            var action = $("#actions").val();
+            if (action == "Delete") {
+              return DeleteGroupOfDealers();
+            }
+            else {
+                return; //do nothing...
+            }
+        });
+        $("#recordCount").text(0);
+    });
+
+    function OnPopupMenuItemClick(s, e) {
+        var itemName = e.item.name;
+        if (itemName == "Edit") {
+            return EditDealer(getID);
+        }
+        if (itemName == "Delete") {
+            return DeleteASingleDealer(getID);
+        }
+    }
+
+    $(document).on("click", "#DealerGridView tbody tr #dropup", function () {
+        getID = $(this).attr('id-slug');
+    }) //Every other function
+</script>
+
+
+<div class="panel panel-default">
+    <div class="panel-heading nopadding">
+        <div class="row nomargin">
+            <div class="col-md-12 padding5">
+                <div class="col-md-2">
+                    <div class="btn-group">
+                        <h4 class="titleStyle">DEALERS</h4>
+                    </div>
+                </div>
+                <div class="col-md-10 action-wrap">
+                    <div class="form-inline">
+                        <div class="form-group pull-right">
+                            <div class="btn-group">
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    if (User.IsInRole("SU"))
+                                    {
+                                        @Html.DropDownList("Actions", null, null, new { @class = "dropDowns btnDisabled", id = "actions", disabled = true })
+                                    }
+                                }
+                                <div class="pull-right">
+                                    @Html.DevExpress().Button(settings =>
+                               {
+                                   settings.Name = "btnDealer";
+
+                                   settings.Width = 100;
+                                   settings.Text = "Add New";
+                                   settings.ToolTip = " Add dealer.";
+                                   settings.ControlStyle.CssClass = "btn btnETMS";
+                                   settings.ClientSideEvents.Click = "DisplayDealerForm";
+                                   settings.ControlStyle.Border.BorderStyle = BorderStyle.Solid;
+                               }).GetHtml()
+                                </div>
+                            </div>
+                        </div>
+                    </div><!--/form-inline-->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="addDealer" class="modal fade" tabindex="-1" role="dialog" style="display: none;">
+        <div class="modal-dialog modal-super-scaled">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Add Dealer</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-horizontal">
+
+                        <div class="form-group">
+                            <label class="control-label labels col-md-2">Name:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().TextBox(settings =>
+                           {
+                               settings.Name = "DealerName";
+                               settings.ControlStyle.CssClass = "form-control input-sm";
+                               settings.ControlStyle.ForeColor = System.Drawing.Color.Black;
+                               settings.Width = Unit.Percentage(100);
+                               settings.Theme = "MetropolisBlue";
+                               settings.Properties.ClientSideEvents.ValueChanged = "ValidateUniquenessOfDealerName";
+                           }).GetHtml()
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" onclick="promptUserBeforeSavingDealer()"><i class="fa fa-thumbs-up"></i> Save</button>
+                    <button type="button" onclick="promptUserBeforeClosingDealerModal()" class="btn btn-default"><i class="fa fa-thumbs-down"></i> Cancel</button>
+                </div>
+            </div> <!-- / .modal-content -->
+        </div> <!-- / .modal-dialog -->
+    </div>
+
+    <div id="editDealer" class="modal fade" tabindex="-1" role="dialog" style="display: none;">
+        <div class="modal-dialog modal-super-scaled">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Update Dealer</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-horizontal">
+
+                        <div class="form-group">
+                            <label class="control-label labels col-md-2">ID:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().TextBox(settings =>
+                           {
+                               settings.Name = "E_DealerID";
+                               settings.ControlStyle.CssClass = "form-control input-sm disable";
+                               settings.Width = Unit.Percentage(100);
+                               settings.Theme = "MetropolisBlue";
+                               settings.ReadOnly = true;
+                               settings.ControlStyle.ForeColor = System.Drawing.Color.Black;
+                           }).GetHtml()
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-2">Name:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().TextBox(settings =>
+                           {
+                               settings.Name = "E_DealerName";
+                               settings.ControlStyle.CssClass = "form-control input-sm";
+                               settings.ControlStyle.ForeColor = System.Drawing.Color.Black;
+                               settings.Width = Unit.Percentage(100);
+                               settings.Theme = "MetropolisBlue";
+                               settings.Properties.ClientSideEvents.ValueChanged = "ValidateUniquenessOfEditedDealerName";
+                           }).GetHtml()
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" onclick="promptUserBeforeUpdatingDealer()"><i class="fa fa-thumbs-up"></i> Update</button>
+                    <button type="button" onclick="promptUserBeforeClosingEditedDealerModal()" class="btn btn-default"><i class="fa fa-thumbs-down"></i> Cancel</button>
+                </div>
+            </div> <!-- / .modal-content -->
+        </div> <!-- / .modal-dialog -->
+    </div>
+
+    <div class="panel-body" style="background-color:#ffffff !important;">
+        <div class="col-md-12">
+            <div class="" style="overflow-x:auto">
+                <div class="table-responsive">
+                    <a style="color:#000; font-weight:bold; margin-right:0px;" id="helperText">[Total rows selected:]</a>
+                    <a style="color:#000;font-weight:bold; margin-right:20px;" id="recordCount"></a>
+                    @Html.Action("DealerGridViewPartial")
+                </div>
+            </div>
+        </div>
+    </div>
+</div><!-- panel -->
+
+

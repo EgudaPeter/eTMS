@@ -1,0 +1,110 @@
+﻿@model eTMS.BusinessObjectLayer.ProfitAndLoss
+
+@using System.Web.UI.WebControls
+
+@using System.Drawing
+
+@{
+    ViewBag.Title = "DailyReport";
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+}
+
+<style>
+    #btnGenerate_CD {
+        width: 120px;
+        height: 27px;
+        margin-left:5px;
+        font-weight:bold;
+    }
+</style>
+<script>
+
+    function GenerateRecords() {
+        var date = CapturedDate.GetValue();
+        if (date == null || date == "") {
+            swal({
+                title: 'Warning!',
+                html: "Please indicate a date!",
+                type: 'warning',
+                allowOutsideClick: false
+            });
+            return;
+        }
+        SiteUtils.loading("Generating...");
+        return ProfitAndLoss_DailyGridView.PerformCallback({ _date: date });
+    }
+
+    function getRecordCountOfResults(s, e) {
+        SiteUtils.loadingOff();
+        var recordCount = s.cpVisibleRowCount;
+        if (recordCount == 0) {
+            swal({
+                title: 'Information!',
+                html: "No records generated for this date!",
+                type: 'info',
+                allowOutsideClick: false
+            });
+            return;
+        }
+    }
+
+</script>
+
+<div class="panel panel-default">
+    <div class="panel-heading nopadding">
+        <div class="row nomargin">
+            <div class="col-md-12 padding5">
+                <div class="col-md-2">
+                    <div class="btn-group">
+                        <h4 class="titleStyle">DAILY REPORT</h4>
+                    </div>
+                </div>
+                <div class="col-md-10 action-wrap">
+                    <div class="form-inline">
+                        <div class="form-group pull-right">
+                            <div class="btn-group">
+                                @Html.DevExpress().DateEdit(s =>
+                           {
+                               s.Name = "CapturedDate";
+                               s.Properties.UseMaskBehavior = true;
+                               s.Properties.EditFormat = EditFormat.Custom;
+                               s.Properties.EditFormatString = "dd/MM/yyyy";
+                               s.Properties.DisplayFormatString = "dd/MM/yyyy";
+                               s.Width = 120;
+                               s.Theme = "MetropolisBlue";
+                               s.Properties.NullText = "dd/mm/yyyy";
+                               s.ControlStyle.CssClass = "form-control input-sm";
+                               s.ControlStyle.ForeColor = Color.Black;
+                           }).GetHtml()
+                                <div class="pull-right">
+                                    @*@Html.DevExpress().Button(settings =>
+                               {
+                                   settings.Name = "btnGenerate";
+                                   settings.Text = "Generate";
+                                   settings.ToolTip = " Generate records.";
+                                   settings.ControlStyle.CssClass = "btnAddNew";
+                                   settings.ClientSideEvents.Click = "GenerateRecords";
+                                   settings.ControlStyle.Border.BorderStyle = BorderStyle.Solid;
+                               }).GetHtml()*@
+                                    <button class="btnAddNew" onclick="GenerateRecords()" id="btnGenerate_CD">Generate records</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!--/form-in-line-->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-body" style="background-color:#ffffff !important;">
+        <div class="col-md-12">
+            <div class="" style="overflow-x:auto">
+                <div class="table-responsive">
+                    @*<a style="color:#000; font-weight:bold; margin-right:0px;" id="helperText">[Total rows selected:]</a>
+                        <a style="color:#000;font-weight:bold; margin-right:20px;" id="recordCount"></a>*@
+                    @Html.Action("ProfitAndLoss_DailyGridViewPartial")
+                </div>
+            </div>
+        </div>
+    </div>
+</div><!-- panel -->

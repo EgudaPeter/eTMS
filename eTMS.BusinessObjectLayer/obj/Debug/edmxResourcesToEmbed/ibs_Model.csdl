@@ -1,0 +1,256 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="IbsMdmModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityType Name="CorporateActionDetail">
+    <Key>
+      <PropertyRef Name="ID_CorporateActionDetail" />
+    </Key>
+    <Property Name="ID_CorporateActionDetail" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="ID_CorporateActionMaster" Type="Int32" />
+    <Property Name="DividendRate" Type="Decimal" Precision="18" Scale="8" />
+    <Property Name="PaymentDate" Type="DateTime" Precision="3" />
+    <Property Name="DividendType" Type="String" MaxLength="1" FixedLength="true" Unicode="false" />
+    <Property Name="ClosureDate" Type="DateTime" Precision="3" />
+    <Property Name="DeclaredID" Type="Int32" />
+    <Property Name="ShareID" Type="Int32" />
+    <NavigationProperty Name="CorporateActionMaster" Relationship="Self.FK_CorporateActionDetail_CorporateActionMaster" FromRole="CorporateActionDetail" ToRole="CorporateActionMaster" />
+  </EntityType>
+  <EntityType Name="CorporateActionMaster">
+    <Key>
+      <PropertyRef Name="ID_CorporateActionMaster" />
+    </Key>
+    <Property Name="ID_CorporateActionMaster" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Symbol" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+    <Property Name="FinYear" Type="String" MaxLength="4" FixedLength="false" Unicode="false" />
+    <Property Name="BonusRate" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+    <Property Name="BonusFor" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+    <Property Name="BonusClosureDate" Type="DateTime" Precision="3" />
+    <Property Name="AnnualID" Type="Int32" />
+    <Property Name="ShareInIssue" Type="Decimal" Precision="28" Scale="4" />
+    <Property Name="Rating" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+    <Property Name="ProfitAfterTaxQ1" Type="Decimal" Precision="18" Scale="2" />
+    <Property Name="ProfitAfterTaxQ2" Type="Decimal" Precision="18" Scale="2" />
+    <Property Name="ProfitAfterTaxQ3" Type="Decimal" Precision="18" Scale="2" />
+    <Property Name="ProfitAfterTax" Type="Decimal" Precision="18" Scale="2" />
+    <Property Name="TurnOverQ1" Type="Decimal" Precision="18" Scale="2" />
+    <Property Name="TurnOverQ2" Type="Decimal" Precision="18" Scale="2" />
+    <Property Name="TurnOverQ3" Type="Decimal" Precision="18" Scale="2" />
+    <Property Name="PE_Ratio" Type="Decimal" Precision="18" Scale="4" />
+    <Property Name="ShareID" Type="Int32" />
+    <NavigationProperty Name="CorporateActionDetails" Relationship="Self.FK_CorporateActionDetail_CorporateActionMaster" FromRole="CorporateActionMaster" ToRole="CorporateActionDetail" />
+  </EntityType>
+  <EntityType Name="IBS_Application">
+    <Key>
+      <PropertyRef Name="ID_Application" />
+    </Key>
+    <Property Name="ID_Application" Type="String" MaxLength="4" FixedLength="false" Unicode="false" Nullable="false" />
+    <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="Money4PaymentActNo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+    <Property Name="Money4LodgementActNo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+    <Property Name="LastVoucherNo" Type="Int32" />
+  </EntityType>
+  <EntityType Name="IBS_Banks">
+    <Key>
+      <PropertyRef Name="ID_Bank" />
+    </Key>
+    <Property Name="ID_Bank" Type="String" MaxLength="4" FixedLength="false" Unicode="false" Nullable="false" />
+    <Property Name="BankName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="Address01" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="Address02" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="ID_State" Type="String" MaxLength="3" FixedLength="false" Unicode="false" />
+    <Property Name="OpenAccount" Type="Boolean" />
+    <Property Name="BankGlActNo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+    <Property Name="SwitchCode" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+    <Property Name="BankCode" Type="String" MaxLength="4" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="IBS_Branches">
+    <Key>
+      <PropertyRef Name="ID_Branch" />
+    </Key>
+    <Property Name="ID_Branch" Type="String" MaxLength="4" FixedLength="false" Unicode="false" Nullable="false" />
+    <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="AccessLevel" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="IBS_Country">
+    <Key>
+      <PropertyRef Name="ID_Country" />
+    </Key>
+    <Property Name="ID_Country" Type="String" MaxLength="3" FixedLength="false" Unicode="false" Nullable="false" />
+    <Property Name="Country" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="IBS_Currency">
+    <Key>
+      <PropertyRef Name="ID_Currency" />
+    </Key>
+    <Property Name="ID_Currency" Type="String" MaxLength="3" FixedLength="false" Unicode="false" Nullable="false" />
+    <Property Name="Currency" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="Unit" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <NavigationProperty Name="IBS_ExcRate" Relationship="Self.FK_IBS_ExcRate_IBS_Currency" FromRole="IBS_Currency" ToRole="IBS_ExcRate" />
+  </EntityType>
+  <EntityType Name="IBS_ExcRate">
+    <Key>
+      <PropertyRef Name="ExcRate_ID" />
+    </Key>
+    <Property Name="ExcRate_ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="CurrencyID" Type="String" MaxLength="3" FixedLength="false" Unicode="false" />
+    <Property Name="EffectiveDate" Type="DateTime" Precision="3" />
+    <Property Name="ExchangeRate" Type="Decimal" Precision="18" Scale="4" />
+    <NavigationProperty Name="IBS_Currency" Relationship="Self.FK_IBS_ExcRate_IBS_Currency" FromRole="IBS_ExcRate" ToRole="IBS_Currency" />
+  </EntityType>
+  <EntityType Name="IBS_PFA">
+    <Key>
+      <PropertyRef Name="ID_PFA" />
+    </Key>
+    <Property Name="ID_PFA" Type="String" MaxLength="4" FixedLength="false" Unicode="false" Nullable="false" />
+    <Property Name="PFA_Name" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="Address01" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="Address02" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="ID_State" Type="String" MaxLength="3" FixedLength="false" Unicode="false" />
+    <Property Name="ContactPerson" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="GSM_Phone1" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+    <Property Name="GSM_Phone2" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+    <Property Name="Email" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+    <Property Name="WebSite" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="IBS_PostCode">
+    <Key>
+      <PropertyRef Name="PostCode" />
+    </Key>
+    <Property Name="PostCode" Type="String" MaxLength="10" FixedLength="false" Unicode="false" Nullable="false" />
+    <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="IBS_ProductLine">
+    <Key>
+      <PropertyRef Name="ID_ProductLine" />
+    </Key>
+    <Property Name="ID_ProductLine" Type="String" MaxLength="4" FixedLength="false" Unicode="false" Nullable="false" />
+    <Property Name="ProductLine" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+  </EntityType>
+  <EntityType Name="IBS_States">
+    <Key>
+      <PropertyRef Name="ID_State" />
+    </Key>
+    <Property Name="ID_State" Type="String" MaxLength="3" FixedLength="false" Unicode="false" Nullable="false" />
+    <Property Name="Title" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="IbsPeople">
+    <Key>
+      <PropertyRef Name="UCID" />
+    </Key>
+    <Property Name="UCID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Name="Email" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+    <Property Name="LastName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="OtherNames" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="Company" Type="Boolean" />
+    <Property Name="RCNumber" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+    <Property Name="MobilePhone" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+    <Property Name="OtherPhones" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="FaxNumber" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+    <Property Name="ID_Country" Type="String" MaxLength="3" FixedLength="false" Unicode="false" />
+    <Property Name="Address01" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="Address02" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="City" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="ID_State" Type="String" MaxLength="3" FixedLength="false" Unicode="false" />
+    <Property Name="Gender" Type="String" MaxLength="1" FixedLength="true" Unicode="false" />
+    <Property Name="DOB" Type="DateTime" Precision="3" />
+    <Property Name="Customer" Type="Boolean" />
+    <Property Name="Supplier" Type="Boolean" />
+    <Property Name="Employee" Type="Boolean" />
+    <Property Name="ID_Application" Type="String" MaxLength="4" FixedLength="false" Unicode="false" />
+    <Property Name="ID_IdentifyWith" Type="String" MaxLength="2" FixedLength="false" Unicode="false" />
+    <Property Name="IDNumber" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="IdentifiedBy" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+    <Property Name="CreationDate" Type="DateTime" Precision="3" />
+    <Property Name="Status" Type="String" MaxLength="1" FixedLength="true" Unicode="false" />
+    <Property Name="Comments" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+    <Property Name="DatabaseName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="TableName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+    <Property Name="PccNo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="IbsTransactionClass">
+    <Key>
+      <PropertyRef Name="ID_TransClass" />
+    </Key>
+    <Property Name="ID_TransClass" Type="String" MaxLength="1" FixedLength="true" Unicode="false" Nullable="false" />
+    <Property Name="TransClass" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="IdentifyPeopleWith">
+    <Key>
+      <PropertyRef Name="ID_IdentifyWith" />
+    </Key>
+    <Property Name="ID_IdentifyWith" Type="String" MaxLength="2" FixedLength="false" Unicode="false" Nullable="false" />
+    <Property Name="IdentifyWith" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="InterfaceManager">
+    <Key>
+      <PropertyRef Name="ID_iManager" />
+    </Key>
+    <Property Name="ID_iManager" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
+    <Property Name="Description" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+    <Property Name="Reversal_sp_Name" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+    <Property Name="Requisition_sp_Name" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+    <Property Name="Receipt_sp_Name" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+    <Property Name="DbName" Type="String" MaxLength="150" FixedLength="false" Unicode="false" />
+    <Property Name="TblName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="VoucherFieldName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="PrimaryFieldName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+    <Property Name="ID_Application" Type="String" MaxLength="4" FixedLength="false" Unicode="false" />
+  </EntityType>
+  <EntityType Name="Location">
+    <Key>
+      <PropertyRef Name="ID_Location" />
+    </Key>
+    <Property Name="ID_Location" Type="String" MaxLength="4" FixedLength="false" Unicode="false" Nullable="false" />
+    <Property Name="Location1" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+  </EntityType>
+  <Association Name="FK_CorporateActionDetail_CorporateActionMaster">
+    <End Role="CorporateActionMaster" Type="Self.CorporateActionMaster" Multiplicity="0..1" />
+    <End Role="CorporateActionDetail" Type="Self.CorporateActionDetail" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="CorporateActionMaster">
+        <PropertyRef Name="ID_CorporateActionMaster" />
+      </Principal>
+      <Dependent Role="CorporateActionDetail">
+        <PropertyRef Name="ID_CorporateActionMaster" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_IBS_ExcRate_IBS_Currency">
+    <End Role="IBS_Currency" Type="Self.IBS_Currency" Multiplicity="0..1" />
+    <End Role="IBS_ExcRate" Type="Self.IBS_ExcRate" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="IBS_Currency">
+        <PropertyRef Name="ID_Currency" />
+      </Principal>
+      <Dependent Role="IBS_ExcRate">
+        <PropertyRef Name="CurrencyID" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="IbsMdmEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="CorporateActionDetails" EntityType="Self.CorporateActionDetail" />
+    <EntitySet Name="CorporateActionMasters" EntityType="Self.CorporateActionMaster" />
+    <EntitySet Name="IBS_Application" EntityType="Self.IBS_Application" />
+    <EntitySet Name="IBS_Banks" EntityType="Self.IBS_Banks" />
+    <EntitySet Name="IBS_Branches" EntityType="Self.IBS_Branches" />
+    <EntitySet Name="IBS_Country" EntityType="Self.IBS_Country" />
+    <EntitySet Name="IBS_Currency" EntityType="Self.IBS_Currency" />
+    <EntitySet Name="IBS_ExcRate" EntityType="Self.IBS_ExcRate" />
+    <EntitySet Name="IBS_PFA" EntityType="Self.IBS_PFA" />
+    <EntitySet Name="IBS_PostCode" EntityType="Self.IBS_PostCode" />
+    <EntitySet Name="IBS_ProductLine" EntityType="Self.IBS_ProductLine" />
+    <EntitySet Name="IBS_States" EntityType="Self.IBS_States" />
+    <EntitySet Name="IbsPeoples" EntityType="Self.IbsPeople" />
+    <EntitySet Name="IbsTransactionClasses" EntityType="Self.IbsTransactionClass" />
+    <EntitySet Name="IdentifyPeopleWiths" EntityType="Self.IdentifyPeopleWith" />
+    <EntitySet Name="InterfaceManagers" EntityType="Self.InterfaceManager" />
+    <EntitySet Name="Locations" EntityType="Self.Location" />
+    <AssociationSet Name="FK_CorporateActionDetail_CorporateActionMaster" Association="Self.FK_CorporateActionDetail_CorporateActionMaster">
+      <End Role="CorporateActionMaster" EntitySet="CorporateActionMasters" />
+      <End Role="CorporateActionDetail" EntitySet="CorporateActionDetails" />
+    </AssociationSet>
+    <AssociationSet Name="FK_IBS_ExcRate_IBS_Currency" Association="Self.FK_IBS_ExcRate_IBS_Currency">
+      <End Role="IBS_Currency" EntitySet="IBS_Currency" />
+      <End Role="IBS_ExcRate" EntitySet="IBS_ExcRate" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>

@@ -1,0 +1,180 @@
+@using System.Web.UI.WebControls
+
+@{
+    System.Globalization.CultureInfo ci = new System.Globalization.CultureInfo("en-US");
+    ci.NumberFormat.CurrencySymbol = "";
+    System.Threading.Thread.CurrentThread.CurrentCulture = ci;
+}
+
+@{
+    var grid = Html.DevExpress().GridView(settings => {
+        settings.Name = "ProfitAndLoss_DailyGridView";
+        settings.CallbackRouteValues = new { Controller = "DailyReport", Action = "ProfitAndLoss_DailyGridViewPartial" };
+        //settings.SettingsSearchPanel.Visible = true;
+        //settings.SettingsText.SearchPanelEditorNullText = "Enter Text to Search...";
+        settings.Width = Unit.Percentage(100);
+        settings.Settings.ShowTitlePanel = true;
+        //settings.Styles.TitlePanel.CssClass = "titleContainer";
+        settings.Theme = "MetropolisBlue";
+
+        settings.CommandColumn.Visible = false;
+
+        settings.KeyFieldName = "PLID";
+        settings.EnableRowsCache = false;
+        settings.SettingsLoadingPanel.Mode = GridViewLoadingPanelMode.Disabled;
+
+        settings.Settings.ShowGroupPanel = true;
+        settings.Settings.ShowFilterRow = false;
+        settings.SettingsBehavior.AllowSelectByRowClick = false;
+
+        settings.SettingsAdaptivity.AdaptivityMode = GridViewAdaptivityMode.Off;
+        settings.SettingsAdaptivity.AdaptiveColumnPosition = GridViewAdaptiveColumnPosition.Right;
+        settings.SettingsAdaptivity.AdaptiveDetailColumnCount = 1;
+        settings.SettingsAdaptivity.AllowOnlyOneAdaptiveDetailExpanded = false;
+        settings.SettingsAdaptivity.HideDataCellsAtWindowInnerWidth = 0;
+
+        settings.Columns.Add(m=>
+        {
+            m.FieldName = "PLID";
+            m.Caption = "ID";
+            m.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+            m.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+            m.Width = 50;
+            m.HeaderStyle.Font.Bold = true;
+            m.HeaderStyle.Font.Size = 11;
+            m.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+        });
+        settings.Columns.Add(m=>
+        {
+            m.FieldName = "TotalTransactionAmount";
+            m.Caption = "Total Transactions Amount";
+            m.HeaderStyle.HorizontalAlign = HorizontalAlign.Right;
+            m.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+            m.Width = 50;
+            m.HeaderStyle.Font.Bold = true;
+            m.HeaderStyle.Font.Size = 11;
+            m.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+        });
+        settings.Columns.Add(m=>
+        {
+            m.FieldName = "TotalExpense";
+            m.Caption = "Total Expense";
+            m.HeaderStyle.HorizontalAlign = HorizontalAlign.Right;
+            m.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+            m.Width = 50;
+            m.HeaderStyle.Font.Bold = true;
+            m.HeaderStyle.Font.Size = 11;
+            m.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+        });
+        settings.Columns.Add(m=>
+        {
+            m.FieldName = "TotalIncome";
+            m.Caption = "Total Income";
+            m.HeaderStyle.HorizontalAlign = HorizontalAlign.Right;
+            m.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+            m.Width = 50;
+            m.HeaderStyle.Font.Bold = true;
+            m.HeaderStyle.Font.Size = 11;
+            m.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+        });
+        settings.Columns.Add(m=>
+        {
+            m.FieldName = "CapturedDay";
+            m.Caption = "Captured Day";
+            //m.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+            //m.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+            m.Width = 50;
+            m.HeaderStyle.Font.Bold = true;
+            m.HeaderStyle.Font.Size = 11;
+            m.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+
+        });
+        settings.Columns.Add(m=>
+        {
+            m.FieldName = "CapturedMonth";
+            m.Caption = "Captured Month";
+            //m.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+            //m.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+            m.Width = 50;
+            m.HeaderStyle.Font.Bold = true;
+            m.HeaderStyle.Font.Size = 11;
+            m.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+        });
+        settings.Columns.Add(m=>
+        {
+            m.FieldName = "CapturedYear";
+            m.Caption = "Captured Year";
+            //m.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+            //m.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+            m.Width = 50;
+            m.HeaderStyle.Font.Bold = true;
+            m.HeaderStyle.Font.Size = 11;
+            m.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+        });
+        settings.Columns.Add(m=>
+        {
+            m.FieldName = "CapturedDate";
+            m.Caption = "Captured Date";
+            //m.HeaderStyle.HorizontalAlign = HorizontalAlign.Center;
+            //m.CellStyle.HorizontalAlign = HorizontalAlign.Center;
+            m.Width = 50;
+            m.HeaderStyle.Font.Bold = true;
+            m.HeaderStyle.Font.Size = 11;
+            m.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+            m.PropertiesEdit.DisplayFormatString = "dd, MMMM yyyy";
+        });
+        settings.Columns.Add(m=>
+        {
+            m.FieldName = "Profit";
+            m.Caption = "Profit";
+            m.HeaderStyle.HorizontalAlign = HorizontalAlign.Right;
+            m.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+            m.Width = 50;
+            m.HeaderStyle.Font.Bold = true;
+            m.HeaderStyle.Font.Size = 11;
+            m.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+        });
+        settings.Columns.Add(m=>
+        {
+            m.FieldName = "Loss";
+            m.Caption = "Loss";
+            m.HeaderStyle.HorizontalAlign = HorizontalAlign.Right;
+            m.CellStyle.HorizontalAlign = HorizontalAlign.Right;
+            m.Width = 50;
+            m.HeaderStyle.Font.Bold = true;
+            m.HeaderStyle.Font.Size = 11;
+            m.HeaderStyle.ForeColor = System.Drawing.Color.Black;
+        });
+
+        settings.SettingsPager.Visible = true;
+        settings.SettingsPager.FirstPageButton.Visible = true;
+        settings.SettingsPager.LastPageButton.Visible = true;
+        settings.SettingsPager.Mode = GridViewPagerMode.ShowPager;
+        settings.SettingsPager.EllipsisMode = PagerEllipsisMode.InsideNumeric;
+        settings.SettingsPager.Position = PagerPosition.Bottom;
+        settings.SettingsPager.ShowNumericButtons = true;
+        settings.SettingsPager.ShowSeparators = true;
+        settings.SettingsPager.PageSizeItemSettings.Visible = true;
+        settings.SettingsPager.PageSizeItemSettings.Position = PagerPageSizePosition.Right;
+        settings.SettingsPager.PageSizeItemSettings.Items = new string[] { "10", "30" };
+
+        settings.Settings.ShowFooter = true;
+        settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "TotalTransactionAmount");
+        settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "TotalExpense");
+        settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "TotalIncome");
+        settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "Profit");
+        settings.TotalSummary.Add(DevExpress.Data.SummaryItemType.Sum, "Loss");
+
+        settings.CustomJSProperties = (sender, e) =>
+        {
+            MVCxGridView ProfitAndLoss_DailyGridView = (MVCxGridView)sender;
+            e.Properties["cpVisibleRowCount"] = ProfitAndLoss_DailyGridView.VisibleRowCount;
+        };
+
+        settings.ClientSideEvents.EndCallback = "getRecordCountOfResults";
+    });
+    if (ViewData["EditError"] != null){
+        grid.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid.Bind(Model).GetHtml()

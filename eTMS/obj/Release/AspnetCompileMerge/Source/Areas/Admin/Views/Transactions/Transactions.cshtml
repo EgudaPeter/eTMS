@@ -1,0 +1,1825 @@
+﻿@model eTMS.BusinessObjectLayer.TransactionTable
+
+@using System.Web.UI.WebControls
+@using System.Drawing
+
+@{
+    System.Globalization.CultureInfo ci = new System.Globalization.CultureInfo("en-US");
+    ci.NumberFormat.CurrencySymbol = "";
+    System.Threading.Thread.CurrentThread.CurrentCulture = ci;
+}
+
+@{
+    ViewBag.Title = "Transactions";
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+}
+
+<script>
+
+    /***********************Global Variables**************************************************/
+    var getID;
+    var selectedIDs;
+
+    var E_oldAmountPaid = 0;
+    var E_oldAmountOutstanding = 0;
+
+    var stopSubmitBecauseAmountAvailableInBankIsLowerThanAmountPaid = false;
+    var stopSubmitBecauseEditedAmountPaidIsHigherThanAmountAvailableInBank = false;
+
+    var editedAmountPaidIsHigherThanAmountAvailableInBank = null;
+    var amountPaidIsHigherThanAmountAvailableInBank = null; //Global Variables
+
+    /**********************************************Add Transaction***********************************************/
+
+    function promptUserBeforeSavingTransaction() {
+        swal({
+            title: 'Confirm?',
+            html: 'Save record?',
+            type: 'info',
+            showCancelButton: true,
+            confirmButtonClass: 'btn btn-info',
+            cancelButtonClass: 'btn btn-primary',
+            confirmButtonText: '<i class="fa fa-thumbs-up"></i> Save',
+            cancelButtonText: '<i class="fa fa-thumbs-down"></i> Cancel',
+            allowOutsideClick: false
+        }).then(function () {
+            var result = ValidateTransactionForm();
+            if (result == true) {
+                $('#addTransaction').modal("hide");
+                return saveTransaction();
+            }
+            if (result == false) {
+                var infoMsg = "Please define required fields <b>[Record Type, Expense Or Income, Amount(Paid), Account, Dealer, Effective Date and Payment Mode]</b>" +
+                    " before progressing to save record!";
+                swal({
+                    title: 'Warning!',
+                    html: infoMsg,
+                    type: 'warning'
+                });
+                return;
+            }
+            if (result == -1) {
+                return;
+            }
+        });
+    }
+
+    function promptUserBeforeClosingTransactionModal() {
+        swal({
+            title: 'Are you sure?',
+            html: 'Inputs will be lost',
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonClass: 'btn btn-info',
+            cancelButtonClass: 'btn btn-primary',
+            confirmButtonText: '<i class="fa fa-thumbs-up"></i> Okay',
+            cancelButtonText: '<i class="fa fa-thumbs-down"></i> Cancel',
+            allowOutsideClick: false
+        }).then(function () {
+            stopSubmitBecauseAmountAvailableInBankIsLowerThanAmountPaid = false;
+            $('#addTransaction').modal("hide");
+        });
+    }
+
+    function ValidateTransactionForm() {
+        if (RecordType.GetValue() != null && RecordType.GetValue() == "EX") {
+            if (ExpenseType.GetValue() != null && AmountPaid.GetValue() != null && Account.GetValue() != null
+                && EffectiveDate.GetValue() != null && Dealer.GetValue() != null && PaymentMode.GetValue() != null)
+            {
+                if (stopSubmitBecauseAmountAvailableInBankIsLowerThanAmountPaid == true) {
+                    swal({
+                        title: 'Warning',
+                        html: amountPaidIsHigherThanAmountAvailableInBank,
+                        type: 'warning',
+                        allowOutsideClick: false
+                    });
+                    return -1;
+                }
+                return true;
+            }
+            return false;
+        }
+        if (RecordType.GetValue() != null && RecordType.GetValue() == "IN") {
+            if (IncomeType.GetValue() != null && AmountPaid.GetValue() != null && Account.GetValue() != null
+                && EffectiveDate.GetValue() != null && Dealer.GetValue() != null && PaymentMode.GetValue() != null)
+            {
+                if (stopSubmitBecauseAmountAvailableInBankIsLowerThanAmountPaid == true) {
+                    swal({
+                        title: 'Warning',
+                        html: amountPaidIsHigherThanAmountAvailableInBank,
+                        type: 'warning',
+                        allowOutsideClick: false
+                    });
+                    return -1;
+                }
+                return true;
+            }
+            return false;
+        }
+    }
+
+    function DisplayTransactionForm() {
+        RecordType.SetSelectedIndex(-1);
+        ExpenseType.SetSelectedIndex(-1);
+        IncomeType.SetSelectedIndex(-1);
+        AmountPaid.SetValue();
+        AmountOutstanding.SetValue();
+        Account.SetSelectedIndex(-1);
+        TransferAmount.SetValue(null);
+        ModifiedAmount.SetValue(null);
+        Dealer.SetSelectedIndex(-1);
+        EffectiveDate.SetDate();
+        PaymentMode.SetSelectedIndex(-1);
+        Description.SetText(null);
+        AttachEvent();
+        $("#addTransaction").modal({ backdrop: 'static', keyboard: false });
+        $("#addTransaction").modal('show');
+    }
+
+    function calculateModifiedAmount() {
+        if (AmountPaid.GetValue() == null || AmountPaid.GetValue() == "") {
+            return;
+        }
+        if (RecordType.GetValue() == null || RecordType.GetValue() == "") {
+            return;
+        }
+        if (RecordType.GetValue() == "EX") {
+            return calculateDifference();
+        }
+        if (RecordType.GetValue() == "IN") {
+            return calculateSum();
+        }
+    }
+
+    function calculateDifference() {
+        var transferAmount = TransferAmount.GetValue();
+        var amountPaid = AmountPaid.GetValue();
+        if (transferAmount == null || amountPaid == null) {
+            return;
+        }
+        if (transferAmount < amountPaid) {
+            var warningMessage = "System detects that amount entered is higher than the available amount in bank!";
+            stopSubmitBecauseAmountAvailableInBankIsLowerThanAmountPaid = true;
+            amountPaidIsHigherThanAmountAvailableInBank = warningMessage;
+            swal({
+                title: 'Warning',
+                html: warningMessage,
+                type: 'warning',
+                allowOutsideClick: false
+            });
+            return;
+        }
+        else {
+            stopSubmitBecauseAmountAvailableInBankIsLowerThanAmountPaid = false;
+            amountPaidIsHigherThanAmountAvailableInBank = null;
+        }
+        var debitedAmount = transferAmount - amountPaid;
+        ModifiedAmount.SetValue(debitedAmount);
+    }
+
+    function calculateSum() {
+        var transferAmount = TransferAmount.GetValue();
+        var amountPaid = AmountPaid.GetValue();
+        if (transferAmount == null || amountPaid == null) {
+            return;
+        }
+        var modifiedAmount = transferAmount + amountPaid;
+        ModifiedAmount.SetValue(modifiedAmount);
+    }
+
+    function onRecordTypeChange() {
+        if (RecordType.GetValue() == null) {
+            return;
+        }
+        Account.GetInputElement().readOnly = false;
+        ASPxClientUtils.DetachEventFromElement(Account.GetMainElement(), "mousedown", OnMouseDown);
+        $("#Account").removeClass("disable");
+
+        AmountPaid.SetEnabled(true);
+        $("#AmountPaid").removeClass("disable");
+
+        if (RecordType.GetValue() == "EX") {
+            DetachEvent("Expense");
+            return calculateDifference();
+        }
+        if (RecordType.GetValue() == "IN") {
+            DetachEvent("Income");
+            return calculateSum();
+        }
+    }
+
+    function AttachEvent() {
+        ExpenseType.GetInputElement().readOnly = true;
+        IncomeType.GetInputElement().readOnly = true;
+        Account.GetInputElement().readOnly = true;
+        ASPxClientUtils.AttachEventToElement(ExpenseType.GetMainElement(), "mousedown", OnMouseDown);
+        ASPxClientUtils.AttachEventToElement(IncomeType.GetMainElement(), "mousedown", OnMouseDown);
+        ASPxClientUtils.AttachEventToElement(Account.GetMainElement(), "mousedown", OnMouseDown);
+
+        $("#ExpenseType").addClass("disable");
+        $("#IncomeType").addClass("disable");
+        $("#Account").addClass("disable");
+        $("#AmountPaid").addClass("disable");
+    }
+
+    function DetachEvent(recordType) {
+        if (recordType == "Income") {
+            IncomeType.GetInputElement().readOnly = false;
+            ASPxClientUtils.DetachEventFromElement(IncomeType.GetMainElement(), "mousedown", OnMouseDown);
+            $("#IncomeType").removeClass("disable");
+
+            ExpenseType.GetInputElement().readOnly = true;
+            ASPxClientUtils.AttachEventToElement(ExpenseType.GetMainElement(), "mousedown", OnMouseDown);
+            $("#ExpenseType").addClass("disable");
+            return;
+        }
+        if (recordType == "Expense") {
+            ExpenseType.GetInputElement().readOnly = false;
+            ASPxClientUtils.DetachEventFromElement(ExpenseType.GetMainElement(), "mousedown", OnMouseDown);
+            $("#ExpenseType").removeClass("disable");
+
+            IncomeType.GetInputElement().readOnly = true;
+            ASPxClientUtils.AttachEventToElement(IncomeType.GetMainElement(), "mousedown", OnMouseDown);
+            $("#IncomeType").addClass("disable");
+            return;
+        }
+    }
+
+    function displayAmountInBank() {
+        var account = Account.GetValue();
+        if (account == null) {
+            TransferAmount.SetValue(null);
+            ModifiedAmount.SetValue(null);
+            return;
+        }
+        $.ajax({
+            url: '@Url.Action("GetAmountInBank", "Transactions",new { Area = "Admin" })',
+            type: 'Post',
+            data: { accountID: account },
+            success: function (data) {
+                if (data.success == true) {
+                    TransferAmount.SetValue(data.Amount);
+                    if (RecordType.GetValue() == "EX") {
+                        return calculateDifference();
+                    }
+                    if (RecordType.GetValue() == "IN") {
+                        return calculateSum();
+                    }
+                }
+                if (data.success == -1) {
+                    swal({
+                        title: 'Error',
+                        html: data.errorMessage,
+                        type: 'error',
+                        allowOutsideClick: false
+                    });
+                    return;
+                }
+            }
+        });
+    } //display Amount In Bank
+
+    function saveTransaction() {
+        SiteUtils.loading("Saving...");
+        if (RecordType.GetValue() == "EX") {
+            var dataArray = {
+                TID: RecordType.GetValue(),
+                FID: ExpenseType.GetValue(),
+                AmountPaid: AmountPaid.GetValue(),
+                AmountOutstanding: AmountOutstanding.GetValue(),
+                AccountID: Account.GetValue(),
+                EffectiveDateString: EffectiveDate.GetValue(),
+                DealerID: Dealer.GetValue(),
+                PaymentMode: PaymentMode.GetValue(),
+                Narration: Description.GetValue()
+            }
+        }
+        if (RecordType.GetValue() == "IN") {
+            var dataArray = {
+                TID: RecordType.GetValue(),
+                FID: IncomeType.GetValue(),
+                AmountPaid: AmountPaid.GetValue(),
+                AmountOutstanding: AmountOutstanding.GetValue(),
+                AccountID: Account.GetValue(),
+                EffectiveDateString: EffectiveDate.GetValue(),
+                DealerID: Dealer.GetValue(),
+                PaymentMode: PaymentMode.GetValue(),
+                Narration: Description.GetValue()
+            }
+        }
+        $.ajax({
+            url: '@Url.Action("SaveTransaction","Transactions",new { Area = "Admin" })',
+            type: 'Post',
+            data: { Data: dataArray },
+            success: function (data) {
+                SiteUtils.loadingOff();
+                if (data.success == true) {
+                    TransactionGridView.Refresh();
+                    swal({
+                        title: 'Success',
+                        html: data.infoMessage,
+                        type: 'success',
+                        allowOutsideClick: false
+                    });
+                    return;
+                }
+                if (data.success == -1) {
+                    swal({
+                        title: 'Error',
+                        html: data.errorMessage,
+                        type: 'error',
+                        allowOutsideClick: false
+                    });
+                    return;
+                }
+            }
+        });
+    } //Save a Transaction
+
+    /************************************************************************************************************/ //Add Transaction
+
+    /**********************************************Update Transaction********************************************/
+    function promptUserBeforeUpdatingTransaction() {
+        swal({
+            title: 'Confirm?',
+            html: 'Update record?',
+            type: 'info',
+            showCancelButton: true,
+            confirmButtonClass: 'btn btn-info',
+            cancelButtonClass: 'btn btn-primary',
+            confirmButtonText: '<i class="fa fa-thumbs-up"></i> Update',
+            cancelButtonText: '<i class="fa fa-thumbs-down"></i> Cancel',
+            allowOutsideClick: false
+        }).then(function () {
+            var result = ValidateUpdateTransactionForm();
+            if (result == true) {
+                $('#editTransaction').modal("hide");
+                return updateTransaction();
+            }
+            if (result == false) {
+                var infoMsg = "Please define required fields <b>[Record Type, Expense Or Income, Amount(Paid), Account, Dealer, Effective Date and Payment Mode]</b>" +
+                    " before progressing to save record!";
+                swal({
+                    title: 'Warning!',
+                    html: infoMsg,
+                    type: 'warning',
+                    allowOutsideClick:false
+                });
+                return;
+            }
+            if (result == -1) {
+                return;
+            }
+        });
+    }
+
+    function promptUserBeforeClosingUpdateTransactionModal() {
+        swal({
+            title: 'Are you sure?',
+            html: 'Inputs will be lost',
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonClass: 'btn btn-info',
+            cancelButtonClass: 'btn btn-primary',
+            confirmButtonText: '<i class="fa fa-thumbs-up"></i> Okay',
+            cancelButtonText: '<i class="fa fa-thumbs-down"></i> Cancel',
+            allowOutsideClick: false
+        }).then(function () {
+            stopSubmitBecauseEditedAmountPaidIsHigherThanAmountAvailableInBank = false;
+            $('#editTransaction').modal("hide");
+        });
+    }
+
+    function ValidateUpdateTransactionForm() {
+        if (E_RecordType.GetValue() != null && E_RecordType.GetValue() == "EX") {
+            if (E_ExpenseType.GetValue() != null && E_AmountPaid.GetValue() != null && E_Account.GetValue() != null
+                && E_EffectiveDate.GetValue() != null && E_Dealer.GetValue() != null && E_PaymentMode.GetValue() != null) {
+                if (stopSubmitBecauseEditedAmountPaidIsHigherThanAmountAvailableInBank == true) {
+                    swal({
+                        title: 'Warning',
+                        html: editedAmountPaidIsHigherThanAmountAvailableInBank,
+                        type: 'warning',
+                        allowOutsideClick: false
+                    });
+                    return -1;
+                }
+                return true;
+            }
+            return false;
+        }
+        if (E_RecordType.GetValue() != null && E_RecordType.GetValue() == "IN") {
+            if (E_IncomeType.GetValue() != null && E_AmountPaid.GetValue() != null && E_Account.GetValue() != null
+                && E_EffectiveDate.GetValue() != null && E_Dealer.GetValue() != null && E_PaymentMode.GetValue() != null) {
+                if (stopSubmitBecauseEditedAmountPaidIsHigherThanAmountAvailableInBank == true) {
+                    swal({
+                        title: 'Warning',
+                        html: editedAmountPaidIsHigherThanAmountAvailableInBank,
+                        type: 'warning',
+                        allowOutsideClick: false
+                    });
+                    return -1;
+                }
+                return true;
+            }
+            return false;
+        }
+    }
+
+    function calculateUpdateModifiedAmount() {
+        if (E_AmountPaid.GetValue() == null || E_AmountPaid.GetValue() == "") {
+            return;
+        }
+        if (E_RecordType.GetValue() == null || E_RecordType.GetValue() == "") {
+            return;
+        }
+        if (E_RecordType.GetValue() == "EX") {
+            return calculateUpdateDifference();
+        }
+        if (E_RecordType.GetValue() == "IN") {
+            return calculateUpdateSum();
+        }
+    }
+
+    function calculateUpdateDifference() {
+        var transferAmount = E_TransferAmount.GetValue();
+        var amountPaid = E_AmountPaid.GetValue();
+        if (transferAmount == null || amountPaid == null) {
+            return;
+        }
+        if (amountPaid == E_oldAmountPaid) {
+            E_ModifiedAmount.SetValue(transferAmount);
+            return;
+        }
+        if (transferAmount < amountPaid) {
+            var warningMessage = "System detects that amount entered is higher than the available amount in bank!";
+            stopSubmitBecauseEditedAmountPaidIsHigherThanAmountAvailableInBank = true;
+            editedAmountPaidIsHigherThanAmountAvailableInBank = warningMessage;
+            swal({
+                title: 'Warning',
+                html: warningMessage,
+                type: 'warning',
+                allowOutsideClick: false
+            });
+            return;
+        }
+        else {
+            stopSubmitBecauseEditedAmountPaidIsHigherThanAmountAvailableInBank = false;
+            editedAmountPaidIsHigherThanAmountAvailableInBank = null;
+        }
+
+        if (amountPaid > E_oldAmountPaid) {
+            var newAmountPaid = amountPaid - E_oldAmountPaid;
+            var modifiedAmount = transferAmount - newAmountPaid;
+            E_ModifiedAmount.SetValue(modifiedAmount);
+            return;
+        }
+        if (amountPaid < E_oldAmountPaid) {
+            var newTransferAmount = transferAmount + E_oldAmountPaid;
+            newTransferAmount -= amountPaid;
+            E_ModifiedAmount.SetValue(newTransferAmount);
+            return;
+        }
+        var debitedAmount = transferAmount - amountPaid;
+        E_ModifiedAmount.SetValue(debitedAmount);
+    }
+
+    function calculateUpdateSum() {
+        var transferAmount = E_TransferAmount.GetValue();
+        var amountPaid = E_AmountPaid.GetValue();
+        if (transferAmount == null || amountPaid == null) {
+            return;
+        }
+        if (amountPaid == E_oldAmountPaid) {
+            E_ModifiedAmount.SetValue(transferAmount);
+            return;
+        }
+        if (amountPaid > E_oldAmountPaid) {
+            var newAmountPaid = amountPaid - E_oldAmountPaid;
+            var totalAmountToCredit =  newAmountPaid;
+            var modifiedAmount = transferAmount + totalAmountToCredit;
+            E_ModifiedAmount.SetValue(modifiedAmount);
+            return;
+        }
+        if (amountPaid < E_oldAmountPaid) {
+            var newTransferAmount = transferAmount - E_oldAmountPaid;
+            newTransferAmount += amountPaid;
+            E_ModifiedAmount.SetValue(newTransferAmount);
+            return;
+        }
+        var totalAmountToCredit = amountPaid;
+        var modifiedAmount = transferAmount + totalAmountToCredit;
+        E_ModifiedAmount.SetValue(modifiedAmount);
+    }
+
+    function onRecordTypeChangeUpdate() {
+        if (E_RecordType.GetValue() == null) {
+            return;
+        }
+        E_Account.GetInputElement().readOnly = false;
+        ASPxClientUtils.DetachEventFromElement(E_Account.GetMainElement(), "mousedown", OnMouseDown);
+        $("#E_Account").removeClass("disable");
+
+        E_AmountPaid.SetEnabled(true);
+        $("#E_AmountPaid").removeClass("disable");
+
+        if (E_RecordType.GetValue() == "EX") {
+            DetachEventUpdate("Expense");
+            return calculateUpdateDifference();
+        }
+        if (E_RecordType.GetValue() == "IN") {
+            DetachEventUpdate("Income");
+            return calculateUpdateSum();
+        }
+    }
+
+    function AttachEventUpdate() {
+        E_ExpenseType.GetInputElement().readOnly = true;
+        E_IncomeType.GetInputElement().readOnly = true;
+        E_Account.GetInputElement().readOnly = true;
+        ASPxClientUtils.AttachEventToElement(E_ExpenseType.GetMainElement(), "mousedown", OnMouseDown);
+        ASPxClientUtils.AttachEventToElement(E_IncomeType.GetMainElement(), "mousedown", OnMouseDown);
+        ASPxClientUtils.AttachEventToElement(E_Account.GetMainElement(), "mousedown", OnMouseDown);
+
+        $("#E_ExpenseType").addClass("disable");
+        $("#E_IncomeType").addClass("disable");
+        $("#E_Account").addClass("disable");
+        $("#E_AmountPaid").addClass("disable");
+    }
+
+    function DetachEventUpdate(recordType) {
+        if (recordType == "Income") {
+            E_IncomeType.GetInputElement().readOnly = false;
+            ASPxClientUtils.DetachEventFromElement(E_IncomeType.GetMainElement(), "mousedown", OnMouseDown);
+            $("#E_IncomeType").removeClass("disable");
+
+            E_ExpenseType.GetInputElement().readOnly = true;
+            ASPxClientUtils.AttachEventToElement(E_ExpenseType.GetMainElement(), "mousedown", OnMouseDown);
+            $("#E_ExpenseType").addClass("disable");
+            return;
+        }
+        if (recordType == "Expense") {
+            E_ExpenseType.GetInputElement().readOnly = false;
+            ASPxClientUtils.DetachEventFromElement(E_ExpenseType.GetMainElement(), "mousedown", OnMouseDown);
+            $("#E_ExpenseType").removeClass("disable");
+
+            E_IncomeType.GetInputElement().readOnly = true;
+            ASPxClientUtils.AttachEventToElement(E_IncomeType.GetMainElement(), "mousedown", OnMouseDown);
+            $("#E_IncomeType").addClass("disable");
+            return;
+        }
+    }
+
+    function EditTransaction(id) {
+        var eDate = null;
+        $.ajax({
+            url: '@Url.Action("EditTransaction", "Transactions", new { Area = "Admin" })',
+            type: 'Post',
+            data: { transactionID: id },
+            success: function (data) {
+                if (data.success == true) {
+                    eDate = data.effectiveDate == null ? null : new Date(data.effectiveDate);
+                    if (data.recordType == "EX") {
+                        E_oldAmountPaid = data.amountPaid;
+                        E_oldAmountOutstanding = data.amountOutstanding;
+                        $("#editTransaction").modal({ backdrop: 'static', keyboard: false });
+                        $("#editTransaction").modal('show');
+                        E_TransactionID.SetValue(data.transactionID);
+                        E_RecordType.SetValue(data.recordType);
+                        E_ExpenseType.SetValue(data.fID);
+                        E_IncomeType.SetSelectedIndex(-1);
+                        E_AmountPaid.SetValue(data.amountPaid);
+                        E_AmountOutstanding.SetValue(data.amountOutstanding);
+                        E_Account.SetValue(data.account);
+                        E_Dealer.SetValue(data.dealer);
+                        E_EffectiveDate.SetDate(eDate);
+                        E_PaymentMode.SetValue(data.paymentMode);
+                        E_Description.SetText(data.narration);
+                        displayAmountInBank_Update();
+                        onRecordTypeChangeUpdate();                      
+                        return;
+                    }
+                    if (data.recordType == "IN") {
+                        E_oldAmountPaid = data.amountPaid;
+                        E_oldAmountOutstanding = data.amountOutstanding;
+                        $("#editTransaction").modal({ backdrop: 'static', keyboard: false });
+                        $("#editTransaction").modal('show');
+                        E_TransactionID.SetValue(data.transactionID);
+                        E_RecordType.SetValue(data.recordType);
+                        E_ExpenseType.SetSelectedIndex(-1);
+                        E_IncomeType.SetValue(data.fID);
+                        E_AmountPaid.SetValue(data.amountPaid);
+                        E_AmountOutstanding.SetValue(data.amountOutstanding);
+                        E_Account.SetValue(data.account);
+                        E_Dealer.SetValue(data.dealer);
+                        E_EffectiveDate.SetDate(eDate);
+                        E_PaymentMode.SetValue(data.paymentMode);
+                        E_Description.SetText(data.narration);
+                        displayAmountInBank_Update();
+                        onRecordTypeChangeUpdate();
+                        return;
+                    }
+                }
+                if (data.success == -1) {
+                    swal({
+                        title: 'Error',
+                        html: data.errorMessage,
+                        type: 'error',
+                        allowOutsideClick: false
+                    });
+                    return;
+                }
+            }
+        });
+    } //Edit Transaction
+
+    function displayAmountInBank_Update() {
+        var account = E_Account.GetValue();
+        if (account == null) {
+            E_TransferAmount.SetValue(null);
+            E_ModifiedAmount.SetValue(null);
+            return;
+        }
+        $.ajax({
+            url: '@Url.Action("GetAmountInBank", "Transactions",new { Area = "Admin" })',
+            type: 'Post',
+            data: { accountID: account },
+            success: function (data) {
+                if (data.success == true) {
+                    E_TransferAmount.SetValue(data.Amount);
+                    if (E_RecordType.GetValue() == "EX") {
+                        return calculateUpdateDifference();
+                    }
+                    if (E_RecordType.GetValue() == "IN") {
+                        return calculateUpdateSum();
+                    }
+                }
+                if (data.success == -1) {
+                    swal({
+                        title: 'Error',
+                        html: data.errorMessage,
+                        type: 'error',
+                        allowOutsideClick: false
+                    });
+                    return;
+                }
+            }
+        });
+    } //display Amount In Bank_Update
+
+    function updateTransaction() {
+        SiteUtils.loading("Updating...");
+        if (E_RecordType.GetValue() == "EX") {
+            var dataArray = {
+                TransactionID: E_TransactionID.GetValue(),
+                TID: E_RecordType.GetValue(),
+                FID: E_ExpenseType.GetValue(),
+                AmountPaid: E_AmountPaid.GetValue(),
+                AmountOutstanding: E_AmountOutstanding.GetValue(),
+                AccountID: E_Account.GetValue(),
+                EffectiveDateString: E_EffectiveDate.GetValue(),
+                DealerID: E_Dealer.GetValue(),
+                PaymentMode: E_PaymentMode.GetValue(),
+                Narration: E_Description.GetValue()
+            }
+        }
+        if (E_RecordType.GetValue() == "IN") {
+            var dataArray = {
+                TransactionID: E_TransactionID.GetValue(),
+                TID: E_RecordType.GetValue(),
+                FID: E_IncomeType.GetValue(),
+                AmountPaid: E_AmountPaid.GetValue(),
+                AmountOutstanding: E_AmountOutstanding.GetValue(),
+                AccountID: E_Account.GetValue(),
+                EffectiveDateString: E_EffectiveDate.GetValue(),
+                DealerID: E_Dealer.GetValue(),
+                PaymentMode: E_PaymentMode.GetValue(),
+                Narration: E_Description.GetValue()
+            }
+        }
+        $.ajax({
+            url: '@Url.Action("UpdateTransaction","Transactions",new { Area = "Admin" })',
+            type: 'Post',
+            data: { Data: dataArray },
+            success: function (data) {
+                SiteUtils.loadingOff();
+                if (data.success == true) {
+                    TransactionGridView.Refresh();
+                    swal({
+                        title: 'Success',
+                        html: data.infoMessage,
+                        type: 'success',
+                        allowOutsideClick: false
+                    });
+                    return;
+                }
+                if (data.success == -1) {
+                    swal({
+                        title: 'Error',
+                        html: data.errorMessage,
+                        type: 'error',
+                        allowOutsideClick: false
+                    });
+                    return;
+                }
+            }
+        });
+    } //Update Transaction
+
+    /************************************************************************************************************/ //Update Transaction
+
+    function ViewTransaction(id) {
+        var eDate = null;
+        $.ajax({
+            url: '@Url.Action("ViewTransaction", "Transactions", new { Area = "Admin" })',
+            type: 'Post',
+            data: { transactionID: id },
+            success: function (data) {
+                if (data.success == true) {
+                    eDate = data.effectiveDate == null ? null : new Date(data.effectiveDate);
+                    if (data.recordType == "EX") {
+                        $("#viewTransaction").modal({ backdrop: 'static', keyboard: false });
+                        $("#viewTransaction").modal('show');
+                        disableControlsInViewTransactionModal();
+                        V_TransactionID.SetValue(data.transactionID);
+                        V_RecordType.SetValue(data.recordType);
+                        V_ExpenseType.SetValue(data.fID);
+                        V_IncomeType.SetSelectedIndex(-1);
+                        V_AmountPaid.SetValue(data.amountPaid);
+                        V_AmountOutstanding.SetValue(data.amountOutstanding);
+                        V_Account.SetValue(data.account);
+                        V_Dealer.SetValue(data.dealer);
+                        V_EffectiveDate.SetDate(eDate);
+                        V_PaymentMode.SetValue(data.paymentMode);
+                        V_Description.SetText(data.narration);
+                        return;
+                    }
+                    if (data.recordType == "IN") {
+                        $("#viewTransaction").modal({ backdrop: 'static', keyboard: false });
+                        $("#viewTransaction").modal('show');
+                        disableControlsInViewTransactionModal();
+                        V_TransactionID.SetValue(data.transactionID);
+                        V_RecordType.SetValue(data.recordType);
+                        V_ExpenseType.SetSelectedIndex(-1);
+                        V_IncomeType.SetValue(data.fID);
+                        V_AmountPaid.SetValue(data.amountPaid);
+                        V_AmountOutstanding.SetValue(data.amountOutstanding);
+                        V_Account.SetValue(data.account);
+                        V_Dealer.SetValue(data.dealer);
+                        V_EffectiveDate.SetDate(eDate);
+                        V_PaymentMode.SetValue(data.paymentMode);
+                        V_Description.SetText(data.narration);
+                        return;
+                    }
+                }
+                if (data.success == -1) {
+                    swal({
+                        title: 'Error',
+                        html: data.errorMessage,
+                        type: 'error',
+                        allowOutsideClick: false
+                    });
+                    return;
+                }
+            }
+        });
+    } //View Transaction
+
+    /**********************************************Every Other Function******************************************/
+
+    function DeleteASingleTransaction(id) {
+        swal({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonClass: 'btn btn-danger',
+            cancelButtonClass: 'btn btn-primary',
+            confirmButtonText: '<i class="fa fa-thumbs-up"></i> Delete',
+            cancelButtonText: '<i class="fa fa-thumbs-down"></i> Cancel',
+            allowOutsideClick: false
+        }).then(function () {
+            SiteUtils.loading("Deleting...");
+            $.ajax({
+                url: '@Url.Action("DeleteASingleTransaction", "Transactions", new { Area = "Admin" })',
+                type: 'Post',
+                data: { selectedKey: id },
+                success: function (data) {
+                    SiteUtils.loadingOff();
+                    if (data.success == true) {
+                        TransactionGridView.Refresh();
+                        swal({
+                            title: 'Success!',
+                            html: data.infoMessage,
+                            type: 'success',
+                            allowOutsideClick: false
+                        });
+                        return;
+                    }
+                    if (data.success == -1) {
+                        swal({
+                            title: 'Error!',
+                            html: data.errorMessage,
+                            type: 'error',
+                            allowOutsideClick: false
+                        });
+                        return;
+                    }
+                }
+            });
+        });
+    } //Delete A Single Transaction
+
+    function DeleteGroupOfTransactions() {
+        swal({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonClass: 'btn btn-danger',
+            cancelButtonClass: 'btn btn-primary',
+            confirmButtonText: '<i class="fa fa-thumbs-up"></i> Delete',
+            cancelButtonText: '<i class="fa fa-thumbs-down"></i> Cancel',
+            allowOutsideClick: false
+        }).then(function () {
+            SiteUtils.loading("Deleting...");
+            $.ajax({
+                url: '@Url.Action("DeleteAGroupOfTransactions", "Transactions", new { Area = "Admin" })',
+                type: 'Post',
+                data: { selectedKeys: selectedIDs },
+                success: function (data) {
+                    SiteUtils.loadingOff();
+                    if (data.success == true) {
+                        TransactionGridView.Refresh();
+                        swal({
+                            title: 'Success!',
+                            html: data.infoMessage,
+                            type: 'success',
+                            allowOutsideClick: false
+                        }).then(function () {
+                            TransactionGridView.UnselectRows();
+                        });
+                        return;
+                    }
+                    if (data.success == -1) {
+                        TransactionGridView.UnselectRows();
+                        swal({
+                            title: 'Error!',
+                            html: data.errorMessage,
+                            type: 'error',
+                            allowOutsideClick: false
+                        });
+                        return;
+                    }
+                }
+            });
+
+        });
+    } //Delete A Group Of Transactions
+
+    $(window).on('beforeunload', function () {
+        $.ajax({
+            url: '@Url.Action("ClearCurrentStatus","Debtors",new { Area = "Admin" })',
+            type: 'Post',
+            data: {},
+        });
+    }); //Clear Current Status
+
+    function CloseViewModal() {
+        $("#viewTransaction").modal('hide');
+    }
+
+    function disableControlsInViewTransactionModal() {
+        V_ExpenseType.GetInputElement().readOnly = true;
+        V_IncomeType.GetInputElement().readOnly = true;
+        V_PaymentMode.GetInputElement().readOnly = true;
+        V_Account.GetInputElement().readOnly = true;
+        V_Dealer.GetInputElement().readOnly = true;
+        ASPxClientUtils.AttachEventToElement(V_ExpenseType.GetMainElement(), "mousedown", OnMouseDown);
+        ASPxClientUtils.AttachEventToElement(V_IncomeType.GetMainElement(), "mousedown", OnMouseDown);
+        ASPxClientUtils.AttachEventToElement(V_PaymentMode.GetMainElement(), "mousedown", OnMouseDown);
+        ASPxClientUtils.AttachEventToElement(V_Account.GetMainElement(), "mousedown", OnMouseDown);
+        ASPxClientUtils.AttachEventToElement(V_Dealer.GetMainElement(), "mousedown", OnMouseDown);
+    }
+
+    function FilterByStatus(status) {
+        TransactionGridView.PerformCallback({
+            _status:status
+        })
+    }
+
+    function OnMouseDown(event) {
+        ASPxClientUtils.PreventEventAndBubble(event);
+    }
+
+    function OnSelectionChanged(s, e) {
+        s.GetSelectedFieldValues("TransactionID", GetSelectedFieldValuesCallback);
+        $("#actions").attr("disabled", false);
+        $("#actions").removeClass("btnDisabled");
+    }
+
+    function GetSelectedFieldValuesCallback(values) {
+        if (values.length == 0) {
+            $("#actions").val("Select Action");
+            $("#actions").attr("disabled", true);
+            $("#actions").addClass("btnDisabled");
+        }
+        selectedIDs = values.join(',');
+        $("#recordCount").text(TransactionGridView.GetSelectedRowCount());
+
+    }
+
+    $(document).ready(function () {
+        AttachEvent();
+        AttachEventUpdate();
+        $("#actions").change(function () {
+            var action = $("#actions").val();
+            if (action == "Delete") {
+                return DeleteGroupOfTransactions();
+            }
+        });
+        $("#status").change(function () {
+            var status = $("#status").val();
+            if (status != "") {
+                return FilterByStatus(status);
+            }
+            return;
+        });
+        $("#recordCount").text(0);
+    });
+
+    function OnPopupMenuItemClick(s, e) {
+        var itemName = e.item.name;
+        if (itemName == "View") {
+            return ViewTransaction(getID);
+        }
+        if (itemName == "Edit") {
+            return EditTransaction(getID);
+        }
+        if (itemName == "Delete") {
+            return DeleteASingleTransaction(getID);
+        }
+    }
+
+    $(document).on("click", "#TransactionGridView tbody tr #dropup", function () {
+        getID = $(this).attr('id-slug');
+    })
+
+    /************************************************************************************************************/ //Every Other function
+</script>
+
+<div class="panel panel-default">
+    <div class="panel-heading nopadding">
+        <div class="row nomargin">
+            <div class="col-md-12 padding5">
+                <div class="col-md-2">
+                    <div class="btn-group">
+                        <h4 class="titleStyle">TRANSACTIONS</h4>
+                    </div>
+                </div>
+                <div class="col-md-10 action-wrap">
+                    <div class="form-inline">
+                        <div class="pull-right btn-group">
+                            @Html.DropDownList("Status", null, "Select Status", new { @class = "dropDowns", id = "status" })
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                if (User.IsInRole("SU"))
+                                {
+                                    @Html.DropDownList("Actions", null, null, new { @class = "dropDowns btnDisabled", id = "actions", disabled = true })
+                                    <div class="pull-right">
+                                        @Html.DevExpress().Button(settings =>
+                                       {
+                                           settings.Name = "btnMakeATransaction";
+
+                                           settings.Text = "Make a Transaction";
+                                           settings.ToolTip = "Capture Transaction";
+                                           settings.ControlStyle.CssClass = "btn btnETMS";
+                                           settings.ClientSideEvents.Click = "DisplayTransactionForm";
+                                           settings.ControlStyle.Border.BorderStyle = BorderStyle.Solid;
+                                       }).GetHtml()
+                                    </div>
+                                }
+                                if (User.IsInRole("SA"))
+                                {
+                                    <div class="pull-right">
+                                        @Html.DevExpress().Button(settings =>
+                                       {
+                                           settings.Name = "btnMakeATransaction";
+
+                                           settings.Text = "Make a Transaction";
+                                           settings.ToolTip = "Capture Transaction.";
+                                           settings.ControlStyle.CssClass = "btn btnETMS";
+                                           settings.ClientSideEvents.Click = "DisplayTransactionForm";
+                                           settings.ControlStyle.Border.BorderStyle = BorderStyle.Solid;
+                                       }).GetHtml()
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div><!--/form-inline-->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="addTransaction" class="modal fade" tabindex="-1" role="dialog" style="display: none;">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Add Transaction</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-horizontal">
+
+                        <div class="form-group">
+                            <label class="control-label labels col-md-2 Required">Record Type:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().ComboBox(s =>
+                                   {
+                                       s.Name = "RecordType";
+                                       s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+                                       s.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                                       s.Properties.TextField = "Type";
+                                       s.Properties.ValueField = "TID";
+                                       s.Theme = "MetropolisBlue";
+                                       s.Properties.NullText = "--Select Type--";
+                                       s.ShowModelErrors = true;
+                                       s.ControlStyle.CssClass = "form-control input-sm";
+                                       s.Width = 250;
+                                       s.ControlStyle.ForeColor = Color.Black;
+                                       s.Properties.ClientSideEvents.ValueChanged = "onRecordTypeChange";
+                                   }).BindList(ViewBag.TransactionTypes).GetHtml()
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <div class="form-group">
+                            <label class="control-label labels col-md-2 Required">Expense:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().ComboBox(s =>
+                                   {
+                                       s.Name = "ExpenseType";
+                                       s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+                                       s.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                                       s.Properties.TextField = "Name";
+                                       s.Properties.ValueField = "FID";
+                                       s.Theme = "MetropolisBlue";
+                                       s.Properties.NullText = "--Select Type--";
+                                       s.ShowModelErrors = true;
+                                       s.ControlStyle.CssClass = "form-control input-sm";
+                                       s.Width = 250;
+                                       s.ControlStyle.ForeColor = Color.Black;
+                                       s.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                                   }).BindList(ViewBag.Factors).GetHtml()
+                            </div>
+                            <label class="control-label labels col-md-2 Required">Income:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().ComboBox(s =>
+                           {
+                               s.Name = "IncomeType";
+                               s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+                               s.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                               s.Properties.TextField = "Name";
+                               s.Properties.ValueField = "FID";
+                               s.Theme = "MetropolisBlue";
+                               s.Properties.NullText = "--Select Type--";
+                               s.ShowModelErrors = true;
+                               s.ControlStyle.CssClass = "form-control input-sm";
+                               s.Width = 250;
+                               s.ControlStyle.ForeColor = Color.Black;
+                               s.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                           }).BindList(ViewBag.Factors).GetHtml()
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label labels col-md-2 Required">Amount(Paid):</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().SpinEdit(settings =>
+                               {
+                                   settings.Name = "AmountPaid"; 
+                                   settings.ControlStyle.CssClass = "form-control input-sm";
+                                   settings.ControlStyle.ForeColor = System.Drawing.Color.Black;
+                                   settings.Width = 250;
+                                   settings.Theme = "MetropolisBlue";
+                                   settings.ClientEnabled = false;
+                                   settings.Properties.DisplayFormatInEditMode = true;
+                                   settings.Properties.DisplayFormatString = "c2";
+                                   settings.Properties.SpinButtons.ShowIncrementButtons = false;
+                                   settings.Properties.NumberType = SpinEditNumberType.Float;
+                                   settings.Properties.ClientSideEvents.ValueChanged = "calculateModifiedAmount";
+                               }).GetHtml()
+                            </div>
+                            <label class="control-label labels col-md-2">Amount(Outstanding):</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().SpinEdit(settings =>
+                               {
+                                   settings.Name = "AmountOutstanding"; 
+                                   settings.ControlStyle.CssClass = "form-control input-sm";
+                                   settings.ControlStyle.ForeColor = Color.Black;
+                                   settings.Width = 250;
+                                   settings.Theme = "MetropolisBlue";
+                                   settings.Properties.DisplayFormatInEditMode = true;
+                                   settings.Properties.DisplayFormatString = "c2";
+                                   settings.Properties.SpinButtons.ShowIncrementButtons = false;
+                                   settings.Properties.NumberType = SpinEditNumberType.Float;
+                               }).GetHtml()
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label labels col-md-2 Required">Account:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().ComboBox(s =>
+                           {
+                               s.Name = "Account";
+                               s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+                               s.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                               s.Properties.TextFormatString = "{0}--{1}";
+                               s.Properties.ValueField = "AccountID";
+                               s.Theme = "MetropolisBlue";
+                               s.Properties.NullText = "--Select Account--";
+                               s.ShowModelErrors = true;
+                               s.ControlStyle.CssClass = "form-control input-sm";
+                               s.Width = 250;
+                               s.ControlStyle.ForeColor = Color.Black;
+                               s.Properties.ClientSideEvents.ValueChanged = "displayAmountInBank";
+                               s.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                               s.Properties.Columns.Add("AccountNumber", "Number");
+                               s.Properties.Columns.Add("AccountName", "Name");
+                               s.Properties.Columns.Add("BankName", "Bank");
+                           }).BindList(ViewBag.Accounts).GetHtml()
+                            </div>
+                            <label class="control-label labels col-md-2">Amount in Bank:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().SpinEdit(s =>
+                           {
+                               s.Name = "TransferAmount";
+                               s.Theme = "MetropolisBlue";
+                               s.Width = 250;
+                               s.ReadOnly = true;
+                               s.ControlStyle.CssClass = "form-control input-sm";
+                               s.ControlStyle.ForeColor = Color.Black;
+                               s.Properties.DisplayFormatInEditMode = true;
+                               s.Properties.DisplayFormatString = "c2";
+                               s.Properties.NumberType = SpinEditNumberType.Float;
+                               s.Properties.SpinButtons.ShowIncrementButtons = false;
+                           }).GetHtml()
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label labels col-md-2 Required">Dealer:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().ComboBox(s =>
+                           {
+                               s.Name = "Dealer";
+                               s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+                               s.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                               s.Properties.TextField = "DealerName";
+                               s.Properties.ValueField = "DealerID";
+                               s.Theme = "MetropolisBlue";
+                               s.Properties.NullText = "--Select Dealer--";
+                               s.ShowModelErrors = true;
+                               s.ControlStyle.CssClass = "form-control input-sm";
+                               s.Width = 250;
+                               s.ControlStyle.ForeColor = Color.Black;
+                               s.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                           }).BindList(ViewBag.Dealers).GetHtml()
+                            </div>
+                            <label class="control-label labels col-md-2">Available Amount:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().SpinEdit(s =>
+                           {
+                               s.Name = "ModifiedAmount";
+                               s.Theme = "MetropolisBlue";
+                               s.Width = 250;
+                               s.ReadOnly = true;
+                               s.ControlStyle.CssClass = "form-control input-sm";
+                               s.ControlStyle.ForeColor = Color.Black;
+                               s.Properties.DisplayFormatInEditMode = true;
+                               s.Properties.DisplayFormatString = "c2";
+                               s.Properties.NumberType = SpinEditNumberType.Float;
+                               s.Properties.SpinButtons.ShowIncrementButtons = false;
+                           }).GetHtml()
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label labels col-md-2 Required">Effective Date:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().DateEdit(s =>
+                                   {
+                                       s.Name = "EffectiveDate"; 
+                                       s.Properties.UseMaskBehavior = true;
+                                       s.Properties.EditFormat = EditFormat.Custom;
+                                       s.Properties.EditFormatString = "dd/MM/yyyy";
+                                       s.Properties.DisplayFormatString = "dd/MM/yyyy";
+                                       s.Width = 250;
+                                       s.Theme = "MetropolisBlue";
+                                       s.Properties.NullText = "dd/mm/yyyy";
+                                       s.ControlStyle.CssClass = "form-control input-sm";
+                                       s.ControlStyle.ForeColor = Color.Black;
+                                   }).GetHtml()
+                            </div>
+                            <label class="control-label labels col-md-2 Required">Payment Mode:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().ComboBox(s =>
+                                   {
+                                       s.Name = "PaymentMode";
+                                       s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+                                       s.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                                       s.Properties.Items.Add("Cash");
+                                       s.Properties.Items.Add("Cheque");
+                                       s.Properties.Items.Add("e-Transfer");
+                                       s.Theme = "MetropolisBlue";
+                                       s.Properties.NullText = "--Select Mode--";
+                                       s.ShowModelErrors = true;
+                                       s.ControlStyle.CssClass = "form-control input-sm";
+                                       s.Width = 250;
+                                       s.ControlStyle.ForeColor = Color.Black;
+                                       s.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                                   }).GetHtml()
+                            </div>
+                        </div>
+
+                        <hr />
+                        <div class="form-group">
+                            <label class="control-label labels col-md-2">Description:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().Memo(s =>
+                           {
+                               s.Name = "Description";
+                               s.Theme = "MetropolisBlue";
+                               //s.Properties.Columns = 110;
+                               s.Properties.Rows = 5;
+                               s.ShowModelErrors = true;
+                               s.ControlStyle.CssClass = "form-control input-sm";
+                               s.Width = Unit.Percentage(100);
+                               s.ControlStyle.ForeColor = Color.Black;
+                           }).GetHtml()
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="saveBenefact" type="button" class="btn btn-default" onclick="promptUserBeforeSavingTransaction()"><i class="fa fa-thumbs-up"></i> Save</button>
+                    <button type="button" class="btn btn-default" onclick="promptUserBeforeClosingTransactionModal()"><i class="fa fa-thumbs-down"></i> Cancel</button>
+                </div>
+            </div> <!-- / .modal-content -->
+        </div> <!-- / .modal-dialog -->
+    </div>
+
+    <div id="editTransaction" class="modal fade" tabindex="-1" role="dialog" style="display: none;">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Update Transaction</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-horizontal">
+
+                        <div class="form-group">
+                            <label class="control-label labels col-md-2">ID:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().SpinEdit(s =>
+                           {
+                               s.Name = "E_TransactionID";
+                               s.Theme = "MetropolisBlue";
+                               s.Width = 250;
+                               s.ReadOnly = true;
+                               s.ControlStyle.CssClass = "form-control input-sm disable";
+                               s.ControlStyle.ForeColor = Color.Black;
+                               s.Properties.DisplayFormatInEditMode = true;
+                               s.Properties.DisplayFormatString = "d";
+                               s.Properties.NumberType = SpinEditNumberType.Integer;
+                               s.Properties.SpinButtons.ShowIncrementButtons = false;
+                           }).GetHtml()
+                            </div>
+                            <label class="control-label labels col-md-2 Required">Record Type:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().ComboBox(s =>
+                                   {
+                                       s.Name = "E_RecordType";
+                                       s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+                                       s.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                                       s.Properties.TextField = "Type";
+                                       s.Properties.ValueField = "TID";
+                                       s.Theme = "MetropolisBlue";
+                                       s.Properties.NullText = "--Select Type--";
+                                       s.ShowModelErrors = true;
+                                       s.ControlStyle.CssClass = "form-control input-sm";
+                                       s.Width = 250;
+                                       s.ControlStyle.ForeColor = Color.Black;
+                                       s.Properties.ClientSideEvents.ValueChanged = "onRecordTypeChangeUpdate";
+                                   }).BindList(ViewBag.TransactionTypes).GetHtml()
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <div class="form-group">
+                            <label class="control-label labels col-md-2 Required">Expense:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().ComboBox(s =>
+                                   {
+                                       s.Name = "E_ExpenseType";
+                                       s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+                                       s.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                                       s.Properties.TextField = "Name";
+                                       s.Properties.ValueField = "FID";
+                                       s.Theme = "MetropolisBlue";
+                                       s.Properties.NullText = "--Select Type--";
+                                       s.ShowModelErrors = true;
+                                       s.ControlStyle.CssClass = "form-control input-sm";
+                                       s.Width = 250;
+                                       s.ControlStyle.ForeColor = Color.Black;
+                                       s.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                                   }).BindList(ViewBag.Factors).GetHtml()
+                            </div>
+                            <label class="control-label labels col-md-2 Required">Income:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().ComboBox(s =>
+                           {
+                               s.Name = "E_IncomeType";
+                               s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+                               s.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                               s.Properties.TextField = "Name";
+                               s.Properties.ValueField = "FID";
+                               s.Theme = "MetropolisBlue";
+                               s.Properties.NullText = "--Select Type--";
+                               s.ShowModelErrors = true;
+                               s.ControlStyle.CssClass = "form-control input-sm";
+                               s.Width = 250;
+                               s.ControlStyle.ForeColor = Color.Black;
+                               s.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                           }).BindList(ViewBag.Factors).GetHtml()
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label labels col-md-2 Required">Amount(Paid):</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().SpinEdit(settings =>
+                           {
+                               settings.Name = "E_AmountPaid";
+                               settings.ControlStyle.CssClass = "form-control input-sm";
+                               settings.ControlStyle.ForeColor = System.Drawing.Color.Black;
+                               settings.Width = 250;
+                               settings.Theme = "MetropolisBlue";
+                               settings.ClientEnabled = false;
+                               settings.Properties.DisplayFormatInEditMode = true;
+                               settings.Properties.DisplayFormatString = "c2";
+                               settings.Properties.SpinButtons.ShowIncrementButtons = false;
+                               settings.Properties.NumberType = SpinEditNumberType.Float;
+                               settings.Properties.ClientSideEvents.ValueChanged = "calculateUpdateModifiedAmount";
+                           }).GetHtml()
+                            </div>
+                            <label class="control-label labels col-md-2">Amount(Outstanding):</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().SpinEdit(settings =>
+                           {
+                               settings.Name = "E_AmountOutstanding";
+                               settings.ControlStyle.CssClass = "form-control input-sm";
+                               settings.ControlStyle.ForeColor = Color.Black;
+                               settings.Width = 250;
+                               settings.Theme = "MetropolisBlue";
+                               settings.Properties.DisplayFormatInEditMode = true;
+                               settings.Properties.DisplayFormatString = "c2";
+                               settings.Properties.SpinButtons.ShowIncrementButtons = false;
+                               settings.Properties.NumberType = SpinEditNumberType.Float;
+                           }).GetHtml()
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label labels col-md-2 Required">Account:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().ComboBox(s =>
+                           {
+                               s.Name = "E_Account";
+                               s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+                               s.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                               s.Properties.TextFormatString = "{0}--{1}";
+                               s.Properties.ValueField = "AccountID";
+                               s.Theme = "MetropolisBlue";
+                               s.Properties.NullText = "--Select Account--";
+                               s.ShowModelErrors = true;
+                               s.ControlStyle.CssClass = "form-control input-sm";
+                               s.Width = 250;
+                               s.ControlStyle.ForeColor = Color.Black;
+                               s.Properties.ClientSideEvents.ValueChanged = "displayAmountInBank_Update";
+                               s.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                               s.Properties.Columns.Add("AccountNumber", "Number");
+                               s.Properties.Columns.Add("AccountName", "Name");
+                               s.Properties.Columns.Add("BankName", "Bank");
+                           }).BindList(ViewBag.Accounts).GetHtml()
+                            </div>
+                            <label class="control-label labels col-md-2">Amount in Bank:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().SpinEdit(s =>
+                           {
+                               s.Name = "E_TransferAmount";
+                               s.Theme = "MetropolisBlue";
+                               s.Width = 250;
+                               s.ReadOnly = true;
+                               s.ControlStyle.CssClass = "form-control input-sm";
+                               s.ControlStyle.ForeColor = Color.Black;
+                               s.Properties.DisplayFormatInEditMode = true;
+                               s.Properties.DisplayFormatString = "c2";
+                               s.Properties.NumberType = SpinEditNumberType.Float;
+                               s.Properties.SpinButtons.ShowIncrementButtons = false;
+                           }).GetHtml()
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label labels col-md-2 Required">Dealer:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().ComboBox(s =>
+                           {
+                               s.Name = "E_Dealer";
+                               s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+                               s.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                               s.Properties.TextField = "DealerName";
+                               s.Properties.ValueField = "DealerID";
+                               s.Theme = "MetropolisBlue";
+                               s.Properties.NullText = "--Select Dealer--";
+                               s.ShowModelErrors = true;
+                               s.ControlStyle.CssClass = "form-control input-sm";
+                               s.Width = 250;
+                               s.ControlStyle.ForeColor = Color.Black;
+                               s.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                           }).BindList(ViewBag.Dealers).GetHtml()
+                            </div>
+                            <label class="control-label labels col-md-2">Available Amount:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().SpinEdit(s =>
+                           {
+                               s.Name = "E_ModifiedAmount";
+                               s.Theme = "MetropolisBlue";
+                               s.Width = 250;
+                               s.ReadOnly = true;
+                               s.ControlStyle.CssClass = "form-control input-sm";
+                               s.ControlStyle.ForeColor = Color.Black;
+                               s.Properties.DisplayFormatInEditMode = true;
+                               s.Properties.DisplayFormatString = "c2";
+                               s.Properties.NumberType = SpinEditNumberType.Float;
+                               s.Properties.SpinButtons.ShowIncrementButtons = false;
+                           }).GetHtml()
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label labels col-md-2 Required">Effective Date:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().DateEdit(s =>
+                           {
+                               s.Name = "E_EffectiveDate";
+                               s.Properties.UseMaskBehavior = true;
+                               s.Properties.EditFormat = EditFormat.Custom;
+                               s.Properties.EditFormatString = "dd/MM/yyyy";
+                               s.Properties.DisplayFormatString = "dd/MM/yyyy";
+                               s.Width = 250;
+                               s.Theme = "MetropolisBlue";
+                               s.Properties.NullText = "dd/mm/yyyy";
+                               s.ControlStyle.CssClass = "form-control input-sm";
+                               s.ControlStyle.ForeColor = Color.Black;
+                           }).GetHtml()
+                            </div>
+                            <label class="control-label labels col-md-2 Required">Payment Mode:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().ComboBox(s =>
+                                   {
+                                       s.Name = "E_PaymentMode";
+                                       s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+                                       s.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                                       s.Properties.Items.Add("Cash");
+                                       s.Properties.Items.Add("Cheque");
+                                       s.Properties.Items.Add("e-Transfer");
+                                       s.Theme = "MetropolisBlue";
+                                       s.Properties.NullText = "--Select Mode--";
+                                       s.ShowModelErrors = true;
+                                       s.ControlStyle.CssClass = "form-control input-sm";
+                                       s.Width = 250;
+                                       s.ControlStyle.ForeColor = Color.Black;
+                                       s.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                                   }).GetHtml()
+                            </div>
+                        </div>
+
+                        <hr />
+                        <div class="form-group">
+                            <label class="control-label labels col-md-2">Description:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().Memo(s =>
+                           {
+                               s.Name = "E_Description";
+                               s.Theme = "MetropolisBlue";
+                               //s.Properties.Columns = 110;
+                               s.Properties.Rows = 5;
+                               s.ShowModelErrors = true;
+                               s.ControlStyle.CssClass = "form-control input-sm";
+                               s.Width = Unit.Percentage(100);
+                               s.ControlStyle.ForeColor = Color.Black;
+                           }).GetHtml()
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="saveBenefact" type="button" class="btn btn-default" onclick="promptUserBeforeUpdatingTransaction()"><i class="fa fa-thumbs-up"></i> Update</button>
+                    <button type="button" class="btn btn-default" onclick="promptUserBeforeClosingUpdateTransactionModal()"><i class="fa fa-thumbs-down"></i> Cancel</button>
+                </div>
+            </div> <!-- / .modal-content -->
+        </div> <!-- / .modal-dialog -->
+    </div>
+
+    <div id="viewTransaction" class="modal fade" tabindex="-1" role="dialog" style="display: none;">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">View Transaction</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-horizontal">
+
+                        <div class="form-group">
+                            <label class="control-label labels col-md-2">ID:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().SpinEdit(s =>
+                           {
+                               s.Name = "V_TransactionID";
+                               s.Theme = "MetropolisBlue";
+                               s.Width = 250;
+                               s.ReadOnly = true;
+                               s.ControlStyle.CssClass = "form-control input-sm";
+                               s.ControlStyle.ForeColor = Color.Black;
+                               s.Properties.DisplayFormatInEditMode = true;
+                               s.Properties.DisplayFormatString = "d";
+                               s.Properties.NumberType = SpinEditNumberType.Integer;
+                               s.Properties.SpinButtons.ShowIncrementButtons = false;
+                           }).GetHtml()
+                            </div>
+                            <label class="control-label labels col-md-2 Required">Record Type:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().ComboBox(s =>
+                                   {
+                                       s.Name = "V_RecordType";
+                                       s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+                                       s.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                                       s.Properties.TextField = "Type";
+                                       s.Properties.ValueField = "TID";
+                                       s.Theme = "MetropolisBlue";
+                                       s.Properties.NullText = "--Select Type--";
+                                       s.ShowModelErrors = true;
+                                       s.ReadOnly = true;
+                                       s.ControlStyle.CssClass = "form-control input-sm";
+                                       s.Width = 250;
+                                       s.ControlStyle.ForeColor = Color.Black;
+                                   }).BindList(ViewBag.TransactionTypes).GetHtml()
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <div class="form-group">
+                            <label class="control-label labels col-md-2 Required">Expense:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().ComboBox(s =>
+                                   {
+                                       s.Name = "V_ExpenseType";
+                                       s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+                                       s.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                                       s.Properties.TextField = "Name";
+                                       s.Properties.ValueField = "FID";
+                                       s.Theme = "MetropolisBlue";
+                                       s.Properties.NullText = "--Select Type--";
+                                       s.ShowModelErrors = true;
+                                       s.ControlStyle.CssClass = "form-control input-sm";
+                                       s.Width = 250;
+                                       s.ReadOnly = true;
+                                       s.ControlStyle.ForeColor = Color.Black;
+                                       s.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                                   }).BindList(ViewBag.Factors).GetHtml()
+                            </div>
+                            <label class="control-label labels col-md-2 Required">Income:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().ComboBox(s =>
+                           {
+                               s.Name = "V_IncomeType";
+                               s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+                               s.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                               s.Properties.TextField = "Name";
+                               s.Properties.ValueField = "FID";
+                               s.Theme = "MetropolisBlue";
+                               s.Properties.NullText = "--Select Type--";
+                               s.ShowModelErrors = true;
+                               s.ControlStyle.CssClass = "form-control input-sm";
+                               s.Width = 250;
+                               s.ReadOnly = true;
+                               s.ControlStyle.ForeColor = Color.Black;
+                               s.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                           }).BindList(ViewBag.Factors).GetHtml()
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label labels col-md-2 Required">Amount(Paid):</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().SpinEdit(settings =>
+                           {
+                               settings.Name = "V_AmountPaid";
+                               settings.ControlStyle.CssClass = "form-control input-sm";
+                               settings.ControlStyle.ForeColor = System.Drawing.Color.Black;
+                               settings.Width = 250;
+                               settings.Theme = "MetropolisBlue";
+                               settings.ClientEnabled = false;
+                               settings.ReadOnly = true;
+                               settings.Properties.DisplayFormatInEditMode = true;
+                               settings.Properties.DisplayFormatString = "c2";
+                               settings.Properties.SpinButtons.ShowIncrementButtons = false;
+                               settings.Properties.NumberType = SpinEditNumberType.Float;
+                           }).GetHtml()
+                            </div>
+                            <label class="control-label labels col-md-2">Amount(Outstanding):</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().SpinEdit(settings =>
+                           {
+                               settings.Name = "V_AmountOutstanding";
+                               settings.ControlStyle.CssClass = "form-control input-sm";
+                               settings.ControlStyle.ForeColor = Color.Black;
+                               settings.Width = 250;
+                               settings.ReadOnly = true;
+                               settings.Theme = "MetropolisBlue";
+                               settings.Properties.DisplayFormatInEditMode = true;
+                               settings.Properties.DisplayFormatString = "c2";
+                               settings.Properties.SpinButtons.ShowIncrementButtons = false;
+                               settings.Properties.NumberType = SpinEditNumberType.Float;
+                           }).GetHtml()
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label labels col-md-2 Required">Account:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().ComboBox(s =>
+                           {
+                               s.Name = "V_Account";
+                               s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+                               s.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                               s.Properties.TextFormatString = "{0}--{1}";
+                               s.Properties.ValueField = "AccountID";
+                               s.Theme = "MetropolisBlue";
+                               s.Properties.NullText = "--Select Account--";
+                               s.ShowModelErrors = true;
+                               s.ReadOnly = true;
+                               s.ControlStyle.CssClass = "form-control input-sm";
+                               s.Width = 250;
+                               s.ControlStyle.ForeColor = Color.Black;
+                               s.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+                               s.Properties.Columns.Add("AccountNumber", "Number");
+                               s.Properties.Columns.Add("AccountName", "Name");
+                               s.Properties.Columns.Add("BankName", "Bank");
+                           }).BindList(ViewBag.Accounts).GetHtml()
+                            </div>
+                            <label class="control-label labels col-md-2">Amount in Bank:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().SpinEdit(s =>
+                           {
+                               s.Name = "V_TransferAmount";
+                               s.Theme = "MetropolisBlue";
+                               s.Width = 250;
+                               s.ReadOnly = true;
+                               s.ControlStyle.CssClass = "form-control input-sm";
+                               s.ControlStyle.ForeColor = Color.Black;
+                               s.Properties.DisplayFormatInEditMode = true;
+                               s.Properties.DisplayFormatString = "c2";
+                               s.Properties.NumberType = SpinEditNumberType.Float;
+                               s.Properties.SpinButtons.ShowIncrementButtons = false;
+                           }).GetHtml()
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label labels col-md-2 Required">Dealer:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().ComboBox(s =>
+                           {
+                               s.Name = "V_Dealer";
+                               s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+                               s.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                               s.Properties.TextField = "DealerName";
+                               s.Properties.ValueField = "DealerID";
+                               s.Theme = "MetropolisBlue";
+                               s.Properties.NullText = "--Select Dealer--";
+                               s.ShowModelErrors = true;
+                               s.ControlStyle.CssClass = "form-control input-sm";
+                               s.Width = 250;
+                               s.ControlStyle.ForeColor = Color.Black;
+                               s.ReadOnly = true;
+                               s.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                           }).BindList(ViewBag.Dealers).GetHtml()
+                            </div>
+                            <label class="control-label labels col-md-2">Available Amount:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().SpinEdit(s =>
+                           {
+                               s.Name = "V_ModifiedAmount";
+                               s.Theme = "MetropolisBlue";
+                               s.Width = 250;
+                               s.ReadOnly = true;
+                               s.ReadOnly = true;
+                               s.ControlStyle.CssClass = "form-control input-sm";
+                               s.ControlStyle.ForeColor = Color.Black;
+                               s.Properties.DisplayFormatInEditMode = true;
+                               s.Properties.DisplayFormatString = "c2";
+                               s.Properties.NumberType = SpinEditNumberType.Float;
+                               s.Properties.SpinButtons.ShowIncrementButtons = false;
+                           }).GetHtml()
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label labels col-md-2 Required">Effective Date:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().DateEdit(s =>
+                           {
+                               s.Name = "V_EffectiveDate";
+                               s.Properties.UseMaskBehavior = true;
+                               s.Properties.EditFormat = EditFormat.Custom;
+                               s.Properties.EditFormatString = "dd/MM/yyyy";
+                               s.Properties.DisplayFormatString = "dd/MM/yyyy";
+                               s.Width = 250;
+                               s.Theme = "MetropolisBlue";
+                               s.ReadOnly = true;
+                               s.Properties.NullText = "dd/mm/yyyy";
+                               s.ControlStyle.CssClass = "form-control input-sm";
+                               s.ControlStyle.ForeColor = Color.Black;
+                           }).GetHtml()
+                            </div>
+                            <label class="control-label labels col-md-2 Required">Payment Mode:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().ComboBox(s =>
+                                   {
+                                       s.Name = "V_PaymentMode";
+                                       s.Properties.IncrementalFilteringMode = IncrementalFilteringMode.StartsWith;
+                                       s.Properties.DropDownStyle = DropDownStyle.DropDownList;
+                                       s.Properties.Items.Add("Cash");
+                                       s.Properties.Items.Add("Cheque");
+                                       s.Properties.Items.Add("e-Transfer");
+                                       s.Theme = "MetropolisBlue";
+                                       s.Properties.NullText = "--Select Mode--";
+                                       s.ShowModelErrors = true;
+                                       s.ReadOnly = true;
+                                       s.ControlStyle.CssClass = "form-control input-sm";
+                                       s.Width = 250;
+                                       s.ControlStyle.ForeColor = Color.Black;
+                                       s.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+                                   }).GetHtml()
+                            </div>
+                        </div>
+
+                        <hr />
+                        <div class="form-group">
+                            <label class="control-label labels col-md-2">Description:</label>
+                            <div class="col-md-4">
+                                @Html.DevExpress().Memo(s =>
+                                   {
+                                       s.Name = "V_Description";
+                                       s.Theme = "MetropolisBlue";
+                                       s.Properties.Rows = 5;
+                                       s.ShowModelErrors = true;
+                                       s.ReadOnly = true;
+                                       s.ControlStyle.CssClass = "form-control input-sm";
+                                       s.Width = Unit.Percentage(100);
+                                       s.ControlStyle.ForeColor = Color.Black;
+                                   }).GetHtml()
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" onclick="CloseViewModal()" class="btn btn-default"><i class="fa fa-times"></i> Close</button>
+                </div>
+            </div> <!-- / .modal-content -->
+        </div> <!-- / .modal-dialog -->
+    </div>
+
+
+    <div class="panel-body" style="background-color:#ffffff !important;">
+        <div class="col-md-12">
+            <div class="" style="overflow-x:auto">
+                <div class="table-responsive">
+                    <a style="color:#000; font-weight:bold; margin-right:0px;" id="helperText">[Total rows selected:]</a>
+                    <a style="color:#000;font-weight:bold; margin-right:20px;" id="recordCount"></a>
+                    @Html.Action("TransactionGridViewPartial")
+                </div>
+            </div>
+        </div>
+    </div>
+</div><!--Panel -->
